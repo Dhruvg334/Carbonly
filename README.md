@@ -185,7 +185,6 @@ git clone https://github.com/yourusername/carbonly.git
 cd carbonly
 ```
 
----
 
 ## 2 Install Backend Dependencies
 
