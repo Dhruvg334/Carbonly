@@ -1,0 +1,336 @@
+body {
+  margin: 0;
+}
+.nav-link {
+  text-decoration: none;
+  color: black;
+  margin-left: 30px;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: #2e7d32;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 14px;
+  padding-right: 45px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  outline: none;
+}
+
+.eye {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+}
+ 
+.top-strip {
+  width: 100%;
+  height: 70px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 80px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid #eee;
+  z-index: 1000;
+}
+
+.container {
+  margin-top: 60px;
+}
+
+.strip-left span {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.strip-right span {
+  margin-left: 30px;
+  cursor: pointer;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background: #f7fdf8;
+  overflow-x: hidden;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 60px;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1b5e20;
+}
+
+/* LAYOUT */
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT IMAGE */
+.image-section {
+  flex: 1;
+  background: url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6") no-repeat center center;
+  background-size: cover;
+  height: 100vh;
+  position: relative;
+}
+
+
+.overlay-text {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  font-size: 40px;
+  color: white;
+  font-weight: 300;
+}
+
+.overlay-text span {
+  font-weight: 600;
+}
+
+.image-section {
+  flex: 1;
+  background-position: center bottom;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.login-box {
+  width: 340px;
+  text-align: center;
+  margin: auto;
+}
+
+
+.login-box h2 {
+  font-size: 40px;
+  margin-bottom: 30px;
+  color: #2e7d32;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  outline: none;
+}
+
+.login-box input:focus {
+  border-color: #2e7d32;
+}
+
+.login-box button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 30px;
+  border: 1px solid #1b5e20;
+  background: transparent;
+  color: #1b5e20;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-section {
+  flex: 1;
+  background: #eaf5ec;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+
+.forgot {
+  display: block;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+  text-decoration: none;
+}
+
+.signup {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.signup span {
+  color: #2e7d32;
+  cursor: pointer;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  width: 600px;
+  max-width: 90%;
+  padding: 50px;
+  border-radius: 20px;
+  position: relative;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  color: #2e7d32;
+}
+
+.modal-content p {
+  margin-bottom: 15px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.close-btn {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 22px;
+  cursor: pointer;
+}
+ 
+
+@keyframes fadeIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-content {
+  background: white;
+  width: 600px;
+  max-width: 90%;
+  padding: 60px;
+  border-radius: 25px;
+  position: relative;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+}
+
+.modal-decor-top {
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle at center, #a5d6a7 0%, transparent 70%);
+  filter: blur(50px);
+  opacity: 0.6;
+  z-index: 0;
+}
+
+.modal-decor-bottom {
+  position: absolute;
+  bottom: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle at center, #c8e6c9 0%, transparent 70%);
+  filter: blur(50px);
+  opacity: 0.6;
+  z-index: 0;
+}
+
+
+.leaf {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #4caf50;
+  border-radius: 50% 50% 0 50%;
+  transform: rotate(45deg);
+  animation: grow 2s ease-out forwards;
+  pointer-events: none;
+}
+
+.overlay-text {
+  position: absolute;
+  bottom: 60px;
+  left: 60px;
+  font-size: 42px;
+  color: white;
+  font-weight: 300;
+  text-shadow: 0px 5px 14px rgba(0, 60, 25, 0.55);
+
+}
+
+.nav-link {
+  text-decoration: none;
+  color: inherit;   /* parent ka same color use karega */
+}
+
+.nav-link:hover {
+  color: inherit;   /* hover pe bhi change nahi hoga */
+}
+
+
+@keyframes grow {
+  0% {
+    transform: scale(0.3) rotate(45deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+.top-strip .logo {
+  font-size: 14 px;
+  font-weight: 630;
+  color: #2e7d32;
+  text-decoration: none;
+  letter-spacing: 0px;
+  margin-left: 3px;
+}

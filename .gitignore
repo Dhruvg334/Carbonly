@@ -1,0 +1,16 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS junk files
+.DS_Store
+Thumbs.db
+
+# Optional
+package-lock.json

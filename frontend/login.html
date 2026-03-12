@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CarbonDash Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="login.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="top-strip">
+
+  <!-- LEFT SIDE (Website Name = Home Link) -->
+  <div class="strip-left">
+    <a href="index.html" class="logo">
+      Carbonly
+    </a>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="strip-right">
+    <span id="purposeBtn" class="nav-link">Know Our Purpose</span>
+    <span id="aboutBtn" class="nav-link">About Us</span>
+  </div>
+
+</div>
+
+<div class="container">
+
+  <!-- LEFT IMAGE SECTION -->
+  <div class="image-section">
+    <div class="overlay-text">
+      It’s time to invest in your <span>PLANET.</span>
+    </div>
+  </div>
+
+  <!-- RIGHT LOGIN SECTION -->
+  <div class="login-section">
+    <div class="login-box">
+
+      <h2>Login</h2>
+
+      <form action="/login" method="POST">
+
+        <input 
+          type="text" 
+          name="username"
+          placeholder="Username"
+          required
+        >
+
+        <div class="password-wrapper">
+          <input 
+            type="password" 
+            id="password" 
+            name="password"
+            placeholder="Password"
+            required
+          >
+          <span id="togglePassword" class="eye"></span>
+        </div>
+
+        <button type="submit">Sign In</button>
+
+      </form>
+
+      <a href="forgot-password.html" class="forgot">
+        Forgot your password?
+      </a>
+
+      <p class="signup">
+        Don't have an account?
+        <a href="signup.html"><font color="green">Sign up!</font></a>
+      </p>
+
+    </div>
+  </div>
+
+</div>
+
+
+<script src="login.js"></script>
+
+
+<!-- PURPOSE MODAL -->
+<div class="modal" id="purposeModal">
+  <div class="modal-content">
+
+    <div class="modal-decor-top"></div>
+    <div class="modal-decor-bottom"></div>
+
+    <span class="close-btn" id="closeModal">&times;</span>
+
+    <h2>Why Track Carbon Footprint?</h2>
+
+    <p>
+      Tracking our carbon footprint is essential in understanding the
+      environmental impact of our daily actions. Every choice we make —
+      from transportation to energy consumption — contributes to global emissions.
+    </p>
+
+    <p>
+      By individually monitoring and reducing our footprint, we create
+      collective impact. Small consistent actions multiply into meaningful
+      environmental change.
+    </p>
+
+    <p>
+      This platform empowers individuals to become climate-conscious
+      decision makers and actively participate in building a sustainable future.
+    </p>
+
+  </div>
+</div>
+
+
+<!-- ABOUT MODAL -->
+<div class="modal" id="aboutModal">
+  <div class="modal-content">
+
+    <div class="modal-decor-top"></div>
+    <div class="modal-decor-bottom"></div>
+
+    <span class="close-btn" id="closeAbout">&times;</span>
+
+    <h2>About Carbonly</h2>
+
+    <p>
+      Carbonly is a web-based platform designed to help individuals
+      monitor and reduce their carbon footprint by tracking their
+      weekly lifestyle activities.
+    </p>
+
+    <p>
+      Users enter information such as transportation distance,
+      electricity usage, water consumption, and air travel.
+      The system processes this data and estimates carbon emissions
+      using a machine learning model.
+    </p>
+
+    <p>
+      The platform then visualizes carbon trends and provides
+      AI-based recommendations to help users adopt more
+      sustainable habits.
+    </p>
+
+    <p>
+      This project integrates modern web technologies,
+      machine learning, and data analytics to promote
+      environmental awareness and responsible living.
+    </p>
+
+  </div>
+</div>
+
+</body>
+</html>
