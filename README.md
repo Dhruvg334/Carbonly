@@ -298,7 +298,7 @@ Potential upgrades for the system include:
 Backend Development, Authentication System (JWT & bcrypt), MongoDB Database Integration, Dashboard Logic Implementation, Carbon Emission Graph Integration (Chart.js)
 
 **Akshhaya Isa**  
-Frontend Development, UI/UX Design, Dynamic Animations, Homepage Design, Dashboard Interface
+Frontend Development, UI/UX Design, Dynamic Animations,  Dashboard Interface, Homepage Design
 
 **Shubhangini Mehta**  
 Machine Learning Model Development for Carbon Emission Prediction
