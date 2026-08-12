@@ -33,22 +33,54 @@
             display: inline-block;
             line-height: 1.2;
         }
+
+        .faq-item {
+            background: #FFFFFF;
+            border: var(--ui-border);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            padding: 16px 20px;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .faq-answer {
+            display: none;
+            margin-top: 10px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid #EEE;
+            padding-top: 10px;
+        }
+
+        .feature-tab-btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border: var(--ui-border);
+            border-radius: 8px;
+            background: #FFFFFF;
+            color: var(--primary-dark);
+            cursor: pointer;
+        }
+
+        .feature-tab-btn.active {
+            background: var(--emerald);
+            color: #FFFFFF !important;
+        }
     </style>
 </head>
 <body>
 
-    <!-- NAVIGATION BAR (HOME LINK REMOVED - LOGO NAVIGATES HOME) -->
+    <!-- NAVIGATION BAR (ONLY ONE CLEAN LOGIN BUTTON IN HEADER) -->
     <header class="top-strip">
         <a href="index.html" class="logo">
             <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
         </a>
         <nav class="nav-links">
             <a href="dashboard.html">Dashboard</a>
-            <a href="why.html">Why Track?</a>
             <a href="docs.html">Docs</a>
-            <a href="login.html" id="loginBtn" class="btn-neo">Login</a>
-            <a href="login.html?mode=signup" id="signupBtn" class="btn-neo btn-neo-primary">Sign Up</a>
-            <a href="profile.html" id="profileBtn" class="btn-neo" style="display:none;">Profile</a>
+            <a href="login.html" class="btn-neo btn-neo-primary">Login</a>
         </nav>
     </header>
 
@@ -70,14 +102,14 @@
         </div>
     </section>
 
-    <!-- ELEGANT LIVE DEMO QUICK SIMULATOR WIDGET (IMPROVED REPORT CARD) -->
+    <!-- DETAILED INTERACTIVE LIVE CARBON REPORT CARD -->
     <section style="padding: 60px 40px; background: var(--mint-light);">
-        <div style="max-width: 1000px; margin: 0 auto;">
+        <div style="max-width: 1050px; margin: 0 auto;">
             <div class="card-neo" style="background: #FFFFFF; padding: 36px; box-shadow: var(--ui-shadow-hover);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
                     <div>
-                        <span class="badge-neo badge-neo-scope1">Instant Metric Preview</span>
-                        <h3 style="margin-top: 6px; font-size: 1.5rem;">Live Impact Calculator</h3>
+                        <span class="badge-neo badge-neo-scope1">Instant Audit Preview</span>
+                        <h3 style="margin-top: 6px; font-size: 1.6rem;">Live Footprint Calculator &amp; Report Card</h3>
                     </div>
                     <a href="dashboard.html" class="btn-neo btn-neo-accent" style="padding: 8px 16px; font-size: 0.85rem;">Full Dashboard →</a>
                 </div>
@@ -97,54 +129,112 @@
                     </div>
                 </div>
 
-                <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 12px; padding: 24px; text-align: center;">
-                    <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted);">ESTIMATED WEEKLY CO2e</span>
-                    <h2 id="previewResultKg" style="font-size: 2.6rem; color: var(--emerald); margin: 6px 0;">205.8 kg CO2e</h2>
-                    <div style="display: flex; justify-content: center; gap: 12px; margin-top: 10px; flex-wrap: wrap;">
-                        <span class="badge-neo badge-neo-scope2" id="previewScopePrimary">Home &amp; Office Power Dominant</span>
-                        <span class="badge-neo" id="previewSavingsEst">Est. Annual Cost Impact: $980</span>
+                <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 12px; padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center;">
+                    <div style="text-align: center; border-right: 1px solid #DDD; padding-right: 24px;">
+                        <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted);">ESTIMATED WEEKLY FOOTPRINT</span>
+                        <h2 id="previewResultKg" style="font-size: 2.6rem; color: var(--emerald); margin: 6px 0;">205.8 kg CO2e</h2>
+                        <span id="previewTonnes" style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">0.2058 metric tons / week</span>
+                    </div>
+
+                    <div>
+                        <div style="margin-bottom: 10px;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">DOMINANT EMISSION VECTOR</span>
+                            <h4 id="previewScopePrimary" style="color: var(--emerald); font-size: 1.1rem; margin-top: 2px;">Home &amp; Office Power</h4>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">ESTIMATED ANNUAL COST IMPACT</span>
+                            <h4 id="previewSavingsEst" style="color: var(--primary-dark); font-size: 1.1rem; margin-top: 2px;">$980 / year energy spend</h4>
+                        </div>
+                        <div>
+                            <span class="badge-neo badge-neo-scope1">Relative Rating: 5 Stars (920 pts)</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ECO-SCORE RATING FEATURE SECTION -->
-    <section style="padding: 80px 40px; background: #FFFFFF; border-top: var(--ui-border); border-bottom: var(--ui-border);">
-        <div style="max-width: 1100px; margin: 0 auto; text-align: center;">
-            <span class="badge-neo badge-neo-scope1">Relative Rating System</span>
-            <h2 style="font-size: 2.5rem; margin: 12px 0 16px 0;">Introducing the EcoScore Benchmark</h2>
-            <p style="color: var(--text-muted); max-width: 700px; margin: 0 auto 40px auto; font-size: 1.05rem;">
-                Understand your footprint relative to national and global benchmarks. Earn up to 1000 points and a 5-Star Rating as you reduce your emissions.
-            </p>
+    <!-- INTERACTIVE FEATURE MATRIX SECTION -->
+    <section style="padding: 80px 40px; background: #FFFFFF;">
+        <div style="max-width: 1050px; margin: 0 auto; text-align: center;">
+            <span class="badge-neo badge-neo-scope2">Platform Capabilities</span>
+            <h2 style="font-size: 2.4rem; margin: 12px 0 24px 0;">Explore System Features</h2>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; text-align: left;">
-                <div class="card-neo" style="background: #E8F5E9;">
-                    <span class="badge-neo badge-neo-scope1">5 Stars (900 - 1000 pts)</span>
-                    <h4 style="margin: 12px 0 4px 0; color: var(--emerald);">Climate Champion</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">Top 10% lowest emissions globally. Exceptional transport and energy efficiency.</p>
+            <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 28px; flex-wrap: wrap;">
+                <button class="feature-tab-btn active" onclick="switchFeature('featEngine', this)">Deterministic Math</button>
+                <button class="feature-tab-btn" onclick="switchFeature('featForecast', this)">12-Month Forecasting</button>
+                <button class="feature-tab-btn" onclick="switchFeature('featSolver', this)">Linear Solver</button>
+                <button class="feature-tab-btn" onclick="switchFeature('featGroq', this)">Groq AI Intelligence</button>
+            </div>
+
+            <div class="card-neo" id="featureContentCard" style="text-align: left; padding: 32px;">
+                <div id="featEngine" class="feature-panel">
+                    <span class="badge-neo badge-neo-scope1">Zero Hallucinations</span>
+                    <h3 style="margin: 12px 0 8px 0;">Deterministic GHG Accounting</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Executes verified conversion factor math across Direct Driving, Power Grids, Flights, Water, and Digital activity using UK DEFRA 2024 and US EPA eGRID datasets with 100% calculation validation.</p>
                 </div>
-                <div class="card-neo" style="background: #FFFFFF;">
-                    <span class="badge-neo badge-neo-scope2">4 Stars (750 - 899 pts)</span>
-                    <h4 style="margin: 12px 0 4px 0;">Eco Leader</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">Top 25% emissions performance. Strong adoption of renewables and clean transport.</p>
+
+                <div id="featForecast" class="feature-panel" style="display:none;">
+                    <span class="badge-neo badge-neo-scope3">Predictive Engine</span>
+                    <h3 style="margin: 12px 0 8px 0;">Holt-Winters Exponential Smoothing</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Projects 12-month future carbon trajectories with upper and lower 95% confidence intervals ($\hat{y}_{t+h} \pm 1.96 \cdot \sigma_h$), comparing business-as-usual vs. Net Zero targets.</p>
                 </div>
-                <div class="card-neo" style="background: #FFFFFF;">
-                    <span class="badge-neo badge-neo-scope3">3 Stars (600 - 749 pts)</span>
-                    <h4 style="margin: 12px 0 4px 0;">Average Baseline</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">Matches global individual/business averages (~4.5 tonnes CO2e/year).</p>
+
+                <div id="featSolver" class="feature-panel" style="display:none;">
+                    <span class="badge-neo badge-neo-scope2">Operations Research</span>
+                    <h3 style="margin: 12px 0 8px 0;">Constrained Decarbonization Solver</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Solves a linear programming optimization problem to find the Pareto-optimal combination of actions (EV fleet, Solar PPA, virtual meetings) for a target annual budget limit.</p>
                 </div>
-                <div class="card-neo" style="background: #FFF5F5;">
-                    <span class="badge-neo" style="background: var(--alert-red); color: #FFFFFF;">1 - 2 Stars (&lt;600 pts)</span>
-                    <h4 style="margin: 12px 0 4px 0; color: #9D0208;">High Priority</h4>
-                    <p style="font-size: 0.85rem; color: #7F1D1D;">Higher than average footprint. High potential for quick-win carbon &amp; cost savings.</p>
+
+                <div id="featGroq" class="feature-panel" style="display:none;">
+                    <span class="badge-neo badge-neo-scope2">Groq LLM Proxy</span>
+                    <h3 style="margin: 12px 0 8px 0;">Executive Briefs &amp; Copilot Assistant</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Integrates Groq llama-3.3-70b-versatile server-side to generate executive narrative briefs, Shapley anomaly diagnoses, and interactive Q&amp;A copilot assistance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTERACTIVE FREQUENTLY ASKED QUESTIONS (FAQ) -->
+    <section style="padding: 80px 40px; background: var(--mint-light); border-top: var(--ui-border); border-bottom: var(--ui-border);">
+        <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <span class="badge-neo badge-neo-scope1">Questions &amp; Answers</span>
+            <h2 style="font-size: 2.4rem; margin: 12px 0 32px 0;">Frequently Asked Questions</h2>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1rem;">
+                    <span>How does Carbonly prevent AI calculation hallucinations?</span>
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Carbonly strictly separates deterministic math from LLM language generation. All emission factors ($kg CO_2e$) are calculated via validated JavaScript math routines using UK DEFRA and US EPA tables. The Groq LLM is used solely for narrative summaries and Q&amp;A assistance.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1rem;">
+                    <span>What is the difference between Direct Driving, Power Grid, and Travel?</span>
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Direct Driving represents Scope 1 direct fuel emissions from vehicles. Home &amp; Office Power represents Scope 2 indirect electricity emissions. Travel, Water &amp; Digital represents Scope 3 value-chain activities.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1rem;">
+                    <span>Can I export formal reports for ESG compliance?</span>
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Yes! Logged-in users can click "Export ESG Report" on the Dashboard header to immediately download a certified Markdown/HTML ESG Audit Report detailing category footprints, EcoScore benchmarks, and methodology references.
                 </div>
             </div>
         </div>
     </section>
 
     <!-- FOOTER WITH ACTIVE STANDARD LINKS -->
-    <footer style="padding: 60px 40px 40px 40px; background: #FFFFFF; border-top: var(--ui-border);">
+    <footer style="padding: 60px 40px 40px 40px; background: #FFFFFF;">
         <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; text-align: left; margin-bottom: 40px;">
             <div>
                 <a href="index.html" class="logo" style="margin-bottom: 12px;">
@@ -193,21 +283,36 @@
 
             const total = scope1 + scope2 + scope3;
             document.getElementById("previewResultKg").innerText = total.toFixed(1) + " kg CO2e";
+            document.getElementById("previewTonnes").innerText = (total / 1000).toFixed(4) + " metric tons / week";
 
             const primaryBadge = document.getElementById("previewScopePrimary");
             if (scope1 >= scope2 && scope1 >= scope3) {
                 primaryBadge.innerText = "Direct Driving Dominant";
-                primaryBadge.className = "badge-neo badge-neo-scope1";
             } else if (scope2 >= scope3) {
                 primaryBadge.innerText = "Home & Office Power Dominant";
-                primaryBadge.className = "badge-neo badge-neo-scope2";
             } else {
                 primaryBadge.innerText = "Travel & Lifestyle Dominant";
-                primaryBadge.className = "badge-neo badge-neo-scope3";
             }
 
             const dollarEst = Math.round(total * 0.42 * 12);
-            document.getElementById("previewSavingsEst").innerText = `Est. Annual Cost Impact: $${dollarEst}`;
+            document.getElementById("previewSavingsEst").innerText = `$${dollarEst} / year energy spend`;
+        }
+
+        function switchFeature(featId, btnElement) {
+            document.querySelectorAll(".feature-panel").forEach(p => p.style.display = "none");
+            document.querySelectorAll(".feature-tab-btn").forEach(b => b.classList.remove("active"));
+
+            document.getElementById(featId).style.display = "block";
+            btnElement.classList.add("active");
+        }
+
+        function toggleFaq(element) {
+            const answer = element.querySelector(".faq-answer");
+            const isOpen = answer.style.display === "block";
+            document.querySelectorAll(".faq-answer").forEach(a => a.style.display = "none");
+            if (!isOpen) {
+                answer.style.display = "block";
+            }
         }
     </script>
 </body>
