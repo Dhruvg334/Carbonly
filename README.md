@@ -22,7 +22,7 @@ Carbonly solves this by executing all calculations via a **100% deterministic ma
 ```mermaid
 graph TD
     A[Enterprise Activity Data] -->|ERP / CSV / Utility APIs| B[Ingestion & Normalization Layer]
-    B -->|Schema Validation & Guardrails| C[(Canonical Activity DB: ActivityRecord)]
+    B -->|Schema Validation & Feature Normalization| C[(Canonical Activity DB: ActivityRecord)]
     C --> D[Factor Resolver & Registry Gateway]
     E[Emission Factor Registry - EFR] -->|Versioned Factor Metadata| D
     F[Methodology Registry] -->|GHG Boundary Specifications| D
@@ -148,7 +148,7 @@ graph LR
 
 ---
 
-### E. Uncertainty Propagation & Data Quality Confidence Score
+### E. Analytical Uncertainty Propagation & Data Quality Confidence Scoring
 
 #### 1. Analytical Uncertainty Propagation Equation
 Activity measurements contain statistical measurement error. Carbonly propagates analytical uncertainty using a weighted variance sum:
@@ -170,8 +170,9 @@ $$\text{Confidence Score} = 100\% - \text{Penalty}_{\text{missing}} - \text{Pena
 
 ---
 
-### F. Data Ingestion Validation & Canonical Activity Data Model
-Raw incoming API and CSV payloads pass through `ingestionValidator.js` for schema validation, deduplication key checks, range check guardrails, and canonical unit conversion (e.g., miles $\rightarrow$ km, Wh $\rightarrow$ kWh).
+### F. Data Ingestion Validation & Canonical Feature Engineering
+
+Raw incoming API and CSV payloads pass through `ingestionValidator.js` for schema validation, deduplication key checks, range check guardrails, and feature normalization (e.g., miles $\rightarrow$ km, Wh $\rightarrow$ kWh).
 
 #### Canonical `ActivityRecord` JSON Schema:
 ```json
@@ -192,9 +193,9 @@ Raw incoming API and CSV payloads pass through `ingestionValidator.js` for schem
 
 ---
 
-### G. Holt-Winters Forecasting & Empirical Backtesting Validation
+### G. Time-Series Forecasting & Model Comparison Benchmarking
 
-Future emissions are projected using additive Holt-Winters exponential smoothing:
+Future emissions are projected using additive Holt-Winters exponential smoothing, benchmarked against a **Seasonal Naive Baseline** model:
 
 $$\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1} + b_{t-1})$$
 
@@ -212,7 +213,19 @@ $$\text{CI}_{95\%} = \hat{y}_{t+h} \pm 1.96 \cdot \hat{\sigma}_e \sqrt{1 + \sum_
 
 ---
 
-### H. Corrected Constrained Decarbonization Linear Solver
+### H. Statistical Anomaly Detection & Error Analysis
+
+Carbonly monitors operational consumption streams for statistical anomalies ($Z > 2.0$) and performs residual error analysis ($\text{Residual} = \text{Actual} - \text{Expected}$):
+
+$$Z = \frac{y_t - \mu}{\sigma}$$
+
+When an anomaly is detected, Carbonly executes **Shapley-inspired contribution attribution** to isolate the root variance driver:
+
+$$\text{Contribution}_k = \frac{\Delta x_k}{\sum_{j} \Delta x_j}$$
+
+---
+
+### I. Operations Research & Decarbonization Linear Solver
 
 The slider optimization engine formulates a linear program to **maximize carbon emissions avoided** subject to an annual target capital budget:
 
@@ -230,7 +243,7 @@ Where:
 
 ---
 
-### I. Evidence-Grounded AI Reasoning Layer
+### J. Evidence-Grounded AI Reasoning Layer
 
 The Groq LLM (`llama-3.3-70b-versatile`) acts purely as a reasoning interface over an **Evidence Store** containing verified calculation proofs (`calc_83a91f`). If evidence is insufficient, the LLM provides an evidence-aware refusal: *"The available activity records do not establish the operational root cause."*
 
@@ -256,8 +269,8 @@ To guarantee mathematical audit rigor, Carbonly’s deterministic calculation en
 
 | Validation Metric | Benchmark Value | Technical Description |
 |---|---|---|
-| **Reference Test Vectors** | 24 Automated Unit Tests | Verified against official DEFRA & EPA test cases |
-| **Passed Test Cases** | 24 / 24 (100% Pass Rate) | Native Node.js test runner execution |
+| **Reference Test Vectors** | 25 Automated Unit Tests | Verified against official DEFRA & EPA test cases |
+| **Passed Test Cases** | 25 / 25 (100% Pass Rate) | Native Node.js test runner execution |
 | **Max Absolute Error** | $0.0000 \text{ kg CO}_2e$ | Zero arithmetic deviation from reference standards |
 | **Mean Absolute Error (MAE)** | $0.0000 \text{ kg CO}_2e$ | Exact floating-point calculation match |
 | **Tolerance Boundary** | $\pm 10^{-6} \text{ kg CO}_2e$ | Strict numerical floating-point boundary |
@@ -270,7 +283,7 @@ To guarantee mathematical audit rigor, Carbonly’s deterministic calculation en
 Carbonly/
 ├── backend/
 │   ├── routes/
-│   │   ├── auth.js            # User registration & JWT authentication
+│   │   ├── auth.js            # User registration & JWT multi-tenant authentication
 │   │   └── carbon.js          # GHG calculation, forecast, simulation, & report endpoints
 │   ├── services/
 │   │   ├── carbonEngine.js    # Scope 1, 2, 3 GHG calculation engine
@@ -278,6 +291,7 @@ Carbonly/
 │   │   ├── methodologyRegistry.js   # Formal GHG Protocol boundary specifications
 │   │   ├── provenanceEngine.js # Unique calculation_id lineage & uncertainty bounds
 │   │   ├── auditTrail.js      # User data mutation log store (userId, orgId, action)
+│   │   ├── baselineManager.js # 2030 Net-Zero target gap & trajectory manager
 │   │   ├── ingestionValidator.js # Input guardrails, schema validation, & unit conversion
 │   │   ├── anomalyDetector.js # Z-score statistical outlier detector
 │   │   ├── anomalyAttribution.js # Shapley-style variance driver attribution
@@ -285,6 +299,8 @@ Carbonly/
 │   │   ├── forecastingEngine.js # Holt-Winters 12-month time-series forecaster
 │   │   ├── optimizerEngine.js # Operations research linear solver
 │   │   └── groqService.js     # Groq LLM API proxy with evidence store grounding
+│   ├── middleware/
+│   │   └── auth.js            # Multi-tenant JWT authorization boundary middleware
 │   ├── tests/
 │   │   ├── carbonEngine.test.js
 │   │   ├── anomalyDetector.test.js
@@ -321,7 +337,7 @@ Carbonly/
 
 ### A. Calculation Endpoint
 - **URL**: `POST /api/carbon/calculate`
-- **Headers**: `Content-Type: application/json`, `Authorization: Bearer <token>`
+- **Headers**: `Content-Type: application/json`, `Authorization: Bearer <token>`, `x-organization-id: ORG-ENTERPRISE-891`
 - **Request Payload**:
 ```json
 {
@@ -383,7 +399,7 @@ npm install
 # 3. Start Backend Gateway Server
 npm start
 
-# 4. Execute Automated Test Suite (24 Tests Across 5 Suites)
+# 4. Execute Automated Test Suite (25 Tests Across 5 Suites)
 npm test
 ```
 
