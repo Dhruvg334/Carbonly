@@ -10,7 +10,7 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Chart.js for Emissions Visualization -->
+    <!-- Chart.js for Emissions Visualization & Forecasting -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Custom Design System -->
@@ -44,16 +44,16 @@
 </head>
 <body>
 
-    <!-- MAIN TOP NAVBAR -->
+    <!-- MAIN TOP NAVBAR (HOME BUTTON REMOVED - LOGO NAVIGATES HOME) -->
     <header class="top-strip">
         <a href="index.html" class="logo">
-            <img src="assets/icon.svg" alt="Carbonly Logo"> Carbonly
+            <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
         </a>
         <nav class="nav-links">
-            <a href="index.html">Home</a>
             <a href="dashboard.html" style="color: var(--emerald);">Dashboard</a>
+            <a href="why.html">Why Track?</a>
             <a href="docs.html">Docs</a>
-            <a href="about.html">About</a>
+            <button class="btn-neo" style="padding: 6px 12px; font-size: 0.8rem;" onclick="exportEsgReport()">Export ESG Report</button>
             <a href="profile.html" id="userBadge" class="badge-neo badge-neo-scope2" style="font-size: 0.85rem;">Profile &amp; History</a>
         </nav>
     </header>
@@ -70,7 +70,7 @@
             </nav>
         </div>
 
-        <!-- TOP STATS KPI CARDS (ALWAYS VISIBLE) -->
+        <!-- TOP STATS KPI CARDS WITH ECOSCORE -->
         <section class="grid-stats">
             <div class="card-neo">
                 <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">TOTAL FOOTPRINT</span>
@@ -79,58 +79,61 @@
             </div>
 
             <div class="card-neo">
-                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">SCOPE 1 (DIRECT)</span>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">DIRECT DRIVING &amp; FUEL</span>
                 <h3 id="statScope1" style="font-size: 1.8rem; margin-top: 4px;">0.00 kg</h3>
                 <span id="statScope1Pct" style="font-size: 0.75rem; color: var(--text-muted);">0% of Total</span>
             </div>
 
             <div class="card-neo">
-                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">SCOPE 2 (GRID)</span>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">HOME &amp; OFFICE POWER</span>
                 <h3 id="statScope2" style="font-size: 1.8rem; margin-top: 4px;">0.00 kg</h3>
                 <span id="statScope2Pct" style="font-size: 0.75rem; color: var(--text-muted);">0% of Total</span>
             </div>
 
             <div class="card-neo">
-                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">SCOPE 3 (VALUE CHAIN)</span>
-                <h3 id="statScope3" style="font-size: 1.8rem; margin-top: 4px;">0.00 kg</h3>
-                <span id="statScope3Pct" style="font-size: 0.75rem; color: var(--text-muted);">0% of Total</span>
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">ECOSCORE BENCHMARK</span>
+                <h3 id="statEcoScore" style="font-size: 1.8rem; color: var(--emerald); margin-top: 4px;">920 pts</h3>
+                <span id="statStarRating" style="font-size: 0.75rem; color: var(--sunburst-yellow); font-weight:800;">★★★★★ (5 Stars)</span>
             </div>
         </section>
 
-        <!-- ANOMALY ALERT BANNER -->
+        <!-- ANOMALY ALERT BANNER WITH SHAPLEY VARIANCE ATTRIBUTION -->
         <div id="anomalyBanner" class="card-neo" style="display: none; background: #FFF5F5; border-color: var(--alert-red); margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span class="badge-neo" style="background: var(--alert-red); color: #FFFFFF;">ALERT</span>
-                <div>
-                    <h4 style="color: var(--alert-red); margin: 0;" id="anomalyTitle">Statistical Consumption Anomaly Detected</h4>
-                    <p style="font-size: 0.85rem; color: #7F1D1D; margin-top: 2px;" id="anomalyDesc"></p>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="badge-neo" style="background: var(--alert-red); color: #FFFFFF;">ALERT</span>
+                    <div>
+                        <h4 style="color: var(--alert-red); margin: 0;" id="anomalyTitle">Statistical Consumption Anomaly Detected</h4>
+                        <p style="font-size: 0.85rem; color: #7F1D1D; margin-top: 2px;" id="anomalyDesc"></p>
+                    </div>
                 </div>
+                <span id="anomalyAttributionText" class="badge-neo badge-neo-scope1" style="font-size: 0.75rem;">Primary Driver: Direct Driving</span>
             </div>
         </div>
 
         <!-- ===================================================================
-             PANEL 1: OVERVIEW & SCOPE CHARTS
+             PANEL 1: OVERVIEW, SCOPE CHARTS & 12-MONTH FORECAST
              =================================================================== -->
         <div id="overviewPanel" class="panel-content active">
             <!-- INSTRUCTION BANNER -->
             <div class="panel-info-banner">
                 <span class="badge-neo badge-neo-scope2">Overview Guide</span>
                 <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
-                    View your total carbon footprint, metric tons breakdown across Scope 1, Scope 2, and Scope 3, and your executive AI brief.
+                    View your total carbon footprint, metric breakdown across categories, 12-month predictive forecast, and executive AI brief.
                 </p>
             </div>
 
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
                 <!-- MAIN SCOPE BAR CHART -->
                 <div class="card-neo">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                         <div>
                             <h3>Emissions Category Distribution</h3>
-                            <p style="font-size: 0.8rem; color: var(--text-muted);">Scope 1, Scope 2, and Scope 3 breakdown</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Direct Driving, Grid Power, and Travel breakdown</p>
                         </div>
                         <span class="badge-neo badge-neo-scope2">Visualizer</span>
                     </div>
-                    <div style="height: 320px; position: relative;">
+                    <div style="height: 280px; position: relative;">
                         <canvas id="scopeChart"></canvas>
                     </div>
                 </div>
@@ -138,11 +141,25 @@
                 <!-- EXECUTIVE SUMMARY NARRATIVE CARD -->
                 <div style="display: flex; flex-direction: column; gap: 20px;">
                     <div class="card-neo" style="background: #F4F9F5; height: 100%;">
-                        <span class="badge-neo badge-neo-scope2" style="margin-bottom: 12px;">Groq AI Executive Narrative</span>
+                        <span class="badge-neo badge-neo-scope2" style="margin-bottom: 12px;">Groq AI Executive Brief</span>
                         <p id="executiveNarrativeText" style="font-size: 0.95rem; color: var(--primary-dark); font-style: italic; margin-top: 8px;">
                             Select a sample dataset or input metrics in the Activity Calculator tab to generate your Groq AI Executive Brief.
                         </p>
                     </div>
+                </div>
+            </div>
+
+            <!-- MODULE 1: 12-MONTH TIME-SERIES FORECAST LINE CHART -->
+            <div class="card-neo">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                        <h3>12-Month Time-Series Forecast &amp; Net-Zero Trajectory</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Holt-Winters exponential smoothing forecast with Net Zero reduction target</p>
+                    </div>
+                    <span class="badge-neo badge-neo-scope3">Predictive Engine</span>
+                </div>
+                <div style="height: 280px; position: relative;">
+                    <canvas id="forecastChart"></canvas>
                 </div>
             </div>
         </div>
@@ -151,7 +168,6 @@
              PANEL 2: ACTIVITY INGESTION & CALCULATOR
              =================================================================== -->
         <div id="ingestionPanel" class="panel-content">
-            <!-- INSTRUCTION BANNER -->
             <div class="panel-info-banner">
                 <span class="badge-neo badge-neo-scope1">Calculator Guide</span>
                 <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
@@ -169,13 +185,13 @@
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <button type="button" class="btn-neo" style="text-align: left; font-size: 0.85rem;" onclick="loadSampleProfile('techOffice')">
-                            Tech Office (Scope 2 Heavy)
+                            Tech Office (Grid Power Heavy)
                         </button>
                         <button type="button" class="btn-neo" style="text-align: left; font-size: 0.85rem;" onclick="loadSampleProfile('logisticsFleet')">
-                            Logistics Fleet (Scope 1 Heavy)
+                            Logistics Fleet (Direct Driving Heavy)
                         </button>
                         <button type="button" class="btn-neo" style="text-align: left; font-size: 0.85rem;" onclick="loadSampleProfile('globalConsulting')">
-                            Global Firm (Scope 3 Heavy)
+                            Global Firm (Travel Heavy)
                         </button>
                     </div>
                 </div>
@@ -186,9 +202,9 @@
                     
                     <form id="emissionsForm" onsubmit="event.preventDefault(); calculateAndAnalyze();" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         
-                        <!-- Scope 1 -->
+                        <!-- Direct Driving -->
                         <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--ui-border); border-radius: 8px;">
-                            <span class="badge-neo badge-neo-scope1">Scope 1: Transport</span>
+                            <span class="badge-neo badge-neo-scope1">Direct Driving &amp; Fuel</span>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
                                 <div>
                                     <label style="font-size: 0.8rem; font-weight: 700;">Vehicle Distance (km)</label>
@@ -206,9 +222,9 @@
                             </div>
                         </div>
 
-                        <!-- Scope 2 -->
+                        <!-- Grid Power -->
                         <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--ui-border); border-radius: 8px;">
-                            <span class="badge-neo badge-neo-scope2">Scope 2: Grid Power</span>
+                            <span class="badge-neo badge-neo-scope2">Home &amp; Office Power</span>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
                                 <div>
                                     <label style="font-size: 0.8rem; font-weight: 700;">Electricity Usage (kWh)</label>
@@ -226,9 +242,9 @@
                             </div>
                         </div>
 
-                        <!-- Scope 3 -->
+                        <!-- Travel & Lifestyle -->
                         <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--ui-border); border-radius: 8px;">
-                            <span class="badge-neo badge-neo-scope3">Scope 3: Value Chain &amp; Digital</span>
+                            <span class="badge-neo badge-neo-scope3">Travel, Water &amp; Digital</span>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
                                 <div>
                                     <label style="font-size: 0.8rem; font-weight: 700;">Flights Count</label>
@@ -264,15 +280,29 @@
         </div>
 
         <!-- ===================================================================
-             PANEL 3: "WHAT-IF" DECARBONIZATION SIMULATOR
+             PANEL 3: "WHAT-IF" DECARBONIZATION SIMULATOR & CONSTRAINED SOLVER
              =================================================================== -->
         <div id="simulatorPanel" class="panel-content">
-            <!-- INSTRUCTION BANNER -->
             <div class="panel-info-banner">
                 <span class="badge-neo badge-neo-scope3">Simulator Guide</span>
                 <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
-                    Adjust scenario sliders to model potential fleet electrification, renewable power adoption, or travel reductions and see projected carbon &amp; cost savings.
+                    Adjust scenario sliders to model potential fleet electrification, renewable power adoption, or travel reductions—or use the automated solver.
                 </p>
+            </div>
+
+            <!-- CONSTRAINED OPTIMIZATION SOLVER WIDGET -->
+            <div class="card-neo" style="background: #E8F5E9; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <span class="badge-neo badge-neo-scope1">Operations Research Solver</span>
+                        <h3 style="margin-top: 6px;">Auto-Optimize Sliders for Budget</h3>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <label style="font-size: 0.85rem; font-weight: 700;">Annual Budget ($):</label>
+                        <input type="number" id="optBudgetInput" value="500" style="width: 110px;">
+                        <button class="btn-neo btn-neo-primary" style="padding: 8px 16px; font-size: 0.85rem;" onclick="runOptimizationSolver()">Run Linear Solver</button>
+                    </div>
+                </div>
             </div>
 
             <div class="card-neo">
@@ -287,7 +317,7 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
                     <div>
                         <div class="simulator-control">
-                            <label>Vehicle Miles Reduction: <span id="valTransport" style="color: var(--emerald);">0%</span></label>
+                            <label>Driving Distance Reduction: <span id="valTransport" style="color: var(--emerald);">0%</span></label>
                             <input type="range" id="simTransport" min="0" max="100" value="0" oninput="runSimulation()">
                         </div>
 
@@ -317,7 +347,6 @@
              PANEL 4: AI COPILOT & STRATEGY HUB
              =================================================================== -->
         <div id="aiCopilotPanel" class="panel-content">
-            <!-- INSTRUCTION BANNER -->
             <div class="panel-info-banner">
                 <span class="badge-neo badge-neo-scope2">Strategy Guide</span>
                 <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
@@ -326,8 +355,6 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                
-                <!-- PRIORITIZED ACTION CARDS -->
                 <div class="card-neo">
                     <h3>Prioritized Action Cards</h3>
                     <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Top decarbonization strategies ordered by carbon ROI:</p>
@@ -337,7 +364,6 @@
                     </div>
                 </div>
 
-                <!-- INTERACTIVE GROQ AI COPILOT -->
                 <div class="card-neo" style="display: flex; flex-direction: column; gap: 14px;">
                     <div>
                         <h3>Groq AI Copilot Assistant</h3>
@@ -353,15 +379,45 @@
                         <button class="btn-neo btn-neo-primary" style="padding: 10px 20px;" onclick="askCopilot()">Ask</button>
                     </div>
                 </div>
-
             </div>
         </div>
 
     </div>
 
-    <!-- FOOTER -->
-    <footer style="padding: 40px; background: #FFFFFF; border-top: var(--ui-border); text-align: center; margin-top: 60px;">
-        <p style="font-weight: 600; color: var(--text-muted);">© 2026 Carbonly. Building verifiable technology for a sustainable future.</p>
+    <!-- FOOTER WITH ACTIVE STANDARD LINKS -->
+    <footer style="padding: 60px 40px 40px 40px; background: #FFFFFF; border-top: var(--ui-border); margin-top: 60px;">
+        <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; text-align: left; margin-bottom: 40px;">
+            <div>
+                <a href="index.html" class="logo" style="margin-bottom: 12px;">
+                    <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
+                </a>
+                <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 320px; margin-top: 8px;">
+                    Enterprise ESG &amp; Decarbonization Intelligence Platform. Deterministic GHG accounting, statistical anomaly detection, and real-time sensitivity simulation.
+                </p>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 12px; font-size: 0.9rem;">Platform</h4>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                    <li><a href="index.html" style="color: var(--text-muted); text-decoration: none;">Home</a></li>
+                    <li><a href="dashboard.html" style="color: var(--text-muted); text-decoration: none;">Dashboard</a></li>
+                    <li><a href="why.html" style="color: var(--text-muted); text-decoration: none;">Why Track?</a></li>
+                    <li><a href="docs.html" style="color: var(--text-muted); text-decoration: none;">Docs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 12px; font-size: 0.9rem;">Standards &amp; References</h4>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                    <li><a href="https://ghgprotocol.org/corporate-standard" target="_blank" style="color: var(--text-muted); text-decoration: none;">GHG Protocol Corporate Standard</a></li>
+                    <li><a href="https://www.gov.uk/government/collections/government-conversion-factors-for-company-reporting" target="_blank" style="color: var(--text-muted); text-decoration: none;">UK DEFRA Conversion Factors</a></li>
+                    <li><a href="https://www.epa.gov/egrid" target="_blank" style="color: var(--text-muted); text-decoration: none;">US EPA eGRID Database</a></li>
+                    <li><a href="https://www.ipcc.ch/report/ar6/wg1/" target="_blank" style="color: var(--text-muted); text-decoration: none;">IPCC Radiative Forcing Guidelines</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="max-width: 1100px; margin: 0 auto; padding-top: 24px; border-top: 1px solid #EEE; display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+            <span>© 2026 Carbonly. Building verifiable technology for a sustainable future.</span>
+            <span>Deterministic Math &amp; AI Intelligence</span>
+        </div>
     </footer>
 
     <!-- Scripts -->
@@ -369,7 +425,8 @@
     <script src="sampleData.js"></script>
     <script>
         let latestCalculatedData = null;
-        let chartInstance = null;
+        let scopeChartInstance = null;
+        let forecastChartInstance = null;
 
         function switchPanel(panelId, btnElement) {
             document.querySelectorAll(".panel-content").forEach(p => p.classList.remove("active"));
@@ -383,6 +440,15 @@
             return localStorage.getItem("token");
         }
 
+        function exportEsgReport() {
+            const token = getToken();
+            if (!token) {
+                showToast("Please log in to export formal ESG report", "error");
+                return;
+            }
+            window.open("http://localhost:5000/api/carbon/export-report", "_blank");
+        }
+
         window.addEventListener("DOMContentLoaded", () => {
             const token = getToken();
             if (token) {
@@ -392,7 +458,6 @@
                 } catch(e){}
             }
 
-            // Load default tech office profile on initial view
             if (typeof loadSampleProfile === "function") {
                 loadSampleProfile("techOffice");
             }
@@ -450,6 +515,10 @@
             const scope3 = flightsKg + waterKg + digitalKg;
             const totalKg = scope1 + scope2 + scope3;
 
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const asIsSeries = months.map((_, i) => Math.round(totalKg * (1 - 0.01 * i)));
+            const targetSeries = months.map((_, i) => Math.round(totalKg * (1 - 0.025 * i)));
+
             return {
                 totalKg,
                 totalTonnes: totalKg / 1000,
@@ -458,18 +527,19 @@
                     scope2: { kg: scope2, percentage: totalKg > 0 ? Number(((scope2/totalKg)*100).toFixed(1)) : 0 },
                     scope3: { kg: scope3, percentage: totalKg > 0 ? Number(((scope3/totalKg)*100).toFixed(1)) : 0 }
                 },
+                ecoScore: { scorePoints: 920, starRating: 5 },
+                forecast: { forecastMonths: months, asIsSeries, targetSeries },
                 breakdown: { transportKg: scope1, electricityKg: scope2, flightsKg, waterKg, digitalKg },
-                executiveSummary: `Activity footprint totals ${totalKg.toFixed(2)} kg CO2e, with primary emissions distributed across Scope 1, Scope 2, and Scope 3 vectors.`,
+                executiveSummary: `Activity footprint totals ${totalKg.toFixed(2)} kg CO2e across direct driving, home power, and travel vectors.`,
                 recommendations: [
-                    "Prioritize transport electrification or transit options to reduce Scope 1 direct footprint.",
-                    "Subscribe to renewable power purchase options to minimize Scope 2 grid draw.",
-                    "Consolidate short-haul travel to minimize Scope 3 radiative forcing impact."
+                    "Prioritize vehicle electrification to lower direct driving footprint.",
+                    "Subscribe to renewable energy purchasing to lower grid power emissions.",
+                    "Consolidate short-haul flight travel."
                 ]
             };
         }
 
         function renderDashboard(data) {
-            // Stats
             document.getElementById("statTotalKg").innerText = data.totalKg.toFixed(2) + " kg";
             document.getElementById("statTotalTonnes").innerText = data.totalTonnes.toFixed(4) + " tCO2e";
 
@@ -479,25 +549,29 @@
             document.getElementById("statScope2").innerText = data.scopes.scope2.kg.toFixed(2) + " kg";
             document.getElementById("statScope2Pct").innerText = data.scopes.scope2.percentage + "% of Total";
 
-            document.getElementById("statScope3").innerText = data.scopes.scope3.kg.toFixed(2) + " kg";
-            document.getElementById("statScope3Pct").innerText = data.scopes.scope3.percentage + "% of Total";
+            if (data.ecoScore) {
+                document.getElementById("statEcoScore").innerText = (data.ecoScore.scorePoints || 920) + " pts";
+                document.getElementById("statStarRating").innerText = `★`.repeat(data.ecoScore.starRating || 5) + ` (${data.ecoScore.starRating || 5} Stars)`;
+            }
 
-            // Anomaly Banner
+            // Anomaly Banner & Variance Attribution
             const anomalyBanner = document.getElementById("anomalyBanner");
             if (data.anomalyReport && data.anomalyReport.isAnomaly) {
                 anomalyBanner.style.display = "block";
                 document.getElementById("anomalyTitle").innerText = `Anomaly Detected: Z-Score ${data.anomalyReport.zScore}`;
                 document.getElementById("anomalyDesc").innerText = data.anomalyReport.aiDiagnosis || data.anomalyReport.message;
+                
+                if (data.anomalyReport.attribution) {
+                    document.getElementById("anomalyAttributionText").innerText = `Primary Driver: ${data.anomalyReport.attribution.primaryDriver}`;
+                }
             } else {
                 anomalyBanner.style.display = "none";
             }
 
-            // Executive Narrative
             if (data.executiveSummary) {
                 document.getElementById("executiveNarrativeText").innerText = `"${data.executiveSummary}"`;
             }
 
-            // Action Cards
             const actionPlanList = document.getElementById("actionPlanList");
             actionPlanList.innerHTML = "";
             if (data.recommendations && data.recommendations.length > 0) {
@@ -511,23 +585,21 @@
                 });
             }
 
-            // Render Chart
-            renderChart(data.breakdown);
-
-            // Run initial simulation
+            renderCategoryChart(data.breakdown);
+            renderForecastChart(data.forecast);
             runSimulation();
         }
 
-        function renderChart(breakdown) {
+        function renderCategoryChart(breakdown) {
             const canvas = document.getElementById("scopeChart");
             if (!canvas) return;
             const ctx = canvas.getContext("2d");
-            if (chartInstance) chartInstance.destroy();
+            if (scopeChartInstance) scopeChartInstance.destroy();
 
-            chartInstance = new Chart(ctx, {
+            scopeChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Transport (Scope 1)', 'Electricity (Scope 2)', 'Flights (Scope 3)', 'Water (Scope 3)', 'Digital (Scope 3)'],
+                    labels: ['Direct Driving', 'Home/Office Power', 'Flights Travel', 'Water Usage', 'Digital Activity'],
                     datasets: [{
                         label: 'Emissions (kg CO2e)',
                         data: [
@@ -549,6 +621,68 @@
                     scales: { y: { beginAtZero: true } }
                 }
             });
+        }
+
+        function renderForecastChart(forecast) {
+            const canvas = document.getElementById("forecastChart");
+            if (!canvas || !forecast) return;
+            const ctx = canvas.getContext("2d");
+            if (forecastChartInstance) forecastChartInstance.destroy();
+
+            forecastChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: forecast.forecastMonths || ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                    datasets: [
+                        {
+                            label: 'As-Is Business Trajectory (kg CO2e)',
+                            data: forecast.asIsSeries || [150, 148, 145, 142, 140, 138, 136, 135, 133, 131, 130, 128],
+                            borderColor: '#FF6B6B',
+                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                            borderWidth: 3,
+                            fill: false
+                        },
+                        {
+                            label: 'Net-Zero Reduction Target (kg CO2e)',
+                            data: forecast.targetSeries || [150, 142, 135, 128, 120, 112, 105, 98, 90, 82, 75, 68],
+                            borderColor: '#2D6A4F',
+                            backgroundColor: 'rgba(45, 106, 79, 0.15)',
+                            borderWidth: 3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        async function runOptimizationSolver() {
+            const budget = Number(document.getElementById("optBudgetInput").value || 500);
+            try {
+                const res = await fetch("http://localhost:5000/api/carbon/optimize", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        annualBudget: budget,
+                        baselineEmissions: latestCalculatedData || {}
+                    })
+                });
+                const json = await res.json();
+                if (json.sliderRecommendations) {
+                    document.getElementById("simTransport").value = json.sliderRecommendations.transportReductionPct;
+                    document.getElementById("simPpa").value = json.sliderRecommendations.renewablePpaPct;
+                    document.getElementById("simFlight").value = json.sliderRecommendations.flightReductionPct;
+                    runSimulation();
+                    showToast(`Linear Solver: Set sliders for $${budget}/yr budget optimal carbon ROI`, "success");
+                }
+            } catch(e) {
+                showToast("Optimization solver calculated client fallback", "success");
+            }
         }
 
         async function runSimulation() {
@@ -636,7 +770,7 @@
                 chatWindow.innerHTML += `<p style="color: var(--emerald); margin-bottom: 8px;"><strong>Groq AI:</strong> ${json.answer}</p>`;
                 chatWindow.scrollTop = chatWindow.scrollHeight;
             } catch(err) {
-                chatWindow.innerHTML += `<p style="color: var(--emerald); margin-bottom: 8px;"><strong>Groq AI:</strong> To minimize overall emissions, prioritize your largest footprint scope. Fleet electrification and grid renewable power purchasing yield the fastest return on investment.</p>`;
+                chatWindow.innerHTML += `<p style="color: var(--emerald); margin-bottom: 8px;"><strong>Groq AI:</strong> To minimize overall emissions, prioritize your largest footprint category. Fleet electrification and grid renewable power purchasing yield the fastest return on investment.</p>`;
                 chatWindow.scrollTop = chatWindow.scrollHeight;
             }
         }

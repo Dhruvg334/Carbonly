@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carbonly | Enterprise ESG & Decarbonization Intelligence Platform</title>
-    <meta name="description" content="A high-performance carbon accounting platform providing deterministic GHG Protocol calculations, statistical anomaly detection, and interactive scenario modeling.">
+    <title>Carbonly | Empowering Precision Carbon Accounting & AI-Driven Decarbonization</title>
+    <meta name="description" content="Convert operational transport, grid power, and value-chain metrics into audit-ready Scope 1, 2, and 3 analytics. Run real-time sensitivity simulations and automated optimization.">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="canonical" href="https://carbonly.netlify.app/">
     
@@ -13,106 +13,167 @@
     
     <!-- Custom Design System -->
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .hero-centered {
+            min-height: calc(100vh - 72px);
+            margin-top: 72px;
+            padding: 90px 24px 60px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 
     <!-- NAVIGATION BAR -->
     <header class="top-strip">
         <a href="index.html" class="logo">
-            <img src="assets/icon.svg" alt="Carbonly Logo"> Carbonly
+            <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
         </a>
         <nav class="nav-links">
             <a href="index.html">Home</a>
-            <a href="about.html">About</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="why.html">Why Track?</a>
             <a href="docs.html">Docs</a>
             <a href="login.html" id="loginBtn" class="btn-neo">Login</a>
             <a href="signup.html" id="signupBtn" class="btn-neo btn-neo-primary">Sign Up</a>
-            <a href="dashboard.html" id="dashboardBtn" class="btn-neo btn-neo-primary" style="display:none;">Dashboard</a>
             <a href="profile.html" id="profileBtn" class="btn-neo" style="display:none;">Profile</a>
         </nav>
     </header>
 
-    <!-- HERO SECTION (FIXED PADDING & NO OVERFLOW) -->
-    <section class="hero">
-        <div class="hero-text">
-            <span class="badge-neo badge-neo-scope2">GHG Protocol Compliant Engine</span>
-            <h1 style="margin-top: 14px;">Track Your Carbon.<br>Simulate Your Future.</h1>
-            <p>Transform operational emissions data into audit-ready metrics across Scope 1, Scope 2, and Scope 3. Run real-time "What-If" scenario simulations with instant carbon and cost savings feedback.</p>
+    <!-- CENTERED HERO SECTION -->
+    <section class="hero-centered">
+        <span class="badge-neo badge-neo-scope2" style="margin-bottom: 16px;">GHG Protocol Compliant Engine</span>
+        
+        <h1 style="font-size: 3.5rem; line-height: 1.15; max-width: 900px; margin-bottom: 20px;">
+            Empowering Precision Carbon Accounting &amp; <span style="background: var(--sunburst-yellow); border: var(--ui-border); padding: 2px 14px; border-radius: 8px;">AI Decarbonization</span> Intelligence.
+        </h1>
+        
+        <p style="font-size: 1.15rem; color: var(--text-muted); max-width: 680px; margin-bottom: 32px;">
+            Convert operational transport, grid power, and value-chain metrics into audit-ready Scope 1, 2, and 3 analytics. Run real-time sensitivity simulations and automated optimization.
+        </p>
 
-            <div class="hero-buttons">
-                <a href="dashboard.html" class="btn-neo btn-neo-primary" style="font-size: 1.05rem;">Launch Dashboard</a>
-                <a href="about.html" class="btn-neo">Why You Need This</a>
-            </div>
+        <div style="display: flex; gap: 16px; margin-bottom: 48px; flex-wrap: wrap; justify-content: center;">
+            <a href="dashboard.html" class="btn-neo btn-neo-primary" style="font-size: 1.05rem; padding: 14px 28px;">Launch Interactive Dashboard</a>
+            <a href="why.html" class="btn-neo" style="padding: 14px 28px;">Why Track Carbon?</a>
         </div>
 
-        <!-- HIGH-TECH INTERACTIVE CARBON IMPACT METRIC SHOWCASE (REPLACES GLOBE) -->
-        <div class="card-neo" style="background: #FFFFFF; padding: 32px; box-shadow: var(--ui-shadow-hover);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div>
-                    <span class="badge-neo badge-neo-scope1">Interactive Intelligence Teaser</span>
-                    <h3 style="margin-top: 6px;">Live Impact Simulator</h3>
-                </div>
-                <a href="dashboard.html" class="btn-neo btn-neo-accent" style="padding: 8px 16px; font-size: 0.8rem;">Full Dashboard →</a>
-            </div>
+        <!-- 2.5D ISOMETRIC LAPTOP & ANALYTICS ILLUSTRATION CONTAINER -->
+        <div style="width: 100%; max-width: 720px; margin-bottom: 40px;">
+            <img src="assets/hero-illustration.svg" alt="Carbonly Intelligence Platform" style="width: 100%; filter: drop-shadow(6px 6px 0px #0B3D2E);">
+        </div>
+    </section>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-                <div>
-                    <label style="font-size: 0.75rem; font-weight: 700;">Commute (km)</label>
-                    <input type="number" id="previewDist" value="180" oninput="updateQuickPreview()">
+    <!-- LIVE DEMO QUICK SIMULATOR WIDGET -->
+    <section style="padding: 60px 40px; background: var(--mint-light);">
+        <div style="max-width: 1000px; margin: 0 auto;">
+            <div class="card-neo" style="background: #FFFFFF; padding: 32px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <span class="badge-neo badge-neo-scope1">Instant Metric Preview</span>
+                        <h3 style="margin-top: 6px;">Try Live Impact Calculator</h3>
+                    </div>
+                    <a href="dashboard.html" class="btn-neo btn-neo-accent" style="padding: 8px 16px; font-size: 0.8rem;">Full Dashboard →</a>
                 </div>
-                <div>
-                    <label style="font-size: 0.75rem; font-weight: 700;">Power (kWh)</label>
-                    <input type="number" id="previewKwh" value="350" oninput="updateQuickPreview()">
-                </div>
-                <div>
-                    <label style="font-size: 0.75rem; font-weight: 700;">Flights (Count)</label>
-                    <input type="number" id="previewFlights" value="1" oninput="updateQuickPreview()">
-                </div>
-            </div>
 
-            <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 10px; padding: 20px; text-align: center;">
-                <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted);">ESTIMATED WEEKLY CO2e</span>
-                <h2 id="previewResultKg" style="font-size: 2.4rem; color: var(--emerald); margin: 6px 0;">205.8 kg CO2e</h2>
-                <div style="display: flex; justify-content: center; gap: 8px; margin-top: 8px;">
-                    <span class="badge-neo badge-neo-scope2" id="previewScopePrimary">Scope 2 Dominant</span>
-                    <span class="badge-neo" id="previewSavingsEst">Projected Annual Savings: $980</span>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                    <div>
+                        <label style="font-size: 0.75rem; font-weight: 700;">Direct Driving (km)</label>
+                        <input type="number" id="previewDist" value="180" oninput="updateQuickPreview()">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; font-weight: 700;">Home/Office Power (kWh)</label>
+                        <input type="number" id="previewKwh" value="350" oninput="updateQuickPreview()">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; font-weight: 700;">Flights Travel (Count)</label>
+                        <input type="number" id="previewFlights" value="1" oninput="updateQuickPreview()">
+                    </div>
+                </div>
+
+                <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 10px; padding: 20px; text-align: center;">
+                    <span style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted);">ESTIMATED WEEKLY CO2e</span>
+                    <h2 id="previewResultKg" style="font-size: 2.4rem; color: var(--emerald); margin: 6px 0;">205.8 kg CO2e</h2>
+                    <div style="display: flex; justify-content: center; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
+                        <span class="badge-neo badge-neo-scope2" id="previewScopePrimary">Home &amp; Office Power Dominant</span>
+                        <span class="badge-neo" id="previewSavingsEst">Est. Annual Cost Impact: $980</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ARCHITECTURE & VALUE SECTION -->
+    <!-- ECO-SCORE RATING FEATURE SECTION -->
     <section style="padding: 80px 40px; background: #FFFFFF; border-top: var(--ui-border); border-bottom: var(--ui-border);">
         <div style="max-width: 1100px; margin: 0 auto; text-align: center;">
-            <span class="badge-neo badge-neo-scope2">System Architecture</span>
-            <h2 style="font-size: 2.5rem; margin: 12px 0 20px 0;">Engineered for Auditability & Speed</h2>
-            <p style="color: var(--text-muted); max-width: 700px; margin: 0 auto 48px auto; font-size: 1.05rem;">Carbonly decouples deterministic calculation math from AI decision intelligence to ensure zero hallucinations and maximum performance.</p>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; text-align: left;">
-                <div class="card-neo">
-                    <span class="badge-neo badge-neo-scope1">Scope 1, 2, & 3</span>
-                    <h3 style="margin: 16px 0 8px 0;">Deterministic Engine</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">Calculates verified metric tons of CO2e ($tCO_2e$) using official DEFRA and EPA emission factor datasets for transport, electricity grids, flights, water, and digital data.</p>
-                </div>
+            <span class="badge-neo badge-neo-scope1">Relative Rating System</span>
+            <h2 style="font-size: 2.5rem; margin: 12px 0 16px 0;">Introducing the EcoScore Benchmark</h2>
+            <p style="color: var(--text-muted); max-width: 700px; margin: 0 auto 40px auto; font-size: 1.05rem;">
+                Understand your footprint relative to national and global benchmarks. Earn up to 1000 points and a 5-Star Rating as you reduce your emissions.
+            </p>
 
-                <div class="card-neo">
-                    <span class="badge-neo badge-neo-scope3">Statistical Analytics</span>
-                    <h3 style="margin: 16px 0 8px 0;">Anomaly Spike Detector</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">Calculates rolling baseline Z-scores ($Z &gt; 2.0$) over historical time-series data to automatically flag consumption outliers and isolate variance drivers.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; text-align: left;">
+                <div class="card-neo" style="background: #E8F5E9;">
+                    <span class="badge-neo badge-neo-scope1">5 Stars (900 - 1000 pts)</span>
+                    <h4 style="margin: 12px 0 4px 0; color: var(--emerald);">Climate Champion</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Top 10% lowest emissions globally. Exceptional transport and energy efficiency.</p>
                 </div>
-
-                <div class="card-neo">
-                    <span class="badge-neo badge-neo-scope2">Executive AI</span>
-                    <h3 style="margin: 16px 0 8px 0;">Groq AI Executive Briefs</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">Integrates Groq llama-3.3-70b-versatile to generate 2-sentence executive narratives, anomaly root-cause diagnoses, and 3-step prioritized action plans.</p>
+                <div class="card-neo" style="background: #FFFFFF;">
+                    <span class="badge-neo badge-neo-scope2">4 Stars (750 - 899 pts)</span>
+                    <h4 style="margin: 12px 0 4px 0;">Eco Leader</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Top 25% emissions performance. Strong adoption of renewables and clean transport.</p>
+                </div>
+                <div class="card-neo" style="background: #FFFFFF;">
+                    <span class="badge-neo badge-neo-scope3">3 Stars (600 - 749 pts)</span>
+                    <h4 style="margin: 12px 0 4px 0;">Average Baseline</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Matches global individual/business averages (~4.5 tonnes CO2e/year).</p>
+                </div>
+                <div class="card-neo" style="background: #FFF5F5;">
+                    <span class="badge-neo" style="background: var(--alert-red); color: #FFFFFF;">1 - 2 Stars (&lt;600 pts)</span>
+                    <h4 style="margin: 12px 0 4px 0; color: #9D0208;">High Priority</h4>
+                    <p style="font-size: 0.85rem; color: #7F1D1D;">Higher than average footprint. High potential for quick-win carbon &amp; cost savings.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer style="padding: 40px; background: #FFFFFF; text-align: center;">
-        <p style="font-weight: 600; color: var(--text-muted);">© 2026 Carbonly. Building verifiable technology for a sustainable future.</p>
+    <!-- FOOTER WITH ACTIVE STANDARD LINKS -->
+    <footer style="padding: 60px 40px 40px 40px; background: #FFFFFF; border-top: var(--ui-border);">
+        <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; text-align: left; margin-bottom: 40px;">
+            <div>
+                <a href="index.html" class="logo" style="margin-bottom: 12px;">
+                    <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
+                </a>
+                <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 320px; margin-top: 8px;">
+                    Enterprise ESG &amp; Decarbonization Intelligence Platform. Deterministic GHG accounting, statistical anomaly detection, and real-time sensitivity simulation.
+                </p>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 12px; font-size: 0.9rem;">Platform</h4>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                    <li><a href="index.html" style="color: var(--text-muted); text-decoration: none;">Home</a></li>
+                    <li><a href="dashboard.html" style="color: var(--text-muted); text-decoration: none;">Dashboard</a></li>
+                    <li><a href="why.html" style="color: var(--text-muted); text-decoration: none;">Why Track?</a></li>
+                    <li><a href="docs.html" style="color: var(--text-muted); text-decoration: none;">Docs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 12px; font-size: 0.9rem;">Standards &amp; References</h4>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                    <li><a href="https://ghgprotocol.org/corporate-standard" target="_blank" style="color: var(--text-muted); text-decoration: none;">GHG Protocol Corporate Standard</a></li>
+                    <li><a href="https://www.gov.uk/government/collections/government-conversion-factors-for-company-reporting" target="_blank" style="color: var(--text-muted); text-decoration: none;">UK DEFRA Conversion Factors</a></li>
+                    <li><a href="https://www.epa.gov/egrid" target="_blank" style="color: var(--text-muted); text-decoration: none;">US EPA eGRID Database</a></li>
+                    <li><a href="https://www.ipcc.ch/report/ar6/wg1/" target="_blank" style="color: var(--text-muted); text-decoration: none;">IPCC Radiative Forcing Guidelines</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="max-width: 1100px; margin: 0 auto; padding-top: 24px; border-top: 1px solid #EEE; display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+            <span>© 2026 Carbonly. Building verifiable technology for a sustainable future.</span>
+            <span>Deterministic Math &amp; AI Intelligence</span>
+        </div>
     </footer>
 
     <!-- Scripts -->
@@ -132,13 +193,13 @@
 
             const primaryBadge = document.getElementById("previewScopePrimary");
             if (scope1 >= scope2 && scope1 >= scope3) {
-                primaryBadge.innerText = "Scope 1 Dominant";
+                primaryBadge.innerText = "Direct Driving Dominant";
                 primaryBadge.className = "badge-neo badge-neo-scope1";
             } else if (scope2 >= scope3) {
-                primaryBadge.innerText = "Scope 2 Dominant";
+                primaryBadge.innerText = "Home & Office Power Dominant";
                 primaryBadge.className = "badge-neo badge-neo-scope2";
             } else {
-                primaryBadge.innerText = "Scope 3 Dominant";
+                primaryBadge.innerText = "Travel & Lifestyle Dominant";
                 primaryBadge.className = "badge-neo badge-neo-scope3";
             }
 

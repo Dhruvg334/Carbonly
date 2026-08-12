@@ -3,109 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile & Avatar Hub | Carbonly</title>
-    <meta name="description" content="Manage your Carbonly user profile, select vector avatar badges, and view historical activity records.">
+    <title>User Profile Hub | Carbonly</title>
+    <meta name="description" content="Manage your Carbonly user profile, update location and regulatory standards, inspect EcoScore ratings, and view historical activity records.">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 61, 46, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: #FFFFFF;
+            border: var(--ui-border);
+            border-radius: 12px;
+            box-shadow: var(--ui-shadow-hover);
+            width: 100%;
+            max-width: 520px;
+            padding: 32px;
+            position: relative;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- NAVBAR -->
+    <!-- NAVBAR (HOME LINK REMOVED - LOGO NAVIGATES HOME) -->
     <header class="top-strip">
         <a href="index.html" class="logo">
-            <img src="assets/icon.svg" alt="Carbonly Logo"> Carbonly
+            <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
         </a>
         <nav class="nav-links">
-            <a href="index.html">Home</a>
             <a href="dashboard.html">Dashboard</a>
+            <a href="why.html">Why Track?</a>
             <a href="docs.html">Docs</a>
-            <a href="about.html">About</a>
             <a href="profile.html" class="badge-neo badge-neo-scope2" style="font-size: 0.85rem;">Profile &amp; History</a>
         </nav>
     </header>
 
     <main style="max-width: 1100px; margin: 100px auto 60px auto; padding: 0 24px;">
-        <div style="margin-bottom: 32px;">
-            <span class="badge-neo badge-neo-scope2">Account &amp; Identity Settings</span>
-            <h1 style="font-size: 2.5rem; margin-top: 8px;">User Profile Hub</h1>
-            <p style="color: var(--text-muted);">Customize your profile avatar, review grid preferences, and inspect historical emissions entries.</p>
+        <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <span class="badge-neo badge-neo-scope2">Account &amp; Identity Hub</span>
+                <h1 style="font-size: 2.5rem; margin-top: 8px;">User Profile &amp; Benchmark</h1>
+                <p style="color: var(--text-muted);">Manage your account parameters, country location, compliance standards, and historical log.</p>
+            </div>
+            <button class="btn-neo btn-neo-primary" onclick="openEditModal()">Edit Profile Settings</button>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px;">
             
-            <!-- LEFT COLUMN: AVATAR SELECTION & USER INFO -->
+            <!-- LEFT COLUMN: USER DETAILS & ECOSCORE CARD -->
             <div style="display: flex; flex-direction: column; gap: 24px;">
-                <!-- USER CARD -->
-                <div class="card-neo" style="text-align: center;">
-                    <div id="currentAvatarDisplay" style="width: 72px; height: 72px; margin: 0 auto 12px auto; background: var(--sage-accent); border: var(--ui-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; color: var(--primary-dark);">
-                        FALCON
-                    </div>
-                    <h3 id="profileUsername" style="font-size: 1.4rem;">Authenticated User</h3>
-                    <p id="profileEmail" style="font-size: 0.85rem; color: var(--text-muted);">user@carbonly.io</p>
-                    <span class="badge-neo badge-neo-scope1" style="margin-top: 12px;">Active Member</span>
-                </div>
-
-                <!-- VECTOR AVATAR PICKER -->
+                
+                <!-- USER ACCOUNT DETAILS CARD -->
                 <div class="card-neo">
-                    <h4>Select Vector Badge Avatar</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Choose your avatar badge style:</p>
-
-                    <div class="avatar-grid" id="avatarPickerGrid">
-                        <div class="avatar-card selected" onclick="selectAvatar('FALCON', 'Falcon Vector')">
-                            <svg class="avatar-badge-svg" viewBox="0 0 50 50">
+                    <div style="text-align: center; margin-bottom: 16px;">
+                        <div id="avatarContainer" style="width: 80px; height: 80px; margin: 0 auto 12px auto; background: var(--sage-accent); border: var(--ui-border); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <svg viewBox="0 0 50 50" style="width: 48px; height: 48px;">
                                 <circle cx="25" cy="25" r="22" fill="#B7E4C7" stroke="#0B3D2E" stroke-width="3"/>
                                 <path d="M15 30 L25 12 L35 30 L25 24 Z" fill="#2D6A4F" stroke="#0B3D2E" stroke-width="2"/>
                             </svg>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Falcon</span>
                         </div>
+                        <h3 id="displayUsername" style="font-size: 1.5rem;">Authenticated User</h3>
+                        <p id="displayEmail" style="font-size: 0.85rem; color: var(--text-muted);">user@carbonly.io</p>
+                    </div>
 
-                        <div class="avatar-card" onclick="selectAvatar('APEX', 'Apex Vector')">
-                            <svg class="avatar-badge-svg" viewBox="0 0 50 50">
-                                <rect x="8" y="8" width="34" height="34" rx="8" fill="#FFE5D9" stroke="#0B3D2E" stroke-width="3"/>
-                                <polygon points="25,12 37,35 13,35" fill="#9D0208"/>
-                            </svg>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Apex</span>
+                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem; border-top: 1px solid #EEE; padding-top: 14px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-muted);">User ID:</span>
+                            <strong id="displayUserId">USR-94821</strong>
                         </div>
-
-                        <div class="avatar-card" onclick="selectAvatar('SENTINEL', 'Sentinel Vector')">
-                            <svg class="avatar-badge-svg" viewBox="0 0 50 50">
-                                <circle cx="25" cy="25" r="22" fill="#E2ECE9" stroke="#0B3D2E" stroke-width="3"/>
-                                <circle cx="25" cy="25" r="10" fill="#1D3557"/>
-                            </svg>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Sentinel</span>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-muted);">Country / Location:</span>
+                            <strong id="displayCountry">United States</strong>
                         </div>
-
-                        <div class="avatar-card" onclick="selectAvatar('NOVA', 'Nova Vector')">
-                            <svg class="avatar-badge-svg" viewBox="0 0 50 50">
-                                <rect x="8" y="8" width="34" height="34" rx="8" fill="#FFF3B0" stroke="#0B3D2E" stroke-width="3"/>
-                                <path d="M25 10 L30 20 L40 25 L30 30 L25 40 L20 30 L10 25 L20 20 Z" fill="#7F5539"/>
-                            </svg>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Nova</span>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-muted);">Regulatory Standard:</span>
+                            <strong id="displayStandard">GHG Protocol Corporate</strong>
                         </div>
                     </div>
                 </div>
+
+                <!-- ECOSCORE & STAR RATING CARD -->
+                <div class="card-neo" style="background: var(--mint-light); text-align: center;">
+                    <span class="badge-neo badge-neo-scope1">Relative EcoScore</span>
+                    <h2 id="displayScorePoints" style="font-size: 2.5rem; color: var(--emerald); margin: 8px 0;">920 pts</h2>
+                    <div id="displayStarRating" style="font-size: 1.4rem; font-weight: 800; color: var(--sunburst-yellow); margin-bottom: 4px;">
+                        ★★★★★ (5 Stars)
+                    </div>
+                    <p id="displayTierName" style="font-weight: 700; color: var(--primary-dark); font-size: 0.9rem;">Climate Champion</p>
+                    <span id="displayPercentile" style="font-size: 0.75rem; color: var(--text-muted);">Top 10% Lowest Emissions Globally</span>
+                </div>
+
             </div>
 
-            <!-- RIGHT COLUMN: RELOCATED EMISSIONS HISTORY TABLE -->
+            <!-- RIGHT COLUMN: RELOCATED EMISSIONS HISTORY TABLE WITH HUMAN SCOPE HEADERS -->
             <div class="card-neo">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <div>
-                        <h3>Emissions History Records</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Historical time-series logging for baseline tracking</p>
+                        <h3>Emissions Activity Log</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Historical activity logs translated into human emission categories</p>
                     </div>
-                    <button class="btn-neo btn-neo-accent" style="padding: 8px 14px; font-size: 0.8rem;" onclick="clearProfileHistory()">Clear Records</button>
+                    <button class="btn-neo btn-neo-accent" style="padding: 8px 14px; font-size: 0.8rem;" onclick="clearProfileHistory()">Clear History</button>
                 </div>
 
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
                         <thead>
                             <tr style="background: var(--sage-accent); border-bottom: var(--ui-border);">
-                                <th style="padding: 10px;">Timestamp</th>
+                                <th style="padding: 10px;">Date</th>
                                 <th style="padding: 10px;">Total (kg CO2e)</th>
-                                <th style="padding: 10px;">Scope 1</th>
-                                <th style="padding: 10px;">Scope 2</th>
-                                <th style="padding: 10px;">Scope 3</th>
+                                <th style="padding: 10px;">Direct Driving</th>
+                                <th style="padding: 10px;">Home/Grid Power</th>
+                                <th style="padding: 10px;">Travel &amp; Water</th>
                                 <th style="padding: 10px;">Status</th>
                             </tr>
                         </thead>
@@ -119,38 +139,154 @@
         </div>
     </main>
 
-    <footer style="padding: 40px; background: #FFFFFF; border-top: var(--ui-border); text-align: center; margin-top: 60px;">
-        <p style="font-weight: 600; color: var(--text-muted);">© 2026 Carbonly. Building verifiable technology for a sustainable future.</p>
+    <!-- EDIT PROFILE MODAL POPUP -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>Edit Profile Settings</h3>
+                <button style="background: none; border: none; font-size: 1.2rem; cursor: pointer; font-weight: 800;" onclick="closeEditModal()">✖</button>
+            </div>
+
+            <form id="editProfileForm" onsubmit="event.preventDefault(); saveProfileChanges();" style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 700;">Display Name</label>
+                    <input type="text" id="editUsername" required>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 700;">Country / Location</label>
+                    <select id="editCountry">
+                        <option value="United States">United States</option>
+                        <option value="European Union">European Union</option>
+                        <option value="India">India</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Global">Global Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 700;">Regulatory Compliance Standard</label>
+                    <select id="editStandard">
+                        <option value="GHG Protocol Corporate Standard">GHG Protocol Corporate Standard</option>
+                        <option value="EPA Climate Leaders">EPA Climate Leaders</option>
+                        <option value="CSRD European Directive">CSRD European Directive</option>
+                        <option value="ISO 14064 Standard">ISO 14064 Carbon Standard</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 700;">Select Avatar Style</label>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 6px;">
+                        <div class="avatar-card selected" onclick="selectModalAvatar('Falcon')">
+                            <span style="font-size: 0.8rem; font-weight: 700;">Falcon</span>
+                        </div>
+                        <div class="avatar-card" onclick="selectModalAvatar('Apex')">
+                            <span style="font-size: 0.8rem; font-weight: 700;">Apex</span>
+                        </div>
+                        <div class="avatar-card" onclick="selectModalAvatar('Sentinel')">
+                            <span style="font-size: 0.8rem; font-weight: 700;">Sentinel</span>
+                        </div>
+                        <div class="avatar-card" onclick="selectModalAvatar('Nova')">
+                            <span style="font-size: 0.8rem; font-weight: 700;">Nova</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                    <button type="submit" class="btn-neo btn-neo-primary" style="flex: 1;">Save Profile Changes</button>
+                    <button type="button" class="btn-neo" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER WITH ACTIVE STANDARD LINKS -->
+    <footer style="padding: 60px 40px 40px 40px; background: #FFFFFF; border-top: var(--ui-border); margin-top: 60px;">
+        <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; text-align: left; margin-bottom: 40px;">
+            <div>
+                <a href="index.html" class="logo" style="margin-bottom: 12px;">
+                    <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
+                </a>
+                <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 320px; margin-top: 8px;">
+                    Enterprise ESG &amp; Decarbonization Intelligence Platform. Deterministic GHG accounting, statistical anomaly detection, and real-time sensitivity simulation.
+                </p>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 12px; font-size: 0.9rem;">Platform</h4>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                    <li><a href="index.html" style="color: var(--text-muted); text-decoration: none;">Home</a></li>
+                    <li><a href="dashboard.html" style="color: var(--text-muted); text-decoration: none;">Dashboard</a></li>
+                    <li><a href="why.html" style="color: var(--text-muted); text-decoration: none;">Why Track?</a></li>
+                    <li><a href="docs.html" style="color: var(--text-muted); text-decoration: none;">Docs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 12px; font-size: 0.9rem;">Standards &amp; References</h4>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;">
+                    <li><a href="https://ghgprotocol.org/corporate-standard" target="_blank" style="color: var(--text-muted); text-decoration: none;">GHG Protocol Corporate Standard</a></li>
+                    <li><a href="https://www.gov.uk/government/collections/government-conversion-factors-for-company-reporting" target="_blank" style="color: var(--text-muted); text-decoration: none;">UK DEFRA Conversion Factors</a></li>
+                    <li><a href="https://www.epa.gov/egrid" target="_blank" style="color: var(--text-muted); text-decoration: none;">US EPA eGRID Database</a></li>
+                    <li><a href="https://www.ipcc.ch/report/ar6/wg1/" target="_blank" style="color: var(--text-muted); text-decoration: none;">IPCC Radiative Forcing Guidelines</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="max-width: 1100px; margin: 0 auto; padding-top: 24px; border-top: 1px solid #EEE; display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+            <span>© 2026 Carbonly. Building verifiable technology for a sustainable future.</span>
+            <span>Deterministic Math &amp; AI Intelligence</span>
+        </div>
     </footer>
 
     <script src="toast.js"></script>
     <script>
-        function selectAvatar(name, desc) {
-            document.getElementById("currentAvatarDisplay").innerText = name;
-            localStorage.setItem("userAvatar", name);
+        let selectedAvatarName = "Falcon";
 
-            const cards = document.querySelectorAll(".avatar-card");
-            cards.forEach(card => card.classList.remove("selected"));
+        function openEditModal() {
+            document.getElementById("editUsername").value = document.getElementById("displayUsername").innerText;
+            document.getElementById("editModal").style.display = "flex";
+        }
 
+        function closeEditModal() {
+            document.getElementById("editModal").style.display = "none";
+        }
+
+        function selectModalAvatar(name) {
+            selectedAvatarName = name;
+            document.querySelectorAll(".avatar-card").forEach(c => c.classList.remove("selected"));
             event.currentTarget.classList.add("selected");
-            showToast(`Profile avatar updated to ${desc}`, "success");
+        }
+
+        function saveProfileChanges() {
+            const username = document.getElementById("editUsername").value.trim();
+            const country = document.getElementById("editCountry").value;
+            const standard = document.getElementById("editStandard").value;
+
+            document.getElementById("displayUsername").innerText = username;
+            document.getElementById("displayCountry").innerText = country;
+            document.getElementById("displayStandard").innerText = standard;
+
+            localStorage.setItem("userCountry", country);
+            localStorage.setItem("userStandard", standard);
+
+            closeEditModal();
+            showToast("Profile settings updated successfully!", "success");
         }
 
         window.addEventListener("DOMContentLoaded", () => {
-            const savedAvatar = localStorage.getItem("userAvatar") || "FALCON";
-            document.getElementById("currentAvatarDisplay").innerText = savedAvatar;
-
             const token = localStorage.getItem("token");
             if (token) {
                 try {
                     const payload = JSON.parse(atob(token.split(".")[1]));
-                    document.getElementById("profileUsername").innerText = payload.username || "Authenticated User";
-                    document.getElementById("profileEmail").innerText = payload.username ? `${payload.username.toLowerCase()}@carbonly.io` : "user@carbonly.io";
+                    document.getElementById("displayUsername").innerText = payload.username || "Authenticated User";
+                    document.getElementById("displayEmail").innerText = payload.username ? `${payload.username.toLowerCase()}@carbonly.io` : "user@carbonly.io";
+                    document.getElementById("displayUserId").innerText = payload.id ? `USR-${payload.id.substring(0,6)}` : "USR-94821";
                 } catch(e){}
                 fetchHistory();
             } else {
                 document.getElementById("profileHistoryBody").innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center;">Please log in to view saved history.</td></tr>';
             }
+
+            document.getElementById("displayCountry").innerText = localStorage.getItem("userCountry") || "United States";
+            document.getElementById("displayStandard").innerText = localStorage.getItem("userStandard") || "GHG Protocol Corporate Standard";
         });
 
         async function fetchHistory() {
