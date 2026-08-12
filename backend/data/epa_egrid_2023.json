@@ -1,0 +1,5 @@
+[
+  { "subregion": "US", "name": "US National Grid Average", "factorKgCO2ePerKwh": 0.385, "unit": "kg CO2e / kWh", "source": "US EPA eGRID2023 Summary Table" },
+  { "subregion": "EU", "name": "EU EEA Grid Average", "factorKgCO2ePerKwh": 0.255, "unit": "kg CO2e / kWh", "source": "EEA 2023 Electricity Intensity" },
+  { "subregion": "IN", "name": "India CEA Grid Average", "factorKgCO2ePerKwh": 0.710, "unit": "kg CO2e / kWh", "source": "CEA CO2 Baseline Database v19" }
+]

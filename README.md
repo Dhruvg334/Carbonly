@@ -10,16 +10,16 @@
 </p>
 
 <p align="center">
-  An enterprise-grade ESG accounting platform providing deterministic GHG Protocol calculations across Scope 1, Scope 2, and Scope 3, versioned emission factor registries, calculation provenance lineage, uncertainty propagation, Holt-Winters time-series forecasting, constrained linear optimization, and evidence-grounded AI decision intelligence.
+  An enterprise-grade ESG accounting platform providing deterministic GHG Protocol calculations across Scope 1, Scope 2, and Scope 3, versioned emission factor registries, calculation provenance lineage, uncertainty propagation, Holt-Winters triple exponential smoothing forecasting, Primal Simplex linear programming optimization, Shapley value attribution, and evidence-grounded AI decision intelligence.
 </p>
 
 ---
 
 ## 1. Executive Summary & Core Architectural Philosophy
 
-Carbonly is an auditable carbon data and decarbonization decision platform: it converts corporate activity data into traceable GHG inventories, quantifies data confidence and uncertainty, identifies operational emission drivers, forecasts future trajectories, and optimizes decarbonization investments—with AI providing a grounded decision interface over verified evidence.
+Carbonly is an auditable carbon data and decarbonization decision platform: it converts corporate activity data into traceable GHG inventories, quantifies data confidence and uncertainty, identifies operational emission drivers via Shapley value game theory, forecasts future trajectories via Holt-Winters exponential smoothing, and optimizes decarbonization investments via Primal Simplex linear programming—with AI providing a grounded decision interface over verified evidence.
 
-### Enterprise Data Engineering Capabilities:
+### Enterprise Data Engineering & Mathematical Capabilities:
 - **High-Throughput Batch Ingestion & Idempotency Pipeline**: Bulk stream ingestion via NDJSON/CSV APIs (`/api/carbon/batch-ingest`) with strict idempotency key deduplication (`idempotencyKey`).
 - **Data Quality & Schema Drift Engine**: Automated assertion checking (`/api/carbon/data-quality-audit`) enforcing range bounds, type constraints, and schema drift warnings.
 - **Data Lineage DAG Graph Generator**: Directed Acyclic Graph (DAG) dependency generator (`/api/carbon/lineage-dag/:calcId`) mapping raw ingestion inflow $\rightarrow$ normalization rules $\rightarrow$ versioned factor entries $\rightarrow$ scope emission proofs.
@@ -39,8 +39,8 @@ graph TD
     I -->|Unique calculation_id & Uncertainty| J[Evidence Store]
     
     J --> K[Holt-Winters Forecasting Engine]
-    J --> L[Constrained Linear Solver]
-    J --> M[Z-Score Anomaly Detector]
+    J --> L[Primal Simplex Linear Solver]
+    J --> M[Shapley Value Anomaly Attribution]
     
     K --> N[Evidence-Grounded AI Reasoning Proxy - Groq LLM]
     L --> N
@@ -101,53 +101,42 @@ graph LR
 
 ---
 
-### D. GHG Protocol Category Mapping (Scope 1, 2, & Progressive Scope 3)
-Carbonly explicitly maps operational activity streams into formal GHG Protocol categories:
+### D. Authentic Holt-Winters Additive Triple Exponential Smoothing (`forecastingEngine.js`)
+Future emissions are projected using true **Holt-Winters Additive Triple Exponential Smoothing** with level $\ell_t$, trend $b_t$, and seasonal $s_t$ ($m=12$) state equations:
 
-- **Scope 1: Direct Mobile Combustion & Fleet Fuel** (`S1-MC-01`)
-- **Scope 2: Purchased Electricity Dual Accounting** (`S2-LOC-01`, `S2-MKT-01`)
-- **Scope 3: Value-Chain Categories** (`S3-CAT6-01`, `S3-CAT4-01`, `S3-CAT3-01`)
-
----
-
-### E. Emission Factor Registry (EFR) & Governance Lifecycle
-Every conversion factor is managed via an immutable **Emission Factor Registry** (`backend/services/emissionFactorRegistry.js`), preventing silent recalculation of historical reports when factors update.
-
-```mermaid
-stateDiagram-v2
-    [*] --> Draft : Factor Proposed
-    Draft --> Reviewed : Internal QA & Source Verification
-    Reviewed --> Approved : Enterprise Compliance Sign-off
-    Approved --> Active : Deployed to Registry Gateway
-    Active --> Deprecated : Superceded by New Annual Revision
-    Deprecated --> [*]
-```
+- **Level Update**: $\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1} + b_{t-1})$
+- **Trend Update**: $b_t = \beta (\ell_t - \ell_{t-1}) + (1-\beta)b_{t-1}$
+- **Seasonal Update**: $s_t = \gamma (y_t - \ell_t) + (1-\gamma)s_{t-m}$
+- **Forecast Horizon**: $\hat{y}_{N+h} = \ell_N + h \cdot b_N + s_{N+h-m}$
+- **Hyperparameter Grid Tuning**: Grid search over $\alpha, \beta, \gamma \in [0.1, 0.9]$ minimizing Sum of Squared Errors (SSE).
+- **Statistically Derived 95% Gaussian Prediction Bounds**: Horizon-scaled variance standard error $\text{SE}_h = \sigma_e \sqrt{1 + (h-1)\alpha^2}$, producing $95\%$ bounds $\hat{y}_{N+h} \pm 1.96 \cdot \text{SE}_h$.
 
 ---
 
-### F. Time-Series Forecasting & Model Accuracy Benchmarks
-Future emissions are projected using additive Holt-Winters exponential smoothing, benchmarked against a **Seasonal Naive Baseline** model:
+### E. Shapley Value Cooperative Game Theory Attribution (`anomalyAttribution.js`)
+Attributes anomaly variance drivers by formulating a 3-player cooperative game $N = \{\text{Transport}, \text{Grid}, \text{Travel}\}$ with characteristic function $v(S) = \left( \sum_{i \in S} \Delta_i \right)^{1.15}$:
 
-#### Empirical Model Accuracy Metrics:
-- **Mean Absolute Error (MAE)**: $2.14 \text{ kg CO}_2\text{e}$ across rolling backtest windows.
-- **Symmetric Mean Absolute Percentage Error (sMAPE)**: $3.12\%$.
-- **Mean Absolute Scaled Error (MASE)**: $0.42$ (outperforming Seasonal Naive baseline MASE $= 1.0$).
+$$\phi_i(v) = \sum_{S \subseteq N \setminus \{i\}} \frac{|S|!(|N|-|S|-1)!}{|N|!} \left[ v(S \cup \{i\}) - v(S) \right]$$
 
----
-
-### G. Operations Research & Decarbonization Linear Solver
-The slider optimization engine formulates a linear program to **maximize carbon emissions avoided** subject to an annual target capital budget:
-
-$$\max \sum_{i=1}^{n} c_i \cdot x_i \quad \text{subject to} \quad \sum_{i=1}^{n} v_i \cdot x_i \le B_{\text{annual}}, \quad 0 \le x_i \le 1$$
+Verifies the **Efficiency Axiom** ($\sum_{i \in N} \phi_i = v(N)$) to prove exact mathematical marginal attribution.
 
 ---
 
-## 3. Calculation Validation against Reference Examples
+### F. Operations Research Primal Simplex Linear Programming Solver (`optimizerEngine.js`)
+Formulates and solves a Primal Simplex Linear Program to **maximize carbon emissions avoided** subject to an annual target capital budget constraint:
+
+$$\max \quad Z = c_1 x_1 + c_2 x_2 + c_3 x_3 \quad \text{subject to} \quad w_1 x_1 + w_2 x_2 + w_3 x_3 \le B, \quad 0 \le x_j \le 1.0$$
+
+Constructs a standard 5-row Simplex Tableau matrix and executes Gauss-Jordan pivot operations until all objective row indicators $\ge 0$.
+
+---
+
+## 3. Calculation Validation against Reference Examples & Real Public Datasets
 
 | Validation Metric | Benchmark Value | Technical Description |
 |---|---|---|
-| **Reference Test Vectors** | 29 Automated Unit Tests | Verified against DEFRA, EPA, & Data Pipeline test suites |
-| **Passed Test Cases** | 29 / 29 (100% Pass Rate) | Native Node.js test runner execution |
+| **Reference Test Vectors** | 33 Automated Unit & Benchmark Tests | Verified against DEFRA, EPA, & Data Pipeline test suites |
+| **Passed Test Cases** | 33 / 33 (100% Pass Rate) | Native Node.js test runner execution |
 | **Max Absolute Error** | $0.0000 \text{ kg CO}_2e$ | Zero arithmetic deviation from reference standards |
 | **Mean Absolute Error (MAE)** | $0.0000 \text{ kg CO}_2e$ | Exact floating-point calculation match |
 | **Tolerance Boundary** | $\pm 10^{-6} \text{ kg CO}_2e$ | Strict numerical floating-point boundary |
@@ -159,6 +148,9 @@ $$\max \sum_{i=1}^{n} c_i \cdot x_i \quad \text{subject to} \quad \sum_{i=1}^{n}
 ```text
 Carbonly/
 ├── backend/
+│   ├── data/
+│   │   ├── defra_2024_factors.json  # Raw UK DEFRA 2024 conversion table reference
+│   │   └── epa_egrid_2023.json      # Raw US EPA eGRID 2023 subregion table reference
 │   ├── routes/
 │   │   ├── auth.js            # User registration & JWT multi-tenant authentication
 │   │   └── carbon.js          # GHG calculation, forecast, simulation, & DE endpoints
@@ -174,14 +166,14 @@ Carbonly/
 │   │   ├── baselineManager.js # 2030 Net-Zero target gap & trajectory manager
 │   │   ├── ingestionValidator.js # Input guardrails, schema validation, & unit conversion
 │   │   ├── anomalyDetector.js # Z-score statistical outlier detector
-      ├── anomalyAttribution.js # Shapley-style variance driver attribution
+│   │   ├── anomalyAttribution.js # Shapley Value cooperative game theory attribution
 │   │   ├── ecoScoreService.js # 0-1000 pts relative benchmark engine
-│   │   ├── forecastingEngine.js # Holt-Winters 12-month time-series forecaster
-│   │   ├── optimizerEngine.js # Operations research linear solver
+│   │   ├── forecastingEngine.js # Holt-Winters additive triple exponential forecaster
+│   │   ├── optimizerEngine.js # Primal Simplex Method linear programming solver
 │   │   └── groqService.js     # Groq LLM API proxy with evidence store grounding
 │   ├── middleware/
 │   │   └── auth.js            # Multi-tenant JWT authorization boundary middleware
-│   ├── tests/                 # 29 native unit tests across 6 test suites
+│   ├── tests/                 # 33 native unit tests across 7 test suites
 │   ├── server.js              # Express gateway entry point
 │   └── package.json
 ├── frontend/
@@ -195,7 +187,6 @@ Carbonly/
 │   ├── script.js             # API base URL controller & navbar state manager
 │   ├── toast.js              # Toast notification system
 │   └── sampleData.js          # Pre-loaded sandbox datasets & public metrics
-├── docs/                      # ARCHITECTURE, USER_GUIDE, DATASETS_AND_MATH, API_SPECIFICATION
 └── README.md
 ```
 
@@ -214,7 +205,7 @@ npm install
 # 3. Start Gateway Server
 npm start
 
-# 4. Run Automated Test Suite (29 Tests Across 6 Suites)
+# 4. Run Automated Test Suite (33 Tests Across 7 Suites)
 npm test
 ```
 

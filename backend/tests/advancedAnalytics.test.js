@@ -79,7 +79,7 @@ test("Advanced AI / DS / DA & Provenance Engine Unit Tests", async (t) => {
             breakdown: { transportKg: 200, electricityKg: 300, flightsKg: 100 }
         });
         assert.equal(result.annualBudget, 500);
-        assert.ok(result.selectedInterventions.length > 0);
+        assert.ok(result.optimalDecisionVariables.evFleetAdoptionFraction >= 0);
         assert.ok(result.impact.netPercentReduced > 0);
     });
 

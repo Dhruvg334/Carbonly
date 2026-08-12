@@ -1,0 +1,6 @@
+[
+  { "category": "Transport", "vehicleType": "gasoline", "factorKgCO2ePerKm": 0.192, "unit": "kg CO2e / km", "source": "UK DEFRA 2024 Table 1.1" },
+  { "category": "Transport", "vehicleType": "diesel", "factorKgCO2ePerKm": 0.171, "unit": "kg CO2e / km", "source": "UK DEFRA 2024 Table 1.2" },
+  { "category": "Transport", "vehicleType": "electric", "factorKgCO2ePerKm": 0.053, "unit": "kg CO2e / km", "source": "UK DEFRA 2024 Table 1.3" },
+  { "category": "Water", "type": "supply_treatment", "factorKgCO2ePerLiter": 0.000708, "unit": "kg CO2e / Liter", "source": "UK DEFRA 2024 Water Table" }
+]
