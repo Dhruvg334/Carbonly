@@ -71,6 +71,9 @@ test("Advanced AI / DS / DA & Provenance Engine Unit Tests", async (t) => {
         assert.equal(result.asIsSeries.length, 12);
         assert.equal(result.targetSeries.length, 12);
         assert.equal(result.upperBounds.length, 12);
+        assert.ok(result.outOfSampleTestMetrics.trainingMonths > 0);
+        assert.ok(result.outOfSampleTestMetrics.testMonths > 0);
+        assert.ok(result.historyStatus.fallbackMode !== undefined);
         assert.ok(result.annualProjectedAsIsKg > 0);
     });
 

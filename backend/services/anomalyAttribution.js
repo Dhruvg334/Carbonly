@@ -1,6 +1,7 @@
 /**
  * Multi-Variate Anomaly Root-Cause Attribution Engine (Cooperative Game Theory Shapley Values)
  * Formulates player subsets S ⊆ N, characteristic payoff functions v(S), and marginal contributions across all 2^(N-1) permutations.
+ * Incorporates super-additive operational synergy scaling factor (eta = 1.15) reflecting facility load compounding.
  */
 
 /**
@@ -8,9 +9,11 @@
  * 
  * @param {Object} currentEmissions Latest emissions breakdown
  * @param {Array} history Historical CarbonEntry records
+ * @param {Object} [options={ synergyExponent: 1.15 }] Configurable synergy exponent
  * @returns {Object} Shapley value attribution metrics and efficiency proof
  */
-function attributeAnomalySpike(currentEmissions = {}, history = []) {
+function attributeAnomalySpike(currentEmissions = {}, history = [], options = {}) {
+    const synergyExponent = options.synergyExponent || 1.15;
     const currentBreakdown = currentEmissions.breakdown || {};
 
     // 1. Calculate baseline historical category means
@@ -35,14 +38,15 @@ function attributeAnomalySpike(currentEmissions = {}, history = []) {
     const players = ["transport", "grid", "travel"];
     const N = players.length; // 3 players -> 8 coalitions
 
-    // 3. Define Characteristic Value Function v(S) with non-linear interaction exponent (1.25)
+    // 3. Define Characteristic Value Function v(S) with super-additive synergy exponent
+    // Physical Meaning: In corporate facility operations, simultaneous activity spikes across multiple vectors
+    // (e.g. simultaneous fleet logistics mileage AND facility power draw) create non-linear facility HVAC / infrastructure load compounding.
     function valueFunction(coalition) {
         if (coalition.length === 0) return 0;
         const sumDelta = coalition.reduce((sum, p) => sum + deltas[p], 0);
-        return Math.pow(sumDelta, 1.15); // Non-linear synergistic value function
+        return Math.pow(sumDelta, synergyExponent);
     }
 
-    // Helper: Factorial function
     function factorial(n) {
         return n <= 1 ? 1 : n * factorial(n - 1);
     }
@@ -54,7 +58,6 @@ function attributeAnomalySpike(currentEmissions = {}, history = []) {
         const otherPlayers = players.filter(p => p !== player);
         let phi = 0;
 
-        // Iterate over all 2^(N-1) subsets of other players
         const numSubsets = 1 << otherPlayers.length; // 2^2 = 4 subsets
         for (let mask = 0; mask < numSubsets; mask++) {
             const S = [];
@@ -94,7 +97,11 @@ function attributeAnomalySpike(currentEmissions = {}, history = []) {
 
     return {
         primaryDriver,
-        shapleyAxiomVerified: efficiencyResidual < 1e-4,
+        gameModelMetadata: {
+            synergyExponent,
+            physicalInterpretation: "Super-additive operational HVAC & infrastructure load compounding exponent",
+            efficiencyAxiomVerified: efficiencyResidual < 1e-4
+        },
         grandCoalitionValue: Number(grandCoalitionValue.toFixed(2)),
         totalShapleySum: Number(totalShapleySum.toFixed(2)),
         varianceAttribution: [

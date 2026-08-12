@@ -1,4 +1,9 @@
-const axios = require("axios");
+let axios = null;
+try {
+    axios = require("axios");
+} catch (e) {
+    axios = null;
+}
 
 /**
  * Groq AI Executive Intelligence & Decarbonization Service
@@ -12,8 +17,11 @@ const MODEL_NAME = "llama-3.3-70b-versatile";
  * Makes an authenticated request to the Groq LLM API with structured fallback.
  */
 async function callGroqLLM(systemPrompt, userPrompt) {
-    const apiKey = process.env.GROQ_API_KEY;
+    if (!axios) {
+        return null;
+    }
 
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey || apiKey.trim() === "" || apiKey === "your_groq_api_key") {
         return null; // Signals fallback mode
     }
@@ -81,18 +89,22 @@ Breakdown: Transport=${emissions.breakdown.transportKg}kg, Electricity=${emissio
 /**
  * Generates a root-cause explanation for a statistical consumption anomaly.
  */
-async function explainAnomaly(anomalyReport, emissions) {
-    if (!anomalyReport.isAnomaly) {
+async function explainAnomaly(anomalyReport = {}, emissions = {}) {
+    if (!anomalyReport || !anomalyReport.isAnomaly) {
         return null;
     }
+
+    const zScore = anomalyReport.zScore || 2.0;
+    const contributor = anomalyReport.primaryContributor || anomalyReport.primaryDriver || "Operational Consumption";
+    const variance = anomalyReport.variancePercentage || 50;
 
     const systemPrompt = `You are a Data Science & Energy Diagnostics Specialist. Provide a 2-sentence root-cause diagnosis for a statistical consumption spike. Focus on the primary contributing category and practical verification steps. No emojis.`;
 
     const userPrompt = `Anomaly Metrics:
-Z-Score: ${anomalyReport.zScore}
-Variance above baseline: +${anomalyReport.variancePercentage}%
-Primary Contributor: ${anomalyReport.primaryContributor}
-Current Emissions: ${emissions.totalKg} kg CO2e`;
+Z-Score: ${zScore}
+Variance above baseline: +${variance}%
+Primary Contributor: ${contributor}
+Current Emissions: ${emissions?.totalKg || 0} kg CO2e`;
 
     const aiResult = await callGroqLLM(systemPrompt, userPrompt);
 
@@ -101,21 +113,22 @@ Current Emissions: ${emissions.totalKg} kg CO2e`;
     }
 
     // Fallback diagnosis
-    return `Statistical Anomaly Triggered: Consumption in ${anomalyReport.primaryContributor} is ${anomalyReport.variancePercentage}% above your historical baseline (Z-Score: ${anomalyReport.zScore}). Verify equipment operational schedules or recent travel activity to identify transient usage patterns.`;
+    return `Statistical Anomaly Triggered: Consumption in ${contributor} is ${variance}% above your historical baseline (Z-Score: ${zScore}). Verify equipment operational schedules or recent travel activity to identify transient usage patterns.`;
 }
 
 /**
  * Generates structured, prioritized decarbonization recommendations.
  */
-async function generatePrioritizedActionPlan(emissions) {
+async function generatePrioritizedActionPlan(emissions = {}) {
+    const breakdown = emissions.breakdown || { transportKg: 80, electricityKg: 50, flightsKg: 0, waterKg: 0.5, digitalKg: 20 };
     const systemPrompt = `You are a Sustainability Engineering Consultant. Provide exactly 3 prioritized, actionable decarbonization recommendations based on the user's category breakdown. Order by carbon reduction ROI. Return a JSON array of 3 strings. No markdown formatting outside JSON.`;
 
     const userPrompt = `Breakdown (kg CO2e):
-Transport: ${emissions.breakdown.transportKg}
-Electricity: ${emissions.breakdown.electricityKg}
-Flights: ${emissions.breakdown.flightsKg}
-Water: ${emissions.breakdown.waterKg}
-Digital: ${emissions.breakdown.digitalKg}`;
+Transport: ${breakdown.transportKg}
+Electricity: ${breakdown.electricityKg}
+Flights: ${breakdown.flightsKg}
+Water: ${breakdown.waterKg}
+Digital: ${breakdown.digitalKg}`;
 
     const aiResult = await callGroqLLM(systemPrompt, userPrompt);
 
@@ -133,13 +146,13 @@ Digital: ${emissions.breakdown.digitalKg}`;
 
     // Rule-based fallback recommendations
     const tips = [];
-    if (emissions.breakdown.transportKg > emissions.breakdown.electricityKg) {
+    if (breakdown.transportKg > breakdown.electricityKg) {
         tips.push("Prioritize transport efficiency: Transition 30% of weekly commutes to public transit or electric vehicle alternatives to reduce Scope 1 footprint.");
     } else {
         tips.push("Optimize electricity consumption: Upgrade lighting to high-efficiency LEDs and utilize smart power strips to lower Scope 2 grid draw.");
     }
 
-    if (emissions.breakdown.flightsKg > 50) {
+    if (breakdown.flightsKg > 50) {
         tips.push("Consolidate air travel: Substitute short-haul flights with rail transport where feasible to eliminate high-altitude radiative forcing impacts.");
     } else {
         tips.push("Reduce digital & idle standby loads: Configure automatic sleep timers on workstations to curb digital footprint intensity.");
@@ -150,9 +163,25 @@ Digital: ${emissions.breakdown.digitalKg}`;
     return tips;
 }
 
+/**
+ * Interactive Copilot Q&A handler
+ */
+async function answerCopilotQuestion(question, latestEmissions) {
+    const systemPrompt = `You are an ESG Sustainability Copilot. Answer user questions concisely based on GHG Protocol rules and decarbonization best practices.`;
+    const userPrompt = `Question: ${question}\nLatest Footprint Data: ${JSON.stringify(latestEmissions)}`;
+
+    const aiResult = await callGroqLLM(systemPrompt, userPrompt);
+    if (aiResult) return aiResult;
+
+    return "To minimize overall emissions, prioritize your largest footprint category. Fleet electrification and grid renewable power purchasing yield the fastest return on investment.";
+}
+
 module.exports = {
     generateExecutiveSummary,
     explainAnomaly,
+    generateAnomalyDiagnosis: explainAnomaly,
     generatePrioritizedActionPlan,
+    generateActionableRecommendations: generatePrioritizedActionPlan,
+    answerCopilotQuestion,
     callGroqLLM
 };

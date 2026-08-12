@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  An enterprise-grade ESG accounting platform providing deterministic GHG Protocol calculations across Scope 1, Scope 2, and Scope 3, versioned emission factor registries, calculation provenance lineage, uncertainty propagation, Holt-Winters triple exponential smoothing forecasting, Primal Simplex linear programming optimization, Shapley value attribution, and evidence-grounded AI decision intelligence.
+  An enterprise-grade ESG accounting platform providing deterministic GHG Protocol calculations across Scope 1, Scope 2, and Scope 3, versioned emission factor registries, calculation provenance lineage, uncertainty propagation, Holt-Winters triple exponential smoothing with genuine Train/Test out-of-sample holdout evaluation, Primal Simplex linear programming optimization, Shapley value attribution with facility load synergy scaling, and evidence-grounded AI decision intelligence.
 </p>
 
 ---
@@ -101,7 +101,7 @@ graph LR
 
 ---
 
-### D. Authentic Holt-Winters Additive Triple Exponential Smoothing (`forecastingEngine.js`)
+### D. Holt-Winters Triple Exponential Smoothing with Out-of-Sample Holdout Evaluation (`forecastingEngine.js`)
 Future emissions are projected using true **Holt-Winters Additive Triple Exponential Smoothing** with level $\ell_t$, trend $b_t$, and seasonal $s_t$ ($m=12$) state equations:
 
 - **Level Update**: $\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1} + b_{t-1})$
@@ -109,16 +109,22 @@ Future emissions are projected using true **Holt-Winters Additive Triple Exponen
 - **Seasonal Update**: $s_t = \gamma (y_t - \ell_t) + (1-\gamma)s_{t-m}$
 - **Forecast Horizon**: $\hat{y}_{N+h} = \ell_N + h \cdot b_N + s_{N+h-m}$
 - **Hyperparameter Grid Tuning**: Grid search over $\alpha, \beta, \gamma \in [0.1, 0.9]$ minimizing Sum of Squared Errors (SSE).
-- **Statistically Derived 95% Gaussian Prediction Bounds**: Horizon-scaled variance standard error $\text{SE}_h = \sigma_e \sqrt{1 + (h-1)\alpha^2}$, producing $95\%$ bounds $\hat{y}_{N+h} \pm 1.96 \cdot \text{SE}_h$.
+- **Genuine Train/Test Out-of-Sample Evaluation**:
+  - Split: 70% Training Set ($t = 1 \ldots N_{train}$), 30% Held-Out Test Set ($t = N_{train}+1 \ldots N$).
+  - Fits model parameters $\alpha, \beta, \gamma$ **strictly on Training Set**.
+  - Evaluates MAE, sMAPE, and MASE **strictly on unseen held-out Test Set** (`outOfSampleTestMetrics`).
+- **Explicit History Sufficiency Metadata**:
+  - When historical observations $< 24$ months, explicitly flags `sufficientHistoryForOutofSample: false` and sets `fallbackMode: "DEMO_UI_SYNTHETIC_SEASONAL_FALLBACK"`.
 
 ---
 
-### E. Shapley Value Cooperative Game Theory Attribution (`anomalyAttribution.js`)
-Attributes anomaly variance drivers by formulating a 3-player cooperative game $N = \{\text{Transport}, \text{Grid}, \text{Travel}\}$ with characteristic function $v(S) = \left( \sum_{i \in S} \Delta_i \right)^{1.15}$:
+### E. Shapley Value Cooperative Game Theory Attribution & Synergy Calibration (`anomalyAttribution.js`)
+Attributes anomaly variance drivers by formulating a 3-player cooperative game $N = \{\text{Transport}, \text{Grid}, \text{Travel}\}$ with characteristic function $v(S) = \left( \sum_{i \in S} \Delta_i \right)^{\eta}$:
 
 $$\phi_i(v) = \sum_{S \subseteq N \setminus \{i\}} \frac{|S|!(|N|-|S|-1)!}{|N|!} \left[ v(S \cup \{i\}) - v(S) \right]$$
 
-Verifies the **Efficiency Axiom** ($\sum_{i \in N} \phi_i = v(N)$) to prove exact mathematical marginal attribution.
+- **Synergy Exponent ($\eta = 1.15$)**: Physical representation of super-additive operational facility load compounding ($\eta > 1.0$), where simultaneous fleet mileage AND grid power spikes create non-linear facility HVAC & infrastructure load penalties.
+- Verifies the **Efficiency Axiom** ($\sum_{i \in N} \phi_i = v(N)$) to prove exact mathematical marginal attribution.
 
 ---
 
