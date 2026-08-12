@@ -44,17 +44,17 @@
 </head>
 <body>
 
-    <!-- MAIN TOP NAVBAR (HOME BUTTON REMOVED - LOGO NAVIGATES HOME) -->
+    <!-- UNIFIED TOP NAVBAR (EXPORT BUTTON MOVED TO OVERVIEW PANEL) -->
     <header class="top-strip">
         <a href="index.html" class="logo">
             <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
         </a>
         <nav class="nav-links">
             <a href="dashboard.html" style="color: var(--emerald);">Dashboard</a>
-            <a href="why.html">Why Track?</a>
             <a href="docs.html">Docs</a>
-            <button class="btn-neo" style="padding: 6px 12px; font-size: 0.8rem;" onclick="exportEsgReport()">Export ESG Report</button>
-            <a href="profile.html" id="userBadge" class="badge-neo badge-neo-scope2" style="font-size: 0.85rem;">Profile &amp; History</a>
+            <div class="auth-nav-item">
+                <a href="profile.html" class="btn-neo btn-neo-primary" style="font-size: 0.85rem; padding: 8px 16px;">Profile &amp; History</a>
+            </div>
         </nav>
     </header>
 
@@ -115,12 +115,15 @@
              PANEL 1: OVERVIEW, SCOPE CHARTS & 12-MONTH FORECAST
              =================================================================== -->
         <div id="overviewPanel" class="panel-content active">
-            <!-- INSTRUCTION BANNER -->
-            <div class="panel-info-banner">
-                <span class="badge-neo badge-neo-scope2">Overview Guide</span>
-                <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
-                    View your total carbon footprint, metric breakdown across categories, 12-month predictive forecast, and executive AI brief.
-                </p>
+            <!-- INSTRUCTION BANNER WITH EXPORT ESG REPORT BUTTON -->
+            <div class="panel-info-banner" style="justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <span class="badge-neo badge-neo-scope2">Overview Guide</span>
+                    <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
+                        View your total footprint, metric breakdown, 12-month predictive forecast, and executive AI brief.
+                    </p>
+                </div>
+                <button class="btn-neo btn-neo-primary" style="padding: 8px 16px; font-size: 0.85rem; white-space: nowrap;" onclick="exportEsgReport()">Export ESG Audit Report</button>
             </div>
 
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
@@ -140,11 +143,16 @@
 
                 <!-- EXECUTIVE SUMMARY NARRATIVE CARD -->
                 <div style="display: flex; flex-direction: column; gap: 20px;">
-                    <div class="card-neo" style="background: #F4F9F5; height: 100%;">
-                        <span class="badge-neo badge-neo-scope2" style="margin-bottom: 12px;">Groq AI Executive Brief</span>
-                        <p id="executiveNarrativeText" style="font-size: 0.95rem; color: var(--primary-dark); font-style: italic; margin-top: 8px;">
-                            Select a sample dataset or input metrics in the Activity Calculator tab to generate your Groq AI Executive Brief.
-                        </p>
+                    <div class="card-neo" style="background: #F4F9F5; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <span class="badge-neo badge-neo-scope2" style="margin-bottom: 12px;">Groq AI Executive Brief</span>
+                            <p id="executiveNarrativeText" style="font-size: 0.95rem; color: var(--primary-dark); font-style: italic; margin-top: 8px;">
+                                Select a sample dataset or input metrics in the Activity Calculator tab to generate your Groq AI Executive Brief.
+                            </p>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <button class="btn-neo btn-neo-accent" style="width: 100%; font-size: 0.85rem;" onclick="exportEsgReport()">Download Formal ESG Certificate</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -423,6 +431,7 @@
     <!-- Scripts -->
     <script src="toast.js"></script>
     <script src="sampleData.js"></script>
+    <script src="script.js"></script>
     <script>
         let latestCalculatedData = null;
         let scopeChartInstance = null;
@@ -450,14 +459,6 @@
         }
 
         window.addEventListener("DOMContentLoaded", () => {
-            const token = getToken();
-            if (token) {
-                try {
-                    const payload = JSON.parse(atob(token.split(".")[1]));
-                    document.getElementById("userBadge").innerText = "Profile: " + (payload.username || "User");
-                } catch(e){}
-            }
-
             if (typeof loadSampleProfile === "function") {
                 loadSampleProfile("techOffice");
             }
@@ -554,7 +555,6 @@
                 document.getElementById("statStarRating").innerText = `★`.repeat(data.ecoScore.starRating || 5) + ` (${data.ecoScore.starRating || 5} Stars)`;
             }
 
-            // Anomaly Banner & Variance Attribution
             const anomalyBanner = document.getElementById("anomalyBanner");
             if (data.anomalyReport && data.anomalyReport.isAnomaly) {
                 anomalyBanner.style.display = "block";

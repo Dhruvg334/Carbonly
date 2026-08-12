@@ -5,19 +5,20 @@
 </p>
 
 <p align="center">
-  A high-performance enterprise ESG analytics platform providing deterministic GHG Protocol calculations across Scope 1, 2, and 3, statistical anomaly detection, 12-month time-series forecasting, and interactive scenario optimization.
+  An enterprise-grade ESG analytics platform providing deterministic GHG Protocol calculations across Scope 1, Scope 2, and Scope 3, statistical anomaly detection, 12-month time-series forecasting, and interactive scenario optimization.
 </p>
 
 ---
 
-## 1. Executive Summary & Architectural Philosophy
-Carbonly is built on a fundamental architectural principle: **decoupling deterministic mathematical accounting from probabilistic AI language generation**. 
+## 1. Architectural Blueprint & System Philosophy
 
-In corporate ESG auditing, carbon footprint calculations must strictly adhere to verified emission conversion constants established by government agencies (UK DEFRA, US EPA). Allowing an AI language model to directly compute arithmetic values introduces risks of model hallucination and audit failure. Carbonly solves this by executing all calculations via a **100% deterministic mathematical engine**, using the Groq `llama-3.3-70b-versatile` LLM exclusively for executive narrative briefs, anomaly root-cause explanation, and interactive strategy guidance.
+Carbonly is designed around a strict architectural boundary: **decoupling deterministic mathematical GHG accounting from probabilistic artificial intelligence**.
+
+In corporate ESG auditing, carbon footprint calculations must strictly adhere to verified emission conversion constants established by government environmental protection agencies (UK DEFRA, US EPA). Allowing an AI language model to directly compute arithmetic values introduces risks of model hallucination and audit failure. Carbonly solves this by executing all calculations via a **100% deterministic mathematical engine**, using the Groq `llama-3.3-70b-versatile` LLM exclusively for executive narrative briefs, anomaly root-cause explanation, and interactive strategy guidance.
 
 ```mermaid
 graph TD
-    A[Client Web Application] -->|HTTP / REST API| B[Express Gateway Server]
+    A[Client Web Application] -->|HTTP / REST API| B[Express Gateway Gateway Server]
     B --> C[Deterministic GHG Calculation Engine]
     B --> D[Statistical Z-Score Anomaly Detector]
     B --> E[EcoScore Benchmark Service]
@@ -29,58 +30,210 @@ graph TD
 
 ---
 
-## 2. Core Technical Capabilities
+## 2. Mathematical & Algorithmic Formulations
 
-### A. Deterministic GHG Accounting Engine
-Calculates verified metric tons of carbon dioxide equivalent ($tCO_2e$) across three standardized emission categories:
-- **Direct Driving & Fuel (Scope 1)**: Computes direct fuel combustion from transport distance ($km$) and engine types (Gasoline: $0.192 \text{ kg/km}$, Diesel: $0.171 \text{ kg/km}$, EV Grid Average: $0.053 \text{ kg/km}$).
-- **Home & Office Power (Scope 2)**: Computes location-based electricity draw ($kWh$) adjusted by regional power grid carbon intensity (US: $0.385 \text{ kg/kWh}$, EU: $0.255 \text{ kg/kWh}$, India: $0.710 \text{ kg/kWh}$, Global: $0.475 \text{ kg/kWh}$).
-- **Travel, Water & Digital (Scope 3)**: Computes commercial flight emissions with a $1.9 \times$ radiative forcing multiplier, municipal water treatment lifecycle factors ($0.000708 \text{ kg/L}$), and internet data transfer ($0.06 \text{ kg/GB} + 0.03 \text{ kg/hr}$).
+### A. Deterministic GHG Accounting Equations
 
-### B. Calculation Validation against Reference Examples
-To guarantee audit rigor, Carbonly’s deterministic engine is continuously validated against reference test cases:
+#### 1. Scope 1: Direct Fleet Transport & Fuel Combustion
+Direct emissions from owned or controlled mobile combustion sources are calculated as:
 
-| Validation Metric | Benchmark Value | Description |
+$$E_{\text{Scope 1}} = D_{\text{km}} \times C_f$$
+
+Where:
+- $D_{\text{km}}$ is the vehicle distance traveled in kilometers.
+- $C_f$ is the fuel-specific emission factor in $\text{kg CO}_2\text{e / km}$:
+  - $\text{Gasoline}: 0.192 \text{ kg CO}_2\text{e/km}$ (DEFRA 2024 Passenger Car Average)
+  - $\text{Diesel}: 0.171 \text{ kg CO}_2\text{e/km}$ (DEFRA 2024 Diesel Car Average)
+  - $\text{Electric (EV)}: 0.053 \text{ kg CO}_2\text{e/km}$ (Grid average charging draw)
+
+#### 2. Scope 2: Location-Based Electricity Grid Draw
+Indirect emissions from purchased electricity are calculated as:
+
+$$E_{\text{Scope 2}} = E_{\text{kWh}} \times I_{\text{grid}}$$
+
+Where:
+- $E_{\text{kWh}}$ is the electrical consumption in kilowatt-hours.
+- $I_{\text{grid}}$ is the regional grid carbon intensity factor in $\text{kg CO}_2\text{e / kWh}$:
+  - $\text{United States (US EPA eGRID)}: 0.385 \text{ kg CO}_2\text{e/kWh}$
+  - $\text{European Union (EU Average)}: 0.255 \text{ kg CO}_2\text{e/kWh}$
+  - $\text{India (Central Electricity Authority)}: 0.710 \text{ kg CO}_2\text{e/kWh}$
+  - $\text{Global Average Baseline}: 0.475 \text{ kg CO}_2\text{e/kWh}$
+
+#### 3. Scope 3: Value-Chain Aviation, Water, & Digital Data Transfer
+Scope 3 emissions encapsulate upstream and downstream value chain activities:
+
+$$E_{\text{Scope 3}} = E_{\text{aviation}} + E_{\text{water}} + E_{\text{digital}}$$
+
+$$E_{\text{aviation}} = N_{\text{flights}} \times D_{\text{haul}} \times F_{\text{flight}} \times RF$$
+
+Where:
+- $RF = 1.9$ is the IPCC AR6 Radiative Forcing Multiplier accounting for high-altitude non-$\text{CO}_2$ warming effects (water vapor, contrails, nitrous oxides).
+- $F_{\text{flight}} = 0.156 \text{ kg CO}_2\text{e/passenger-km}$.
+- $E_{\text{water}} = V_{\text{liters}} \times 0.000708 \text{ kg CO}_2\text{e/L}$ (Municipal water treatment and distribution lifecycle factor).
+- $E_{\text{digital}} = (G_{\text{GB}} \times 0.06 + H_{\text{hours}} \times 0.03) \times I_{\text{grid}}$ (Data center transfer & display power).
+
+---
+
+### B. Statistical Anomaly Detection & Shapley Variance Attribution
+
+#### 1. Z-Score Outlier Bound
+Historical time-series logs are evaluated to detect operational consumption spikes:
+
+$$Z = \frac{x_i - \mu}{\sigma}$$
+
+Where $\mu$ is the rolling historical mean and $\sigma$ is the sample standard deviation. An anomaly alert is triggered whenever $Z > 2.0$.
+
+#### 2. Shapley Variance Decomposition
+When an anomaly is flagged, the system computes the exact Shapley contribution factor $\phi_k$ for each activity vector $k \in \{\text{transport}, \text{electricity}, \text{flights}\}$:
+
+$$\phi_k = \frac{\Delta x_k}{\sum_{j} \Delta x_j} \times 100\%$$
+
+Isolating the primary category responsible for the emission surge.
+
+---
+
+### C. Holt-Winters Exponential Smoothing Time-Series Forecasting
+
+12-month future trajectories are modeled using additive Holt-Winters exponential smoothing:
+
+$$\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1} + b_{t-1})$$
+
+$$b_t = \beta (\ell_t - \ell_{t-1}) + (1-\beta) b_{t-1}$$
+
+$$\hat{y}_{t+h} = \ell_t + h \cdot b_t + s_{t+h-m}$$
+
+Upper and lower 95% confidence intervals are computed as:
+
+$$\text{CI}_{95\%} = \hat{y}_{t+h} \pm 1.96 \times \hat{\sigma}_e \sqrt{1 + \sum_{j=1}^{h-1} \psi_j^2}$$
+
+---
+
+### D. Constrained Decarbonization Linear Solver
+
+The slider optimization solver formulates a linear program to minimize total carbon emissions subject to a financial budget constraint:
+
+$$\min \sum_{i=1}^{n} c_i \cdot x_i \quad \text{subject to} \quad \sum_{i=1}^{n} v_i \cdot x_i \le B_{\text{annual}}, \quad 0 \le x_i \le 1$$
+
+Where:
+- $x_i$ is the implementation fraction of intervention $i$ (EV transition, Solar PPA, flight reduction).
+- $c_i$ is the carbon reduction impact of intervention $i$.
+- $v_i$ is the capital cost of intervention $i$.
+- $B_{\text{annual}}$ is the user's defined annual target budget.
+
+---
+
+## 3. Calculation Validation against Reference Examples
+
+To guarantee mathematical audit rigor, Carbonly’s calculation engine is verified against reference test vectors:
+
+| Validation Metric | Benchmark Value | Technical Description |
 |---|---|---|
-| **Reference Calculation Cases** | 19 Automated Tests | Verified against official DEFRA & EPA test vectors |
-| **Passed Test Cases** | 19 / 19 (100% Pass Rate) | All test assertions pass cleanly |
+| **Reference Test Vectors** | 19 Automated Unit Tests | Verified against official DEFRA & EPA test cases |
+| **Passed Test Cases** | 19 / 19 (100% Pass Rate) | Native Node.js test runner execution |
 | **Max Absolute Error** | $0.0000 \text{ kg CO}_2e$ | Zero arithmetic deviation from reference standards |
 | **Mean Absolute Error (MAE)** | $0.0000 \text{ kg CO}_2e$ | Exact floating-point calculation match |
-| **Tolerance Threshold** | $\pm 10^{-6} \text{ kg CO}_2e$ | Strict numerical verification boundary |
-
-### C. Relative EcoScore & 5-Star Rating Engine
-Evaluates user footprint relative to global benchmark weekly average emissions ($86.5 \text{ kg CO}_2e / \text{week}$ per person/facility):
-- $\le 43 \text{ kg/week} \implies$ **5 Stars (900-1000 pts) - Climate Champion** (Top 10% Lowest Emissions)
-- $\le 73 \text{ kg/week} \implies$ **4 Stars (750-899 pts) - Eco Leader** (Top 25% Lowest Emissions)
-- $\le 108 \text{ kg/week} \implies$ **3 Stars (600-749 pts) - Average Baseline** (Standard Global Average)
-- $> 108 \text{ kg/week} \implies$ **1-2 Stars (<600 pts) - High Priority Target**
-
-### D. Time-Series Forecasting & Anomaly Spike Detection
-- **Holt-Winters Exponential Smoothing**: Projects 12-month future emissions trajectories with upper and lower 95% confidence bounds ($\hat{y}_{t+h} \pm 1.96 \cdot \sigma_h$).
-- **Z-Score Anomaly Detector**: Flags statistical consumption spikes when $Z = (x_i - \mu)/\sigma > 2.0$ and decomposes variance drivers using Shapley attribution math.
-
-### E. Constrained Linear Optimization Solver
-Formulates an operations research linear program to calculate Pareto-optimal slider positions for budget-constrained decarbonization:
-$$\min \sum c_i \cdot x_i \quad \text{subject to} \quad \sum e_i \cdot x_i \ge E_{\text{target}}$$
+| **Tolerance Boundary** | $\pm 10^{-6} \text{ kg CO}_2e$ | Strict numerical floating-point boundary |
 
 ---
 
-## 3. Repository Documentation Hierarchy
-Detailed technical specifications are located in the repository [`docs/`](file:///c:/Projects/Carbonly/docs/) directory:
-- [`docs/ARCHITECTURE.md`](file:///c:/Projects/Carbonly/docs/ARCHITECTURE.md): System architecture, layer boundaries, and Mermaid diagrams.
-- [`docs/USER_GUIDE.md`](file:///c:/Projects/Carbonly/docs/USER_GUIDE.md): Step-by-step user manual and platform feature walkthrough.
-- [`docs/DATASETS_AND_MATH.md`](file:///c:/Projects/Carbonly/docs/DATASETS_AND_MATH.md): Reference conversion factor tables, accuracy metrics, and mathematical equations.
-- [`docs/API_SPECIFICATION.md`](file:///c:/Projects/Carbonly/docs/API_SPECIFICATION.md): Complete REST API endpoints and JSON payload schemas.
+## 4. Repository Architecture & File Structure
+
+```text
+Carbonly/
+├── backend/
+│   ├── routes/
+│   │   ├── auth.js            # User registration & JWT authentication
+│   │   └── carbon.js          # GHG calculation, forecast, simulation, & report endpoints
+│   ├── services/
+│   │   ├── carbonEngine.js    # Scope 1, 2, 3 GHG calculation engine
+│   │   ├── anomalyDetector.js # Z-score statistical outlier detector
+│   │   ├── anomalyAttribution.js # Shapley variance root-cause attribution
+│   │   ├── ecoScoreService.js # 0-1000 pts relative benchmark engine
+│   │   ├── forecastingEngine.js # Holt-Winters 12-month time-series forecaster
+│   │   ├── optimizerEngine.js # Operations research linear solver
+│   │   └── groqService.js     # Groq LLM API proxy with deterministic fallbacks
+│   ├── tests/
+│   │   ├── carbonEngine.test.js
+│   │   ├── anomalyDetector.test.js
+│   │   ├── ecoScoreService.test.js
+│   │   ├── groqService.test.js
+│   │   └── advancedAnalytics.test.js
+│   ├── models/                # User & CarbonRecord database models
+│   ├── server.js              # Express gateway entry point
+│   └── package.json
+├── frontend/
+│   ├── index.html             # Centered hero landing page & live report card
+│   ├── dashboard.html         # Subpaged ESG analytics dashboard hub
+│   ├── docs.html              # Subpaged technical documentation hub
+│   ├── profile.html           # Profile management, reset password, & activity log
+│   ├── why.html               # 6-card "Why Track Carbon?" value proposition page
+│   ├── login.html             # Unified switchable authentication portal
+│   ├── signup.html            # Redirect page to unified login portal
+│   ├── style.css              # Custom high-contrast design system
+│   ├── script.js             # Dynamic navbar authentication state sync
+│   ├── toast.js              # Toast notification system
+│   ├── sampleData.js          # Pre-loaded sandbox datasets & public dataset metrics
+│   └── assets/                # High-craft SVG vectors (logo.svg, hero-illustration.svg)
+├── docs/
+│   ├── ARCHITECTURE.md        # Technical design blueprint
+│   ├── USER_GUIDE.md          # Platform user guide & handbook
+│   ├── DATASETS_AND_MATH.md   # Dataset specifications & math formulas
+│   └── API_SPECIFICATION.md   # Complete REST API specifications
+└── README.md
+```
 
 ---
 
-## 4. Local Development Setup
+## 5. REST API Specifications
+
+### A. Calculation Endpoint
+- **URL**: `POST /api/carbon/calculate`
+- **Headers**: `Content-Type: application/json`, `Authorization: Bearer <token>`
+- **Request Payload**:
+```json
+{
+  "transportKm": 180,
+  "vehicleType": "gasoline",
+  "electricityKwh": 350,
+  "region": "US",
+  "flightsTaken": 1,
+  "flightType": "short",
+  "waterLiters": 1200,
+  "screenHours": 160,
+  "internetGb": 450
+}
+```
+- **Response Schema**:
+```json
+{
+  "status": "success",
+  "data": {
+    "totalKg": 205.8,
+    "totalTonnes": 0.2058,
+    "scopes": {
+      "scope1": { "kg": 34.56, "percentage": 16.8 },
+      "scope2": { "kg": 134.75, "percentage": 65.5 },
+      "scope3": { "kg": 36.49, "percentage": 17.7 }
+    },
+    "ecoScore": { "scorePoints": 920, "starRating": 5 },
+    "anomalyReport": { "isAnomaly": false, "zScore": "0.42" },
+    "executiveSummary": "Activity footprint totals 205.80 kg CO2e dominated by grid power draw."
+  }
+}
+```
+
+### B. ESG Report Exporter Endpoint
+- **URL**: `GET /api/carbon/export-report`
+- **Headers**: `Authorization: Bearer <token>`
+- **Response**: Triggers an automated download of a certified Markdown/HTML ESG Audit Certificate.
+
+---
+
+## 6. Local Setup & Testing
 
 ### Prerequisites
 - Node.js (v18.0.0 or higher)
 - npm (v9.0.0 or higher)
-
-### Step-by-Step Installation
 
 ```bash
 # 1. Clone Repository
@@ -90,29 +243,14 @@ cd Carbonly/backend
 # 2. Install Dependencies
 npm install
 
-# 3. Environment Configuration (Optional)
-# Create a .env file inside backend/ directory if supplying custom PORT or GROQ_API_KEY
-# PORT=5000
-# GROQ_API_KEY=your_groq_api_key_here
-
-# 4. Start Backend Express Server
+# 3. Start Backend Gateway Server
 npm start
-```
 
-### Running Automated Test Suite
-
-```bash
+# 4. Execute Automated Test Suite (19 Tests Across 5 Suites)
 npm test
 ```
 
 ---
 
-## 5. Deployment Configuration
-Carbonly is configured for single-command deployment to **Netlify**:
-- `publish = "frontend"`
-- SPA fallback redirect rule: `/* -> /index.html (200)` configured in `netlify.toml` and `frontend/_redirects`.
-
----
-
-## 6. License
+## 7. License
 Distributed under the Open Source **MIT License**.

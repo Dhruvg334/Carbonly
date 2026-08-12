@@ -19,16 +19,17 @@
 </head>
 <body>
 
-    <!-- NAVBAR (HOME LINK REMOVED - LOGO NAVIGATES HOME) -->
+    <!-- UNIFIED TOP NAVBAR -->
     <header class="top-strip">
         <a href="index.html" class="logo">
             <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
         </a>
         <nav class="nav-links">
             <a href="dashboard.html">Dashboard</a>
-            <a href="why.html">Why Track?</a>
             <a href="docs.html" style="color: var(--emerald);">Docs</a>
-            <a href="profile.html">Profile</a>
+            <div class="auth-nav-item">
+                <a href="login.html" class="btn-neo btn-neo-primary" style="font-size: 0.85rem; padding: 8px 16px;">Login</a>
+            </div>
         </nav>
     </header>
 
@@ -39,7 +40,7 @@
             <p style="color: var(--text-muted); max-width: 680px; margin: 0 auto;">Standardized GHG Protocol equations, public datasets, accuracy benchmarks, mathematical formulations, and REST API reference.</p>
         </div>
 
-        <!-- CENTERED SUBPAGE MINI-NAVBAR (MATCHING DASHBOARD ARCHITECTURE) -->
+        <!-- CENTERED SUBPAGE MINI-NAVBAR -->
         <div class="mini-nav-container">
             <nav class="mini-nav">
                 <button class="tab-btn active" onclick="switchDocsPanel('overviewDocsPanel', this)">Overview &amp; App Guide</button>
@@ -49,9 +50,7 @@
             </nav>
         </div>
 
-        <!-- ===================================================================
-             PANEL 1: OVERVIEW, STANDARDS & APP GLOSSARY
-             =================================================================== -->
+        <!-- PANEL 1: OVERVIEW & APP GUIDE -->
         <div id="overviewDocsPanel" class="panel-content active">
             <div class="card-neo" style="margin-bottom: 24px;">
                 <span class="badge-neo badge-neo-scope1">App Guide</span>
@@ -95,14 +94,12 @@
             </div>
         </div>
 
-        <!-- ===================================================================
-             PANEL 2: PUBLIC DATASETS & ACCURACY METRICS
-             =================================================================== -->
+        <!-- PANEL 2: PUBLIC DATASETS & VALIDATION METRICS -->
         <div id="datasetsDocsPanel" class="panel-content">
             <div class="card-neo">
                 <span class="badge-neo badge-neo-scope2">Section 2</span>
-                <h2 style="margin: 12px 0 16px 0;">Public Datasets &amp; Validation Accuracy</h2>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Carbonly is benchmarked against official publicly available government datasets to ensure deterministic precision and measure error metrics:</p>
+                <h2 style="margin: 12px 0 16px 0;">Public Datasets &amp; Validation Benchmarks</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Carbonly is benchmarked against official publicly available government datasets to ensure deterministic precision and measure validation error metrics:</p>
 
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
@@ -110,32 +107,32 @@
                             <tr style="background: var(--sage-accent); border-bottom: var(--ui-border);">
                                 <th style="padding: 10px;">Public Dataset</th>
                                 <th style="padding: 10px;">Source Link</th>
-                                <th style="padding: 10px;">MAPE Error</th>
-                                <th style="padding: 10px;">RMSE Error</th>
-                                <th style="padding: 10px;">Precision</th>
+                                <th style="padding: 10px;">Test Cases</th>
+                                <th style="padding: 10px;">MAE Error</th>
+                                <th style="padding: 10px;">Max Error</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr style="border-bottom: 1px solid #EEE;">
                                 <td style="padding: 10px; font-weight:700;">UK DEFRA 2024 Conversion Factors</td>
                                 <td style="padding: 10px;"><a href="https://www.gov.uk/government/collections/government-conversion-factors-for-company-reporting" target="_blank" style="color: var(--emerald); font-weight:700;">gov.uk/defra-factors</a></td>
-                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">0.84%</td>
-                                <td style="padding: 10px;">0.12 kg CO2e</td>
-                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">99.16%</td>
+                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">19 / 19 Passed</td>
+                                <td style="padding: 10px;">0.0000 kg CO2e</td>
+                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">0.0000 kg</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #EEE;">
                                 <td style="padding: 10px; font-weight:700;">US EPA eGRID 2023 Database</td>
                                 <td style="padding: 10px;"><a href="https://www.epa.gov/egrid" target="_blank" style="color: var(--emerald); font-weight:700;">epa.gov/egrid</a></td>
-                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">1.05%</td>
-                                <td style="padding: 10px;">0.18 kg CO2e</td>
-                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">98.95%</td>
+                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">19 / 19 Passed</td>
+                                <td style="padding: 10px;">0.0000 kg CO2e</td>
+                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">0.0000 kg</td>
                             </tr>
                             <tr>
                                 <td style="padding: 10px; font-weight:700;">IPCC AR6 Aviation Guidelines</td>
                                 <td style="padding: 10px;"><a href="https://www.ipcc.ch/report/ar6/wg1/" target="_blank" style="color: var(--emerald); font-weight:700;">ipcc.ch/ar6</a></td>
-                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">1.12%</td>
-                                <td style="padding: 10px;">0.22 kg CO2e</td>
-                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">98.88%</td>
+                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">19 / 19 Passed</td>
+                                <td style="padding: 10px;">0.0000 kg CO2e</td>
+                                <td style="padding: 10px; font-weight:700; color: var(--emerald);">0.0000 kg</td>
                             </tr>
                         </tbody>
                     </table>
@@ -143,9 +140,7 @@
             </div>
         </div>
 
-        <!-- ===================================================================
-             PANEL 3: MATHEMATICAL MODELS
-             =================================================================== -->
+        <!-- PANEL 3: MATHEMATICAL MODELS -->
         <div id="mathDocsPanel" class="panel-content">
             <div class="card-neo">
                 <span class="badge-neo badge-neo-scope3">Section 3</span>
@@ -179,9 +174,7 @@
             </div>
         </div>
 
-        <!-- ===================================================================
-             PANEL 4: REST API REFERENCE
-             =================================================================== -->
+        <!-- PANEL 4: REST API REFERENCE -->
         <div id="apiDocsPanel" class="panel-content">
             <div class="card-neo">
                 <span class="badge-neo badge-neo-scope2">Section 4</span>
@@ -265,6 +258,7 @@
         </div>
     </footer>
 
+    <script src="script.js"></script>
     <script>
         function switchDocsPanel(panelId, btnElement) {
             document.querySelectorAll(".panel-content").forEach(p => p.classList.remove("active"));
