@@ -1,14 +1,20 @@
 /**
  * Carbonly Audit Trail & Data Mutation Log Engine
- * Logs data mutations (User -> Action -> Old State -> New State -> Reason -> Timestamp).
+ * Logs immutable data mutation events (userId -> organizationId -> Action -> Old State -> New State -> Reason -> Timestamp).
  */
 
 const auditLogStore = [];
 
-function recordAuditEvent(userEmail, action, oldState, newState, reason, affectedCalcId) {
+function recordAuditEvent(userObj, action, oldState, newState, reason, affectedCalcId) {
+    const user = typeof userObj === "object" ? userObj : { userId: "usr_analyst_01", userEmail: String(userObj) };
+
     const event = {
         eventId: "audit_" + Math.random().toString(36).substring(2, 9),
-        userEmail: userEmail || "system_analyst@carbonly.io",
+        userId: user.userId || "usr_analyst_01",
+        userEmail: user.userEmail || "analyst@company.com",
+        organizationId: user.organizationId || "ORG-ENTERPRISE-891",
+        role: user.role || "Sustainability Analyst",
+        sessionId: user.sessionId || "sess_9401ab",
         action,
         oldState,
         newState,
@@ -21,9 +27,9 @@ function recordAuditEvent(userEmail, action, oldState, newState, reason, affecte
     return event;
 }
 
-function getAuditTrail(filterEmail) {
-    if (filterEmail) {
-        return auditLogStore.filter(e => e.userEmail === filterEmail);
+function getAuditTrail(filterOrgId) {
+    if (filterOrgId) {
+        return auditLogStore.filter(e => e.organizationId === filterOrgId);
     }
     return [...auditLogStore];
 }

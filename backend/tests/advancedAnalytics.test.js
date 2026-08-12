@@ -16,19 +16,23 @@ test("Advanced AI / DS / DA & Provenance Engine Unit Tests", async (t) => {
         assert.equal(factor.factor_id, "EPA_GRID_US_2023");
         assert.equal(factor.value, 0.385);
         assert.equal(factor.lifecycle_status, "Active");
-        assert.equal(factor.source_organization, "US EPA eGRID");
+        assert.equal(factor.approved_by, "ESG Compliance & Audit Board");
     });
 
     await t.test("getMethodology should return accounting boundary and methodology details", () => {
-        const method = getMethodology("S1-CAT1-01");
-        assert.equal(method.methodology_id, "S1-CAT1-01");
+        const method = getMethodology("S1-MC-01");
+        assert.equal(method.methodology_id, "S1-MC-01");
         assert.equal(method.scope, "Scope 1");
-        assert.equal(method.accounting_boundary, "Operational Control Boundary");
+        assert.equal(method.ghg_category, "Mobile Combustion");
+        assert.equal(method.accounting_boundary, "Operational Control Fleet Boundary");
     });
 
-    await t.test("recordAuditEvent should log data mutation event", () => {
-        const event = recordAuditEvent("analyst@company.com", "UPDATE_ELECTRICITY", 350, 370, "Invoice correction");
+    await t.test("recordAuditEvent should log data mutation event with immutable userId and orgId", () => {
+        const user = { userId: "usr_analyst_01", userEmail: "analyst@company.com", organizationId: "ORG-891" };
+        const event = recordAuditEvent(user, "UPDATE_ELECTRICITY", 350, 370, "Invoice correction");
+        assert.equal(event.userId, "usr_analyst_01");
         assert.equal(event.userEmail, "analyst@company.com");
+        assert.equal(event.organizationId, "ORG-891");
         assert.equal(event.oldState, 350);
         assert.equal(event.newState, 370);
     });

@@ -14,12 +14,12 @@ function generateCalculationLineage(inputActivity, scopeBreakdown) {
     const factorsUsed = [];
     const methodologiesUsed = [];
 
-    // Scope 1 Lineage & Methodology
+    // Scope 1 Lineage & Mobile Combustion Methodology
     let s1FactorId = "DEFRA_TRANSPORT_GASOLINE_2024";
     if (inputActivity.vehicleType === "diesel") s1FactorId = "DEFRA_TRANSPORT_DIESEL_2024";
     if (inputActivity.vehicleType === "electric") s1FactorId = "DEFRA_TRANSPORT_EV_2024";
     factorsUsed.push(getEmissionFactor(s1FactorId));
-    methodologiesUsed.push(getMethodology("S1-CAT1-01"));
+    methodologiesUsed.push(getMethodology("S1-MC-01"));
 
     // Scope 2 Lineage & Dual Accounting Methodology
     let s2FactorId = "GLOBAL_GRID_DEFAULT_2024";
