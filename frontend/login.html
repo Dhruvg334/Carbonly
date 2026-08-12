@@ -3,70 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Carbonly Intelligence Platform</title>
+    <title>Authentication | Carbonly Intelligence Platform</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-</head>
-<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--mint-light);">
+    
+    <style>
+        .auth-container {
+            width: 100%;
+            max-width: 440px;
+            background: #FFFFFF;
+            padding: 36px;
+            margin: 100px auto 40px auto;
+        }
 
-    <main class="card-neo" style="width: 100%; max-width: 420px; background: #FFFFFF; padding: 36px;">
-        <div style="text-align: center; margin-bottom: 28px;">
+        .auth-tabs {
+            display: flex;
+            background: var(--mint-light);
+            border: var(--ui-border);
+            border-radius: 8px;
+            padding: 4px;
+            gap: 6px;
+            margin-bottom: 24px;
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 6px;
+            color: var(--primary-dark);
+            transition: background var(--motion-fast);
+        }
+
+        .auth-tab-btn.active {
+            background: var(--emerald);
+            color: #FFFFFF !important;
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .eye-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body style="background: var(--mint-light);">
+
+    <!-- NAVBAR (HOME LINK REMOVED - LOGO NAVIGATES HOME) -->
+    <header class="top-strip">
+        <a href="index.html" class="logo">
+            <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
+        </a>
+        <nav class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="why.html">Why Track?</a>
+            <a href="docs.html">Docs</a>
+        </nav>
+    </header>
+
+    <main class="card-neo auth-container">
+        <div style="text-align: center; margin-bottom: 24px;">
             <a href="index.html" class="logo" style="justify-content: center; font-size: 1.8rem; margin-bottom: 8px;">
-                <img src="assets/icon.svg" alt="Carbonly Logo"> Carbonly
+                <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
             </a>
-            <span class="badge-neo badge-neo-scope2">Secure Gateway Login</span>
+            <span class="badge-neo badge-neo-scope2" id="authSubTitle">Secure Account Access</span>
         </div>
 
-        <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- SWITCHABLE TAB TOGGLE (LOGIN / SIGNUP) -->
+        <div class="auth-tabs">
+            <button class="auth-tab-btn active" id="loginTabBtn" onclick="switchAuthMode('login')">Log In</button>
+            <button class="auth-tab-btn" id="signupTabBtn" onclick="switchAuthMode('signup')">Sign Up</button>
+        </div>
+
+        <form id="authForm" onsubmit="event.preventDefault(); handleAuthSubmit();" style="display: flex; flex-direction: column; gap: 16px;">
             <div>
                 <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">Username</label>
                 <input type="text" id="username" placeholder="Enter your username" required>
             </div>
 
+            <div id="emailContainer" style="display: none;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">Email Address</label>
+                <input type="email" id="email" placeholder="name@company.com">
+            </div>
+
             <div>
                 <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">Password</label>
-                <input type="password" id="password" placeholder="••••••••" required>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="••••••••" required>
+                    <button type="button" class="eye-btn" onclick="togglePasswordVisibility()" title="Toggle Password Visibility">👁️</button>
+                </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
-                <a href="forgot-password.html" style="color: var(--emerald); font-weight: 700; text-decoration: none;">Forgot Password?</a>
-            </div>
-
-            <button type="submit" class="btn-neo btn-neo-primary" style="width: 100%; margin-top: 8px;">Log In</button>
+            <button type="submit" class="btn-neo btn-neo-primary" id="authSubmitBtn" style="width: 100%; margin-top: 8px;">Log In</button>
         </form>
-
-        <div style="text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--text-muted);">
-            Don't have an account? <a href="signup.html" style="color: var(--emerald); font-weight: 700; text-decoration: none;">Sign Up</a>
-        </div>
     </main>
 
     <script src="toast.js"></script>
     <script>
-        async function handleLogin() {
+        let currentAuthMode = "login";
+
+        function switchAuthMode(mode) {
+            currentAuthMode = mode;
+            const loginBtn = document.getElementById("loginTabBtn");
+            const signupBtn = document.getElementById("signupTabBtn");
+            const emailContainer = document.getElementById("emailContainer");
+            const submitBtn = document.getElementById("authSubmitBtn");
+            const subTitle = document.getElementById("authSubTitle");
+
+            if (mode === "signup") {
+                loginBtn.classList.remove("active");
+                signupBtn.classList.add("active");
+                emailContainer.style.display = "block";
+                document.getElementById("email").required = true;
+                submitBtn.innerText = "Create Account";
+                subTitle.innerText = "Register New Account";
+            } else {
+                signupBtn.classList.remove("active");
+                loginBtn.classList.add("active");
+                emailContainer.style.display = "none";
+                document.getElementById("email").required = false;
+                submitBtn.innerText = "Log In";
+                subTitle.innerText = "Secure Account Access";
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById("password");
+            if (passInput.type === "password") {
+                passInput.type = "text";
+            } else {
+                passInput.type = "password";
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get("mode") === "signup") {
+                switchAuthMode("signup");
+            }
+        });
+
+        async function handleAuthSubmit() {
             const username = document.getElementById("username").value.trim();
             const password = document.getElementById("password").value;
+            const email = document.getElementById("email").value.trim();
 
-            try {
-                const res = await fetch("http://localhost:5000/api/auth/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const data = await res.json();
-
-                if (res.ok && data.token) {
-                    localStorage.setItem("token", data.token);
-                    showToast("Login successful! Redirecting to dashboard...", "success");
-                    setTimeout(() => {
-                        window.location.href = "dashboard.html";
-                    }, 1200);
-                } else {
-                    showToast(data.message || "Invalid credentials", "error");
+            if (currentAuthMode === "signup") {
+                try {
+                    const res = await fetch("http://localhost:5000/api/auth/register", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username, email, password })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        showToast("Account registered! Switching to Login...", "success");
+                        setTimeout(() => switchAuthMode("login"), 1200);
+                    } else {
+                        showToast(data.message || "Registration failed", "error");
+                    }
+                } catch(e) {
+                    showToast("Network error connecting to API server", "error");
                 }
-            } catch (err) {
-                showToast("Network error connecting to API server", "error");
+            } else {
+                try {
+                    const res = await fetch("http://localhost:5000/api/auth/login", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.token) {
+                        localStorage.setItem("token", data.token);
+                        showToast("Login successful! Redirecting to dashboard...", "success");
+                        setTimeout(() => window.location.href = "dashboard.html", 1200);
+                    } else {
+                        showToast(data.message || "Invalid credentials", "error");
+                    }
+                } catch(e) {
+                    showToast("Network error connecting to API server", "error");
+                }
             }
         }
     </script>

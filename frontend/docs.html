@@ -19,13 +19,12 @@
 </head>
 <body>
 
-    <!-- NAVBAR -->
+    <!-- NAVBAR (HOME LINK REMOVED - LOGO NAVIGATES HOME) -->
     <header class="top-strip">
         <a href="index.html" class="logo">
             <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
         </a>
         <nav class="nav-links">
-            <a href="index.html">Home</a>
             <a href="dashboard.html">Dashboard</a>
             <a href="why.html">Why Track?</a>
             <a href="docs.html" style="color: var(--emerald);">Docs</a>
@@ -43,7 +42,7 @@
         <!-- CENTERED SUBPAGE MINI-NAVBAR (MATCHING DASHBOARD ARCHITECTURE) -->
         <div class="mini-nav-container">
             <nav class="mini-nav">
-                <button class="tab-btn active" onclick="switchDocsPanel('overviewDocsPanel', this)">Overview &amp; Standards</button>
+                <button class="tab-btn active" onclick="switchDocsPanel('overviewDocsPanel', this)">Overview &amp; App Guide</button>
                 <button class="tab-btn" onclick="switchDocsPanel('datasetsDocsPanel', this)">Public Datasets &amp; Metrics</button>
                 <button class="tab-btn" onclick="switchDocsPanel('mathDocsPanel', this)">Mathematical Models</button>
                 <button class="tab-btn" onclick="switchDocsPanel('apiDocsPanel', this)">REST API Reference</button>
@@ -51,18 +50,34 @@
         </div>
 
         <!-- ===================================================================
-             PANEL 1: OVERVIEW & STANDARDS
+             PANEL 1: OVERVIEW, STANDARDS & APP GLOSSARY
              =================================================================== -->
         <div id="overviewDocsPanel" class="panel-content active">
-            <div class="card-neo">
-                <span class="badge-neo badge-neo-scope1">Section 1</span>
-                <h2 style="margin: 12px 0 16px 0;">Deterministic Accounting Standard</h2>
-                <p style="color: var(--text-muted); margin-bottom: 16px;">Carbonly calculates emissions deterministically following global standards (GHG Protocol Corporate Standard, DEFRA 2024, and EPA guidelines). Technical regulatory scopes are mapped to human categories:</p>
+            <div class="card-neo" style="margin-bottom: 24px;">
+                <span class="badge-neo badge-neo-scope1">App Guide</span>
+                <h2 style="margin: 12px 0 16px 0;">How to Use Carbonly &amp; Glossary of Terms</h2>
+                
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 8px; padding: 16px;">
+                        <h4 style="color: var(--emerald);">Step 1: Calculate Your Emissions Footprint</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Navigate to the <strong>Activity Calculator</strong> tab on the Dashboard. Enter your vehicle distance, fuel type, electricity kWh, regional grid, flight count, and water usage. Or click <strong>"Load Pre-Loaded Sample Profiles"</strong> for instant sandbox data.</p>
+                    </div>
 
-                <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 8px; padding: 16px; font-family: monospace; font-size: 0.9rem; margin-bottom: 20px;">
-                    Emissions (kg CO2e) = Activity Metric × Verified Conversion Factor
+                    <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 8px; padding: 16px;">
+                        <h4 style="color: var(--emerald);">Step 2: Inspect EcoScore &amp; Historical Trends</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">View your total footprint in kg CO2e and metric tons ($tCO_2e$). Inspect your relative <strong>EcoScore (0-1000 pts)</strong> and 5-Star rating. Check your <strong>Historical Progress Line Chart</strong> to see if your footprint is improving over time!</p>
+                    </div>
+
+                    <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 8px; padding: 16px;">
+                        <h4 style="color: var(--emerald);">Step 3: Run Sensitivity Simulations &amp; Optimization</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Use the <strong>What-If Simulator</strong> to adjust scenario sliders, or click <strong>"Run Linear Solver"</strong> to automatically set the sliders for maximum carbon reduction within your annual target budget.</p>
+                    </div>
                 </div>
+            </div>
 
+            <div class="card-neo">
+                <span class="badge-neo badge-neo-scope2">Category Definitions</span>
+                <h3 style="margin: 12px 0 16px 0;">Human Category Mappings</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
                     <div style="background: #FFFFFF; border: var(--ui-border); border-radius: 8px; padding: 16px;">
                         <h4 style="color: var(--emerald);">Direct Driving &amp; Fuel (Scope 1)</h4>
