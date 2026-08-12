@@ -6,6 +6,7 @@
     <title>Authentication | Carbonly Intelligence Platform</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="script.js"></script>
     <link rel="stylesheet" href="style.css">
     
     <style>
@@ -73,6 +74,9 @@
             <a href="dashboard.html">Dashboard</a>
             <a href="why.html">Why Track?</a>
             <a href="docs.html">Docs</a>
+            <div class="auth-nav-item">
+                <script>document.write(getAuthNavItemHtml());</script>
+            </div>
         </nav>
     </header>
 

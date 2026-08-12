@@ -11,7 +11,8 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Custom Design System -->
+    <!-- Custom Client Script & Design System -->
+    <script src="script.js"></script>
     <link rel="stylesheet" href="style.css">
     
     <style>
@@ -63,7 +64,7 @@
             <a href="dashboard.html">Dashboard</a>
             <a href="docs.html">Docs</a>
             <div class="auth-nav-item">
-                <a href="login.html" class="btn-neo btn-neo-primary" style="font-size: 0.85rem; padding: 8px 16px;">Login</a>
+                <script>document.write(getAuthNavItemHtml());</script>
             </div>
         </nav>
     </header>

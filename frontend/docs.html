@@ -7,6 +7,7 @@
     <meta name="description" content="Technical documentation detailing GHG Protocol formulas, DEFRA/EPA factor databases, Methodology Registry boundaries, Z-score anomaly math, and REST API specs.">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="script.js"></script>
     <link rel="stylesheet" href="style.css">
     
     <style>
@@ -28,7 +29,7 @@
             <a href="dashboard.html">Dashboard</a>
             <a href="docs.html" style="color: var(--emerald);">Docs</a>
             <div class="auth-nav-item">
-                <a href="login.html" class="btn-neo btn-neo-primary" style="font-size: 0.85rem; padding: 8px 16px;">Login</a>
+                <script>document.write(getAuthNavItemHtml());</script>
             </div>
         </nav>
     </header>

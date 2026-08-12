@@ -7,6 +7,7 @@
     <meta name="description" content="Discover why individuals, small businesses, and ESG data analysts need Carbonly for cost savings, compliance, and real-time decarbonization tracking.">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="script.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,7 +20,9 @@
         <nav class="nav-links">
             <a href="dashboard.html">Dashboard</a>
             <a href="docs.html">Docs</a>
-            <a href="login.html" class="btn-neo btn-neo-primary">Login</a>
+            <div class="auth-nav-item">
+                <script>document.write(getAuthNavItemHtml());</script>
+            </div>
         </nav>
     </header>
 
