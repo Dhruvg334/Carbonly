@@ -1,118 +1,108 @@
 /**
- * Constrained Decarbonization Optimization Engine (Operations Research / DS)
- * Calculates the Pareto-optimal combination of decarbonization interventions given a user budget constraint.
+ * Carbonly Constrained Decarbonization Linear Solver
+ * Formulates a linear program to maximize carbon reduction subject to an annual capital budget constraint.
  */
 
-const DECARBONIZATION_INTERVENTIONS = [
-    {
-        id: "ev_transition",
-        name: "Electric Vehicle Fleet Transition",
-        category: "Direct Driving & Fuel",
-        costPerYear: 800,
-        carbonReductionRatio: 0.65, // Reduces driving footprint by 65%
-        priority: 1
-    },
-    {
-        id: "renewable_ppa",
-        name: "Solar & Wind Power Purchase (PPA)",
-        category: "Home & Office Power",
-        costPerYear: 350,
-        carbonReductionRatio: 0.85, // Reduces grid footprint by 85%
-        priority: 2
-    },
-    {
-        id: "flight_consolidation",
-        name: "Virtual Meeting Flight Consolidation",
-        category: "Travel & Lifestyle",
-        costPerYear: 100,
-        carbonReductionRatio: 0.50, // Reduces flight footprint by 50%
-        priority: 3
-    },
-    {
-        id: "water_recycling",
-        name: "Smart Water Recycling & Low-Flow Systems",
-        category: "Travel & Lifestyle",
-        costPerYear: 150,
-        carbonReductionRatio: 0.40,
-        priority: 4
-    }
-];
+function solveOptimalDecarbonization(annualBudget = 500, currentData = {}) {
+    const budget = Math.max(50, Number(annualBudget || 500));
+    const breakdown = currentData.breakdown || {};
 
-/**
- * Solves for the optimal allocation of decarbonization interventions given a budget limit
- * 
- * @param {number} annualBudget Maximum annual budget limit in USD ($)
- * @param {Object} baselineEmissions Baseline emissions breakdown object
- * @returns {Object} Optimized intervention roadmap and slider positions
- */
-function solveOptimalDecarbonization(annualBudget = 500, baselineEmissions = {}) {
-    const budget = Math.max(0, Number(annualBudget || 500));
-    const breakdown = baselineEmissions.breakdown || { transportKg: 100, electricityKg: 250, flightsKg: 150 };
-    
-    let remainingBudget = budget;
-    const selectedInterventions = [];
+    const transportKg = breakdown.transportKg || 100;
+    const electricityKg = breakdown.electricityKg || 150;
+    const flightsKg = breakdown.flightsKg || 80;
 
-    let recommendedTransportPct = 0;
-    let recommendedPpaPct = 0;
-    let recommendedFlightPct = 0;
-
-    DECARBONIZATION_INTERVENTIONS.forEach(item => {
-        if (remainingBudget >= item.costPerYear) {
-            remainingBudget -= item.costPerYear;
-            selectedInterventions.push({
-                ...item,
-                allocationStatus: "100% Implemented"
-            });
-
-            if (item.id === "ev_transition") recommendedTransportPct = 65;
-            if (item.id === "renewable_ppa") recommendedPpaPct = 85;
-            if (item.id === "flight_consolidation") recommendedFlightPct = 50;
-        } else if (remainingBudget > 0) {
-            const partialRatio = Number((remainingBudget / item.costPerYear).toFixed(2));
-            selectedInterventions.push({
-                ...item,
-                allocationStatus: `${Math.round(partialRatio * 100)}% Partial Budget Allocation`
-            });
-
-            if (item.id === "ev_transition") recommendedTransportPct = Math.round(65 * partialRatio);
-            if (item.id === "renewable_ppa") recommendedPpaPct = Math.round(85 * partialRatio);
-            if (item.id === "flight_consolidation") recommendedFlightPct = Math.round(50 * partialRatio);
-
-            remainingBudget = 0;
+    // Define decarbonization intervention portfolio with realistic cost & abatement parameters
+    const interventions = [
+        {
+            id: "ev_fleet_transition",
+            name: "EV Fleet Transition (Scope 1)",
+            maxPotentialKg: transportKg * 0.70,
+            unitCostDollar: 300, // Capital cost per 100% adoption
+            paybackYears: 2.5,
+            abatementCostDollarPerTon: 45
+        },
+        {
+            id: "solar_ppa_subscription",
+            name: "Solar Renewable PPA (Scope 2)",
+            maxPotentialKg: electricityKg * 0.90,
+            unitCostDollar: 250,
+            paybackYears: 1.8,
+            abatementCostDollarPerTon: 28
+        },
+        {
+            id: "virtual_flight_consolidation",
+            name: "Virtual Flight Consolidation (Scope 3 - Category 6)",
+            maxPotentialKg: flightsKg * 0.50,
+            unitCostDollar: 50,
+            paybackYears: 0.1,
+            abatementCostDollarPerTon: -120 // Net positive cost savings
         }
+    ];
+
+    // Solve Knapsack/Linear Fractional Program: Sort by Abatement ROI (Kg Saved per Dollar)
+    const sorted = [...interventions].sort((a, b) => {
+        const roiA = a.maxPotentialKg / a.unitCostDollar;
+        const roiB = b.maxPotentialKg / b.unitCostDollar;
+        return roiB - roiA;
     });
 
-    // Calculate baseline vs optimized emissions
-    const bTransport = breakdown.transportKg || 0;
-    const bGrid = breakdown.electricityKg || 0;
-    const bFlights = breakdown.flightsKg || 0;
-    const bTotal = bTransport + bGrid + bFlights;
+    let remainingBudget = budget;
+    let totalKgSaved = 0;
+    let totalCostSpent = 0;
+    const selectedInterventions = [];
 
-    const optTransport = bTransport * (1 - recommendedTransportPct / 100);
-    const optGrid = bGrid * (1 - recommendedPpaPct / 100);
-    const optFlights = bFlights * (1 - recommendedFlightPct / 100);
-    const optTotal = optTransport + optGrid + optFlights;
+    let transportReductionPct = 0;
+    let renewablePpaPct = 0;
+    let flightReductionPct = 0;
 
-    const totalKgSaved = Math.max(0, bTotal - optTotal);
-    const netPercentReduced = bTotal > 0 ? Number(((totalKgSaved / bTotal) * 100).toFixed(1)) : 0;
-    const annualNetDollarReturn = Math.round(totalKgSaved * 0.42 * 12);
+    sorted.forEach(interv => {
+        if (remainingBudget <= 0) return;
+
+        const fraction = Math.min(1.0, remainingBudget / interv.unitCostDollar);
+        const costAllocated = Math.round(interv.unitCostDollar * fraction);
+        const kgSaved = Math.round(interv.maxPotentialKg * fraction);
+
+        remainingBudget -= costAllocated;
+        totalCostSpent += costAllocated;
+        totalKgSaved += kgSaved;
+
+        if (interv.id === "ev_fleet_transition") transportReductionPct = Math.round(fraction * 70);
+        if (interv.id === "solar_ppa_subscription") renewablePpaPct = Math.round(fraction * 90);
+        if (interv.id === "virtual_flight_consolidation") flightReductionPct = Math.round(fraction * 50);
+
+        selectedInterventions.push({
+            name: interv.name,
+            adoptionFractionPct: Math.round(fraction * 100),
+            allocatedCostDollar: costAllocated,
+            projectedKgSaved: kgSaved,
+            paybackYears: interv.paybackYears,
+            abatementCostDollarPerTon: interv.abatementCostDollarPerTon
+        });
+    });
+
+    const baselineTotalKg = (transportKg + electricityKg + flightsKg) || 1;
+    const netPercentReduced = Number(((totalKgSaved / baselineTotalKg) * 100).toFixed(1));
+    const estimatedAnnualDollarSavings = Math.round(totalKgSaved * 0.42 * 12);
 
     return {
+        objective: "Maximize Carbon Emissions Avoided Subject to Annual Budget Limit",
         annualBudget: budget,
-        remainingBudget: Math.round(remainingBudget),
+        totalCostSpent,
+        totalKgSaved,
         selectedInterventions,
         sliderRecommendations: {
-            transportReductionPct: recommendedTransportPct,
-            renewablePpaPct: recommendedPpaPct,
-            flightReductionPct: recommendedFlightPct
+            transportReductionPct,
+            renewablePpaPct,
+            flightReductionPct
         },
         impact: {
-            totalKgSaved: Number(totalKgSaved.toFixed(2)),
-            tonnesSaved: Number((totalKgSaved / 1000).toFixed(4)),
+            kgSaved: totalKgSaved,
             netPercentReduced,
-            annualNetDollarReturn
+            estimatedAnnualDollarSavings
         }
     };
 }
 
-module.exports = { solveOptimalDecarbonization, DECARBONIZATION_INTERVENTIONS };
+module.exports = {
+    solveOptimalDecarbonization
+};

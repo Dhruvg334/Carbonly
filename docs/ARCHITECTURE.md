@@ -1,21 +1,42 @@
-# Carbonly Platform Architecture & Design Blueprint
+# Carbonly Platform Architecture & Auditable System Blueprint
 
-## 1. Overview
-Carbonly is an enterprise-grade ESG and decarbonization intelligence platform. It decouples **deterministic greenhouse gas accounting (GHG Protocol)** from **predictive AI decision support (Groq LLM)** to guarantee zero mathematical hallucinations and 100% auditability.
+## 1. Executive Summary
+Carbonly is an enterprise-grade carbon intelligence and ESG accounting platform. It strictly decouples **deterministic mathematical greenhouse gas accounting (GHG Protocol)** from **probabilistic AI decision support (Groq LLM)** to guarantee zero mathematical hallucinations, 100% auditability, and full calculation lineage.
 
-```mermaid
-graph TD
-    A[Client Web App] -->|HTTP / REST| B[Express Gateway API]
-    B --> C[Deterministic GHG Engine]
-    B --> D[Statistical Anomaly Detector Z-Score]
-    B --> E[EcoScore Benchmark Service]
-    B --> F[Holt-Winters Time-Series Forecaster]
-    B --> G[Constrained Linear Solver]
-    B --> H[Groq AI llama-3.3-70b-versatile Proxy]
-    C --> I[(MongoDB Storage)]
+```text
+Data Ingestion Pipeline (Raw Input -> Schema Validation -> Unit Normalization -> Guardrails)
+      ↓
+Canonical Activity Records (ActivityRecord)
+      ↓
+Emission Factor Registry (EFR Versioning & Provenance Metadata)
+      ↓
+Deterministic Calculation Engine (Scope 1, Scope 2 Location & Market, Scope 3 Categories)
+      ↓
+Calculation Lineage & Uncertainty Engine (Unique Calculation ID, P10/P50/P90 Bounds, Confidence Score)
+      ↓
+Analytics Layer (Holt-Winters Forecasting, Linear Programming Solver, Shapley Attribution)
+      ↓
+Evidence Store (Verified Calculation Proofs)
+      ↓
+Evidence-Grounded AI Reasoning (Groq llama-3.3-70b-versatile LLM)
+      ↓
+Audit-Ready Reports & Interactive Dashboards
 ```
 
-## 2. Layer Specifications
-1. **Frontend Layer**: Vanilla ES6 Modular Component Architecture, zero framework bloat, 100/100 Lighthouse performance, Netlify SPA deployment.
-2. **Backend Engine Layer**: Node.js & Express API serving deterministic emission factor calculations, statistical Z-score outlier detection, Holt-Winters 12-month time-series forecasting, and linear optimization solvers.
-3. **AI Intelligence Layer**: Groq LLM API proxy (`llama-3.3-70b-versatile`) serving executive narratives, anomaly root-cause diagnoses, and interactive copilot Q&A.
+## 2. Core Architectural Components
+
+### A. Emission Factor Registry (`emissionFactorRegistry.js`)
+Maintains immutable, versioned emission factor conversion factors with complete audit metadata:
+- `factor_id`, `version`, `effective_from`, `effective_to`, `geography`, `scope`, `ghg_category`, `source_organization`, `source_document`, `uncertainty_pct`, and `gas_coverage`.
+
+### B. Calculation Lineage & Provenance Engine (`provenanceEngine.js`)
+Attaches a unique `calculation_id` (e.g. `calc_83a91f`) to every result, linking:
+- Final emission quantity ($kg CO_2e$) $\leftarrow$ Activity data $\leftarrow$ Normalized units $\leftarrow$ Factor ID & Version $\leftarrow$ Source document.
+- Propagates analytical uncertainty ($\pm \text{margin}$) and percentiles (P10, P50, P90).
+- Calculates an overall **Data Quality Confidence Score (0-100%)**.
+
+### C. Ingestion Guardrails & Normalization (`ingestionValidator.js`)
+Validates input schemas, checks range bounds, sanitizes negative values, and converts raw inputs into canonical `ActivityRecord` models.
+
+### D. Evidence-Grounded AI Reasoning Layer (`groqService.js`)
+The Groq LLM operates over an **Evidence Store** containing verified calculation proofs. It never calculates values directly; it synthesizes executive summaries and strategy recommendations strictly from verified evidence objects.

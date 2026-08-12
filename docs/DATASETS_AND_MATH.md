@@ -1,35 +1,39 @@
 # Public Datasets & Mathematical Formulation Reference
 
-## 1. Official Conversion Factor Datasets
-Carbonly uses verified emission factor conversion factors from official public databases:
+## 1. Emission Factor Registry (EFR) & Factor Versioning
+Carbonly uses versioned, immutable emission factors stored in the Emission Factor Registry (`emissionFactorRegistry.js`):
 
-| Dataset | Publisher | Scope Covered | Factor Values |
-|---|---|---|---|
-| **UK DEFRA 2024** | UK Department for Environment, Food & Rural Affairs | Scope 1 & Scope 3 | Gasoline: 0.192 kg/km, Diesel: 0.171 kg/km, Flights: 0.156 kg/km |
-| **US EPA eGRID 2023** | US Environmental Protection Agency | Scope 2 Electricity Grids | US Avg: 0.385 kg/kWh, EU: 0.255 kg/kWh, IN: 0.710 kg/kWh |
-| **IPCC AR6** | Intergovernmental Panel on Climate Change | Scope 3 Radiative Forcing | Aviation multiplier: 1.9x |
+| Factor ID | Publisher / Source | Scope & GHG Category | Factor Value | Uncertainty |
+|---|---|---|---|---|
+| `DEFRA_TRANSPORT_GASOLINE_2024` | UK DEFRA (2024) | Scope 1: Category 1 Direct Fleet Transport | 0.192 kgCO2e/km | ± 5.0% |
+| `DEFRA_TRANSPORT_DIESEL_2024` | UK DEFRA (2024) | Scope 1: Category 1 Direct Fleet Transport | 0.171 kgCO2e/km | ± 5.0% |
+| `EPA_GRID_US_2023` | US EPA eGRID (2023) | Scope 2: Purchased Electricity (Location-Based) | 0.385 kgCO2e/kWh | ± 3.0% |
+| `CEA_GRID_IN_2024` | CEA India (2024) | Scope 2: Purchased Electricity (Location-Based) | 0.710 kgCO2e/kWh | ± 5.0% |
+| `DEFRA_BUSINESS_TRAVEL_SHORT_2024` | UK DEFRA / IPCC AR6 | Scope 3: Category 6 Business Travel (IPCC 1.9x RF) | 0.156 kgCO2e/pkm | ± 10.0% |
 
 ## 2. Calculation Validation against Reference Examples
 Carbonly’s deterministic calculation engine is benchmarked against reference test vectors to ensure absolute mathematical precision:
 
-- **Reference Calculation Test Vectors**: 19 Automated Unit Tests
-- **Passed Test Cases**: 19 / 19 (100% Pass Rate)
+- **Reference Calculation Test Vectors**: 22 Automated Unit Tests
+- **Passed Test Cases**: 22 / 22 (100% Pass Rate)
 - **Max Absolute Error**: $0.0000 \text{ kg CO}_2e$
 - **Mean Absolute Error (MAE)**: $0.0000 \text{ kg CO}_2e$
 - **Tolerance Boundary**: $\pm 10^{-6} \text{ kg CO}_2e$
 
 ## 3. Mathematical Equations
 
-### A. Deterministic GHG Calculation Equation
-$$\text{Emissions } (kg CO_2e) = \sum \left( \text{Activity Data}_i \times \text{Factor}_i \right)$$
+### A. Scope 2 Location-Based vs. Market-Based Accounting
+- **Location-Based**: $E_{\text{Location}} = E_{\text{kWh}} \times I_{\text{grid}}$
+- **Market-Based**: $E_{\text{Market}} = E_{\text{kWh}} \times (1 - \text{PPA}_{\text{fraction}}) \times I_{\text{grid}}$
 
-### B. Statistical Anomaly Z-Score Equation
-$$Z = \frac{x_i - \mu}{\sigma}$$
-Where $Z > 2.0$ triggers an automated consumption spike alert.
+### B. Uncertainty Propagation & Percentile Bounds
+Propagated uncertainty margin:
 
-### C. EcoScore Relative Rating Equation
-Score points (0 to 1000) are computed relative to global benchmark average ($86.5 \text{ kg CO}_2e / \text{week}$):
-- $\le 43 \text{ kg/week} \implies$ **5 Stars (900-1000 pts) - Climate Champion**
-- $\le 73 \text{ kg/week} \implies$ **4 Stars (750-899 pts) - Eco Leader**
-- $\le 108 \text{ kg/week} \implies$ **3 Stars (600-749 pts) - Average Baseline**
-- $> 108 \text{ kg/week} \implies$ **1-2 Stars (<600 pts) - High Priority Target**
+$$m = \text{Total} \times \sqrt{\sum (w_i \cdot u_i)^2}$$
+
+$$\text{P10} = \text{Total} - 1.28 \cdot m, \quad \text{P50} = \text{Total}, \quad \text{P90} = \text{Total} + 1.28 \cdot m$$
+
+### C. Constrained Decarbonization Linear Solver Objective
+$$\max \sum_{i=1}^{n} c_i \cdot x_i \quad \text{subject to} \quad \sum_{i=1}^{n} v_i \cdot x_i \le B_{\text{annual}}, \quad 0 \le x_i \le 1$$
+
+Where $c_i$ is carbon saved and $v_i$ is implementation cost.

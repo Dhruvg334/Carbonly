@@ -3,8 +3,38 @@ const assert = require("node:assert/strict");
 const { forecastEmissions } = require("../services/forecastingEngine");
 const { solveOptimalDecarbonization } = require("../services/optimizerEngine");
 const { attributeAnomalySpike } = require("../services/anomalyAttribution");
+const { getEmissionFactor } = require("../services/emissionFactorRegistry");
+const { validateAndNormalizeActivity } = require("../services/ingestionValidator");
+const { generateCalculationLineage } = require("../services/provenanceEngine");
 
-test("Advanced AI / DS / DA Engine Unit Tests", async (t) => {
+test("Advanced AI / DS / DA & Provenance Engine Unit Tests", async (t) => {
+
+    await t.test("getEmissionFactor should return versioned metadata and provenance for valid factor ID", () => {
+        const factor = getEmissionFactor("EPA_GRID_US_2023");
+        assert.equal(factor.factor_id, "EPA_GRID_US_2023");
+        assert.equal(factor.value, 0.385);
+        assert.equal(factor.source_organization, "US EPA eGRID");
+        assert.equal(factor.scope, "Scope 2");
+    });
+
+    await t.test("validateAndNormalizeActivity should reject negative quantities and normalize canonical units", () => {
+        const input = { transportKm: -50, electricityKwh: 350, vehicleType: "gasoline" };
+        const { normalizedInput } = validateAndNormalizeActivity(input);
+        assert.equal(normalizedInput.transportKm, 0);
+        assert.equal(normalizedInput.electricityKwh, 350);
+    });
+
+    await t.test("generateCalculationLineage should attach unique calculation ID and uncertainty bounds", () => {
+        const input = { vehicleType: "gasoline", region: "US", flightType: "short" };
+        const scopeBreakdown = {
+            totalKg: 200,
+            scopes: { scope1: { kg: 50 }, scope2: { kg: 100 }, scope3: { kg: 50 } }
+        };
+        const lineage = generateCalculationLineage(input, scopeBreakdown);
+        assert.ok(lineage.calculationId.startsWith("calc_"));
+        assert.ok(lineage.dataQuality.propagatedUncertaintyPct > 0);
+        assert.ok(lineage.dataQuality.percentiles.p50 === 200);
+    });
 
     await t.test("forecastEmissions should generate 12 monthly projections and confidence bounds", () => {
         const result = forecastEmissions([], 200.0);
@@ -15,7 +45,7 @@ test("Advanced AI / DS / DA Engine Unit Tests", async (t) => {
         assert.ok(result.annualProjectedAsIsKg > 0);
     });
 
-    await t.test("solveOptimalDecarbonization should allocate interventions within budget", () => {
+    await t.test("solveOptimalDecarbonization should maximize carbon reduction within budget", () => {
         const result = solveOptimalDecarbonization(500, {
             breakdown: { transportKg: 200, electricityKg: 300, flightsKg: 100 }
         });
