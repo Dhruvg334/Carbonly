@@ -1,14 +1,14 @@
 # Carbonly Platform Architecture & Auditable System Blueprint
 
 ## 1. Executive Summary & Core Positioning
-Carbonly is an **auditable carbon data and decarbonization decision platform**: it converts enterprise activity data into traceable GHG inventories, quantifies measurement uncertainty, detects operational consumption anomalies, forecasts emissions, optimizes decarbonization investments, and uses **evidence-grounded AI** to explain what happened and what the organization should do next.
+Carbonly is an **auditable carbon data and decarbonization decision platform**: it converts enterprise activity data into traceable GHG inventories, quantifies data confidence and uncertainty, identifies operational emission drivers, forecasts future trajectories, and optimizes decarbonization investments—with AI providing a grounded decision interface over verified evidence.
 
 ```text
 Enterprise Data (ERP / CSV / Utility APIs)
       ↓
 Ingestion & Normalization Layer (Validation & Guardrails)
       ↓
-Canonical Activity Database (ActivityRecord)
+Canonical Activity Database (Generic ActivityRecord Array)
       ↓
 Emission Factor Registry (EFR Governance) + Methodology Registry (MR Boundaries)
       ↓
@@ -16,9 +16,9 @@ Deterministic Calculation Engine (Scope 1 Mobile Combustion, Scope 2 Location/Ma
       ↓
 Provenance Lineage Engine (calc_83a91f + Uncertainty P10/P50/P90 + Data Quality Score)
       ↓
-Analytics Layer (Holt-Winters Forecasting, Linear Programming Solver, Residual Anomaly Detection)
+Analytics Layer (Holt-Winters Forecasting, Linear Programming Solver, Residual Anomaly Detection, Baseline Target Manager)
       ↓
-Evidence Store (Verified Calculation Proofs)
+Evidence Store (Verified Calculation Proofs + activityRecordIds)
       ↓
 Evidence-Grounded AI Reasoning Proxy (Groq llama-3.3-70b-versatile LLM)
       ↓
@@ -41,4 +41,14 @@ Defines explicit GHG Protocol accounting boundaries and assumptions:
 
 ### C. Provenance & Audit Trail Engines (`provenanceEngine.js` & `auditTrail.js`)
 - **Calculation Lineage**: Traces `calculation_id` $\leftarrow$ `ActivityRecord` $\leftarrow$ Factor Version $\leftarrow$ Source Doc.
-- **Mutation Audit Trail**: Logs user data edits (`userId`, `organizationId`, `action`, `oldState`, `newState`, `reason`, `timestamp`).
+- **Mutation Audit Trail**: Logs user data edits (`userId`, `organizationId`, `role`, `sessionId`, `action`, `oldState`, `newState`, `reason`, `timestamp`).
+
+### D. Multi-Tenant Authorization Middleware (`auth.js`)
+Enforces strict organization boundary access, blocking cross-tenant data access requests with a `403 Forbidden` response.
+
+### E. Baseline & Net-Zero Target Trajectory Manager (`baselineManager.js`)
+Calculates baseline emissions, 2030 target emissions, achieved reductions, progress percentage, and target gap:
+$$\text{Target Gap} = \max(0, \text{CurrentEmissions} - \text{TargetEmissions})$$
+
+### F. Enriched Evidence Store (`provenanceEngine.js`)
+Evidence objects attach `activityRecordIds`, `methodologyId`, `factorVersion`, `formula`, `assumptions`, and `calculationTimestamp` to guarantee grounded AI reasoning.
