@@ -1,5 +1,5 @@
 /**
- * Toast Alert & Custom Notification System
+ * Toast Alert & Custom Notification System (Clean Engineering Standards)
  */
 
 function showToast(message, type = "success", duration = 3500) {
@@ -13,9 +13,9 @@ function showToast(message, type = "success", duration = 3500) {
     const toast = document.createElement("div");
     toast.className = `toast-neo toast-neo-${type}`;
 
-    const icon = type === "error" ? "⚠️" : "✅";
+    const badgeText = type === "error" ? "[ERROR]" : "[SUCCESS]";
     toast.innerHTML = `
-        <span>${icon} ${message}</span>
+        <span><strong>${badgeText}</strong> ${message}</span>
         <span style="cursor:pointer; margin-left: 12px; font-weight:800;" onclick="this.parentElement.remove()">✖</span>
     `;
 

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile & Avatar Hub | Carbonly</title>
-    <meta name="description" content="Manage your Carbonly user profile, select custom animal/bird avatar icons, and view historical activity records.">
+    <meta name="description" content="Manage your Carbonly user profile, select vector avatar badges, and view historical activity records.">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -21,15 +21,15 @@
             <a href="dashboard.html">Dashboard</a>
             <a href="docs.html">Docs</a>
             <a href="about.html">About</a>
-            <a href="profile.html" class="badge-neo badge-neo-scope2" style="font-size: 0.85rem;">Profile & History</a>
+            <a href="profile.html" class="badge-neo badge-neo-scope2" style="font-size: 0.85rem;">Profile &amp; History</a>
         </nav>
     </header>
 
     <main style="max-width: 1100px; margin: 100px auto 60px auto; padding: 0 24px;">
         <div style="margin-bottom: 32px;">
-            <span class="badge-neo badge-neo-scope2">Account & Identity Settings</span>
+            <span class="badge-neo badge-neo-scope2">Account &amp; Identity Settings</span>
             <h1 style="font-size: 2.5rem; margin-top: 8px;">User Profile Hub</h1>
-            <p style="color: var(--text-muted);">Customize your profile avatar, view grid preferences, and review your historical emissions entries.</p>
+            <p style="color: var(--text-muted);">Customize your profile avatar, review grid preferences, and inspect historical emissions entries.</p>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px;">
@@ -38,49 +38,50 @@
             <div style="display: flex; flex-direction: column; gap: 24px;">
                 <!-- USER CARD -->
                 <div class="card-neo" style="text-align: center;">
-                    <div id="currentAvatarDisplay" style="font-size: 4rem; margin-bottom: 8px;">🦅</div>
+                    <div id="currentAvatarDisplay" style="width: 72px; height: 72px; margin: 0 auto 12px auto; background: var(--sage-accent); border: var(--ui-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; color: var(--primary-dark);">
+                        FALCON
+                    </div>
                     <h3 id="profileUsername" style="font-size: 1.4rem;">Authenticated User</h3>
                     <p id="profileEmail" style="font-size: 0.85rem; color: var(--text-muted);">user@carbonly.io</p>
                     <span class="badge-neo badge-neo-scope1" style="margin-top: 12px;">Active Member</span>
                 </div>
 
-                <!-- ANIMAL & BIRD AVATAR PICKER -->
+                <!-- VECTOR AVATAR PICKER -->
                 <div class="card-neo">
-                    <h4>Select Profile Avatar</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Choose between custom Neo-Brutalist animal & bird avatars:</p>
+                    <h4>Select Vector Badge Avatar</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Choose your avatar badge style:</p>
 
                     <div class="avatar-grid" id="avatarPickerGrid">
-                        <div class="avatar-card selected" onclick="selectAvatar('🦅', 'Eagle')">
-                            <span class="avatar-icon">🦅</span>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Eagle</span>
+                        <div class="avatar-card selected" onclick="selectAvatar('FALCON', 'Falcon Vector')">
+                            <svg class="avatar-badge-svg" viewBox="0 0 50 50">
+                                <circle cx="25" cy="25" r="22" fill="#B7E4C7" stroke="#0B3D2E" stroke-width="3"/>
+                                <path d="M15 30 L25 12 L35 30 L25 24 Z" fill="#2D6A4F" stroke="#0B3D2E" stroke-width="2"/>
+                            </svg>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Falcon</span>
                         </div>
-                        <div class="avatar-card" onclick="selectAvatar('🦊', 'Fox')">
-                            <span class="avatar-icon">🦊</span>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Fox</span>
+
+                        <div class="avatar-card" onclick="selectAvatar('APEX', 'Apex Vector')">
+                            <svg class="avatar-badge-svg" viewBox="0 0 50 50">
+                                <rect x="8" y="8" width="34" height="34" rx="8" fill="#FFE5D9" stroke="#0B3D2E" stroke-width="3"/>
+                                <polygon points="25,12 37,35 13,35" fill="#9D0208"/>
+                            </svg>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Apex</span>
                         </div>
-                        <div class="avatar-card" onclick="selectAvatar('🦉', 'Owl')">
-                            <span class="avatar-icon">🦉</span>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Owl</span>
+
+                        <div class="avatar-card" onclick="selectAvatar('SENTINEL', 'Sentinel Vector')">
+                            <svg class="avatar-badge-svg" viewBox="0 0 50 50">
+                                <circle cx="25" cy="25" r="22" fill="#E2ECE9" stroke="#0B3D2E" stroke-width="3"/>
+                                <circle cx="25" cy="25" r="10" fill="#1D3557"/>
+                            </svg>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Sentinel</span>
                         </div>
-                        <div class="avatar-card" onclick="selectAvatar('🐺', 'Wolf')">
-                            <span class="avatar-icon">🐺</span>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Wolf</span>
-                        </div>
-                        <div class="avatar-card" onclick="selectAvatar('🐯', 'Tiger')">
-                            <span class="avatar-icon">🐯</span>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Tiger</span>
-                        </div>
-                        <div class="avatar-card" onclick="selectAvatar('🐻', 'Bear')">
-                            <span class="avatar-icon">🐻</span>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Bear</span>
-                        </div>
-                        <div class="avatar-card" onclick="selectAvatar('🐬', 'Dolphin')">
-                            <span class="avatar-icon">🐬</span>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Dolphin</span>
-                        </div>
-                        <div class="avatar-card" onclick="selectAvatar('🦁', 'Lion')">
-                            <span class="avatar-icon">🦁</span>
-                            <span style="font-size: 0.75rem; font-weight: 700;">Lion</span>
+
+                        <div class="avatar-card" onclick="selectAvatar('NOVA', 'Nova Vector')">
+                            <svg class="avatar-badge-svg" viewBox="0 0 50 50">
+                                <rect x="8" y="8" width="34" height="34" rx="8" fill="#FFF3B0" stroke="#0B3D2E" stroke-width="3"/>
+                                <path d="M25 10 L30 20 L40 25 L30 30 L25 40 L20 30 L10 25 L20 20 Z" fill="#7F5539"/>
+                            </svg>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Nova</span>
                         </div>
                     </div>
                 </div>
@@ -99,7 +100,7 @@
                 <div style="overflow-x: auto;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
                         <thead>
-                            <tr style="background: var(--sage-accent); border-bottom: var(--neo-border);">
+                            <tr style="background: var(--sage-accent); border-bottom: var(--ui-border);">
                                 <th style="padding: 10px;">Timestamp</th>
                                 <th style="padding: 10px;">Total (kg CO2e)</th>
                                 <th style="padding: 10px;">Scope 1</th>
@@ -118,25 +119,25 @@
         </div>
     </main>
 
-    <footer style="padding: 40px; background: #FFFFFF; border-top: var(--neo-border); text-align: center; margin-top: 60px;">
+    <footer style="padding: 40px; background: #FFFFFF; border-top: var(--ui-border); text-align: center; margin-top: 60px;">
         <p style="font-weight: 600; color: var(--text-muted);">© 2026 Carbonly. Building verifiable technology for a sustainable future.</p>
     </footer>
 
     <script src="toast.js"></script>
     <script>
-        function selectAvatar(iconSymbol, name) {
-            document.getElementById("currentAvatarDisplay").innerText = iconSymbol;
-            localStorage.setItem("userAvatar", iconSymbol);
+        function selectAvatar(name, desc) {
+            document.getElementById("currentAvatarDisplay").innerText = name;
+            localStorage.setItem("userAvatar", name);
 
             const cards = document.querySelectorAll(".avatar-card");
             cards.forEach(card => card.classList.remove("selected"));
 
             event.currentTarget.classList.add("selected");
-            showToast(`Profile avatar updated to ${name}!`, "success");
+            showToast(`Profile avatar updated to ${desc}`, "success");
         }
 
         window.addEventListener("DOMContentLoaded", () => {
-            const savedAvatar = localStorage.getItem("userAvatar") || "🦅";
+            const savedAvatar = localStorage.getItem("userAvatar") || "FALCON";
             document.getElementById("currentAvatarDisplay").innerText = savedAvatar;
 
             const token = localStorage.getItem("token");

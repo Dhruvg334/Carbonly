@@ -13,7 +13,7 @@
     <!-- Chart.js for Emissions Visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Neo-Brutalist Design System -->
+    <!-- Custom Design System -->
     <link rel="stylesheet" href="style.css">
     
     <style>
@@ -30,7 +30,6 @@
             margin-bottom: 28px;
         }
 
-        /* Simulator Control Styling */
         .simulator-control {
             margin-bottom: 20px;
         }
@@ -55,7 +54,7 @@
             <a href="dashboard.html" style="color: var(--emerald);">Dashboard</a>
             <a href="docs.html">Docs</a>
             <a href="about.html">About</a>
-            <a href="profile.html" id="userBadge" class="badge-neo badge-neo-scope2" style="font-size: 0.85rem;">Profile & History</a>
+            <a href="profile.html" id="userBadge" class="badge-neo badge-neo-scope2" style="font-size: 0.85rem;">Profile &amp; History</a>
         </nav>
     </header>
 
@@ -64,10 +63,10 @@
         <!-- CENTERED SUBPAGE MINI-NAVBAR -->
         <div class="mini-nav-container">
             <nav class="mini-nav">
-                <button class="tab-btn active" onclick="switchPanel('overviewPanel', this)">📊 Overview &amp; Scopes</button>
-                <button class="tab-btn" onclick="switchPanel('ingestionPanel', this)">📝 Activity Calculator</button>
-                <button class="tab-btn" onclick="switchPanel('simulatorPanel', this)">🕹️ "What-If" Simulator</button>
-                <button class="tab-btn" onclick="switchPanel('aiCopilotPanel', this)">🧠 AI Copilot &amp; Strategy</button>
+                <button class="tab-btn active" onclick="switchPanel('overviewPanel', this)">Overview &amp; Scopes</button>
+                <button class="tab-btn" onclick="switchPanel('ingestionPanel', this)">Activity Calculator</button>
+                <button class="tab-btn" onclick="switchPanel('simulatorPanel', this)">What-If Simulator</button>
+                <button class="tab-btn" onclick="switchPanel('aiCopilotPanel', this)">AI Strategy Hub</button>
             </nav>
         </div>
 
@@ -101,7 +100,7 @@
         <!-- ANOMALY ALERT BANNER -->
         <div id="anomalyBanner" class="card-neo" style="display: none; background: #FFF5F5; border-color: var(--alert-red); margin-bottom: 24px;">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 1.5rem;">⚠️</span>
+                <span class="badge-neo" style="background: var(--alert-red); color: #FFFFFF;">ALERT</span>
                 <div>
                     <h4 style="color: var(--alert-red); margin: 0;" id="anomalyTitle">Statistical Consumption Anomaly Detected</h4>
                     <p style="font-size: 0.85rem; color: #7F1D1D; margin-top: 2px;" id="anomalyDesc"></p>
@@ -113,6 +112,14 @@
              PANEL 1: OVERVIEW & SCOPE CHARTS
              =================================================================== -->
         <div id="overviewPanel" class="panel-content active">
+            <!-- INSTRUCTION BANNER -->
+            <div class="panel-info-banner">
+                <span class="badge-neo badge-neo-scope2">Overview Guide</span>
+                <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
+                    View your total carbon footprint, metric tons breakdown across Scope 1, Scope 2, and Scope 3, and your executive AI brief.
+                </p>
+            </div>
+
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
                 <!-- MAIN SCOPE BAR CHART -->
                 <div class="card-neo">
@@ -144,23 +151,31 @@
              PANEL 2: ACTIVITY INGESTION & CALCULATOR
              =================================================================== -->
         <div id="ingestionPanel" class="panel-content">
+            <!-- INSTRUCTION BANNER -->
+            <div class="panel-info-banner">
+                <span class="badge-neo badge-neo-scope1">Calculator Guide</span>
+                <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
+                    Enter your transport distance, electricity usage, flights, and water metrics to calculate emissions. You can also load pre-configured sample datasets.
+                </p>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
                 
                 <!-- PRE-LOADED SAMPLE DATASET SANDBOX -->
                 <div class="card-neo" style="background: #FFFFFF;">
-                    <span class="badge-neo badge-neo-scope1">Instant Dataset Sandbox</span>
-                    <h4 style="margin: 12px 0 8px 0;">Pre-Loaded Sample Profiles</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Select a profile to load instant test metrics:</p>
+                    <span class="badge-neo badge-neo-scope1">Instant Sandbox</span>
+                    <h4 style="margin: 12px 0 8px 0;">Pre-Loaded Profiles</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Select a profile to load test metrics:</p>
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <button type="button" class="btn-neo" style="text-align: left; font-size: 0.85rem;" onclick="loadSampleProfile('techOffice')">
-                            💻 Tech Office (Scope 2 Heavy)
+                            Tech Office (Scope 2 Heavy)
                         </button>
                         <button type="button" class="btn-neo" style="text-align: left; font-size: 0.85rem;" onclick="loadSampleProfile('logisticsFleet')">
-                            🚛 Logistics Fleet (Scope 1 Heavy)
+                            Logistics Fleet (Scope 1 Heavy)
                         </button>
                         <button type="button" class="btn-neo" style="text-align: left; font-size: 0.85rem;" onclick="loadSampleProfile('globalConsulting')">
-                            ✈️ Global Firm (Scope 3 Heavy)
+                            Global Firm (Scope 3 Heavy)
                         </button>
                     </div>
                 </div>
@@ -172,7 +187,7 @@
                     <form id="emissionsForm" onsubmit="event.preventDefault(); calculateAndAnalyze();" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         
                         <!-- Scope 1 -->
-                        <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--neo-border); border-radius: 8px;">
+                        <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--ui-border); border-radius: 8px;">
                             <span class="badge-neo badge-neo-scope1">Scope 1: Transport</span>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
                                 <div>
@@ -192,7 +207,7 @@
                         </div>
 
                         <!-- Scope 2 -->
-                        <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--neo-border); border-radius: 8px;">
+                        <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--ui-border); border-radius: 8px;">
                             <span class="badge-neo badge-neo-scope2">Scope 2: Grid Power</span>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
                                 <div>
@@ -212,7 +227,7 @@
                         </div>
 
                         <!-- Scope 3 -->
-                        <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--neo-border); border-radius: 8px;">
+                        <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--ui-border); border-radius: 8px;">
                             <span class="badge-neo badge-neo-scope3">Scope 3: Value Chain &amp; Digital</span>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
                                 <div>
@@ -252,11 +267,19 @@
              PANEL 3: "WHAT-IF" DECARBONIZATION SIMULATOR
              =================================================================== -->
         <div id="simulatorPanel" class="panel-content">
+            <!-- INSTRUCTION BANNER -->
+            <div class="panel-info-banner">
+                <span class="badge-neo badge-neo-scope3">Simulator Guide</span>
+                <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
+                    Adjust scenario sliders to model potential fleet electrification, renewable power adoption, or travel reductions and see projected carbon &amp; cost savings.
+                </p>
+            </div>
+
             <div class="card-neo">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <div>
-                        <h3>"What-If" Decarbonization Sensitivity Simulator</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">Interactively adjust scenario parameters to calculate metric tons of CO2e avoided and annual cost ROI.</p>
+                        <h3>Decarbonization Sensitivity Simulator</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Adjust scenario parameters to calculate metric tons of CO2e avoided and annual cost ROI.</p>
                     </div>
                     <span class="badge-neo badge-neo-scope3">Real-time 60fps</span>
                 </div>
@@ -280,7 +303,7 @@
                     </div>
 
                     <!-- SIMULATION RESULTS -->
-                    <div style="background: var(--mint-light); border: var(--neo-border); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; justify-content: center; text-align: center;">
+                    <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; justify-content: center; text-align: center;">
                         <span style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted);">PROJECTED SCENARIO SAVINGS</span>
                         <h2 id="simKgSaved" style="font-size: 2.2rem; color: var(--emerald); margin: 8px 0;">0.00 kg CO2e</h2>
                         <p id="simDollarSaved" style="font-weight: 800; color: var(--primary-dark); font-size: 1.1rem;">Estimated Annual Cost Savings: $0</p>
@@ -294,6 +317,14 @@
              PANEL 4: AI COPILOT & STRATEGY HUB
              =================================================================== -->
         <div id="aiCopilotPanel" class="panel-content">
+            <!-- INSTRUCTION BANNER -->
+            <div class="panel-info-banner">
+                <span class="badge-neo badge-neo-scope2">Strategy Guide</span>
+                <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
+                    Review prioritized decarbonization action items and ask custom questions to the AI Copilot.
+                </p>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
                 
                 <!-- PRIORITIZED ACTION CARDS -->
@@ -313,7 +344,7 @@
                         <p style="font-size: 0.8rem; color: var(--text-muted);">Ask custom questions regarding GHG accounting or decarbonization</p>
                     </div>
 
-                    <div id="copilotChatWindow" style="height: 220px; overflow-y: auto; background: var(--mint-light); border: var(--neo-border); border-radius: 10px; padding: 14px; font-size: 0.9rem;">
+                    <div id="copilotChatWindow" style="height: 220px; overflow-y: auto; background: var(--mint-light); border: var(--ui-border); border-radius: 10px; padding: 14px; font-size: 0.9rem;">
                         <p style="color: var(--text-muted);">Ask a question below to consult the AI Copilot...</p>
                     </div>
 
@@ -329,7 +360,7 @@
     </div>
 
     <!-- FOOTER -->
-    <footer style="padding: 40px; background: #FFFFFF; border-top: var(--neo-border); text-align: center; margin-top: 60px;">
+    <footer style="padding: 40px; background: #FFFFFF; border-top: var(--ui-border); text-align: center; margin-top: 60px;">
         <p style="font-weight: 600; color: var(--text-muted);">© 2026 Carbonly. Building verifiable technology for a sustainable future.</p>
     </footer>
 
@@ -400,13 +431,13 @@
                     const fallback = calculateClientFallback(payload);
                     latestCalculatedData = fallback;
                     renderDashboard(fallback);
-                    showToast("Calculated via high-speed deterministic client engine", "success");
+                    showToast("Calculated via high-speed deterministic engine", "success");
                 }
             } catch (err) {
                 const fallback = calculateClientFallback(payload);
                 latestCalculatedData = fallback;
                 renderDashboard(fallback);
-                showToast("Calculated via high-speed deterministic client engine", "success");
+                showToast("Calculated via high-speed deterministic engine", "success");
             }
         }
 
