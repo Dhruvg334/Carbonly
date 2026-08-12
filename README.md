@@ -15,17 +15,26 @@
 
 ---
 
+## Table of Contents
+1. [Executive Summary & Core Architectural Philosophy](#1-executive-summary--core-architectural-philosophy)
+2. [GHG Protocol Accounting & Governance Registries](#2-ghg-protocol-accounting--governance-registries)
+3. [Data Engineering Infrastructure & Pipelines](#3-data-engineering-infrastructure--pipelines)
+4. [Advanced Data Science & Machine Learning Theory](#4-advanced-data-science--machine-learning-theory)
+5. [Operations Research & Constrained Optimization](#5-operations-research--constrained-optimization)
+6. [Empirical Calculation Validation & Public Datasets](#6-empirical-calculation-validation--public-datasets)
+7. [REST API Endpoint Reference](#7-rest-api-endpoint-reference)
+8. [Repository Structure & Local Setup](#8-repository-structure--local-setup)
+
+---
+
 ## 1. Executive Summary & Core Architectural Philosophy
 
 Carbonly is an auditable carbon data and decarbonization decision platform: it converts corporate activity data into traceable GHG inventories, quantifies data confidence and uncertainty, identifies operational emission drivers via Shapley value game theory, forecasts future trajectories via Holt-Winters exponential smoothing and ARIMA(1,1,1), detects multi-dimensional correlation anomalies via Mahalanobis distance matrix inversion, quantifies risk via 10,000-iteration Monte Carlo simulation, and optimizes decarbonization investments via Primal Simplex linear programming—with AI providing a grounded decision interface over verified evidence.
 
-### Enterprise Data Science, ML & Data Engineering Capabilities:
-- **Time-Series Model Competition & CSS Parameter Estimation**: Cross-validates Holt-Winters, ARIMA(1,1,1) (with Conditional Sum of Squares $\theta_1$ parameter estimation), and Seasonal Naive models on held-out test data (`/api/carbon/model-competition`) to select the winning model with minimum out-of-sample sMAPE.
-- **Multi-Variate Mahalanobis Distance Matrix Inversion Engine**: Executes $5 \times 5$ Gauss-Jordan matrix inversion $\Sigma^{-1}$ (`/api/carbon/multivariate-anomaly`) to compute the full quadratic form $D_M = \sqrt{(x-\mu)^T \Sigma^{-1} (x-\mu)}$ capturing joint off-diagonal correlations.
-- **10,000-Iteration Monte Carlo Uncertainty Quantification**: Executes independent Box-Muller Gaussian and true Log-Normal stochastic draws $X = \exp(\mu_{\ln} + \sigma_{\ln} Z)$ (`/api/carbon/monte-carlo-uncertainty`) deriving non-parametric $80\%$ $[P_{10}, P_{90}]$ and $95\%$ $[P_{2.5}, P_{97.5}]$ Central Predictive Intervals.
-- **KernelSHAP Surrogate Model Explainer**: Formulates predictive surrogate model $f(x) = \text{EcoScore}(x)$, evaluates coalition subsets $S \subseteq M$ against background expectation $E[x]$, and computes exact Shapley marginal contributions (`/api/carbon/shap-explanation`) satisfying the Efficiency Axiom ($\sum \phi_i = f(x) - E[f(x)]$).
-- **High-Throughput Batch Ingestion & Idempotency Pipeline**: Bulk stream ingestion via NDJSON/CSV APIs (`/api/carbon/batch-ingest`) with strict idempotency key deduplication (`idempotencyKey`).
-- **Decoupled Arithmetic from Probabilistic LLMs**: All carbon arithmetic is executed by a 100% deterministic mathematical engine. The Groq LLM operates strictly as an evidence-grounded reasoning proxy over verified calculation proofs.
+### Architectural Seams & Anti-Hallucination Boundary Design
+Generic AI applications frequently pass quantitative calculations directly to Large Language Models (LLMs), introducing arithmetic hallucinations and non-reproducible ESG reporting. Carbonly enforces a strict **decoupled architectural boundary**:
+1. **100% Deterministic Arithmetic Execution Layer**: All Scope 1, 2, and 3 calculations, matrix inversions, linear solver pivots, and time-series fits are executed by pure, deterministic JavaScript mathematical engines.
+2. **Evidence-Grounded AI Reasoning Proxy Layer**: The Groq LLM (`llama-3.3-70b-versatile`) operates strictly as a read-only narrative proxy over immutable calculation proofs (`calc_83a91f`).
 
 ```mermaid
 graph TD
@@ -61,9 +70,90 @@ graph TD
 
 ---
 
-## 2. Technical Specifications & Data Science / ML Architecture
+## 2. GHG Protocol Accounting & Governance Registries
 
-### A. Time-Series Model Competition & Cross-Validation (`modelSelectionEngine.js`)
+### A. GHG Protocol Scope & Category Boundary Mappings
+Carbonly explicitly maps operational activity streams into formal GHG Protocol categories:
+
+- **Scope 1: Direct Mobile Combustion & Fleet Fuel** (`S1-MC-01`)
+  - Fuel types: Gasoline ($0.192 \text{ kg CO}_2\text{e/km}$), Diesel ($0.171 \text{ kg CO}_2\text{e/km}$), Electric Grid Average ($0.053 \text{ kg CO}_2\text{e/km}$).
+- **Scope 2: Purchased Electricity Dual Accounting** (`S2-LOC-01`, `S2-MKT-01`)
+  - Subregions: US eGRID ($0.385 \text{ kg CO}_2\text{e/kWh}$), EU EEA ($0.255 \text{ kg CO}_2\text{e/kWh}$), India CEA ($0.710 \text{ kg CO}_2\text{e/kWh}$), Global Average ($0.475 \text{ kg CO}_2\text{e/kWh}$).
+- **Scope 3: Value-Chain Progressive Categories** (`S3-CAT6-01`, `S3-CAT4-01`, `S3-CAT3-01`)
+  - Category 6 (Business Travel): Short-haul ($800 \text{ km}, 0.156 \text{ kg/pkm}$) and Long-haul ($3,500 \text{ km}, 0.115 \text{ kg/pkm}$) flights multiplied by IPCC AR6 Radiative Forcing Multiplier ($1.9\times$).
+  - Category 4 (Water Lifecycle): Municipal water supply and wastewater treatment ($0.000708 \text{ kg CO}_2\text{e/Liter}$).
+  - Category 3 (Digital Infrastructure): Workload data transfer ($0.06 \text{ kWh/GB}$) and display runtime ($0.03 \text{ kWh/hr}$).
+
+### B. Emission Factor Registry (EFR) & Governance Lifecycle (`emissionFactorRegistry.js`)
+Every conversion factor is managed via an immutable **Emission Factor Registry**, preventing silent recalculation of historical ESG reports when factors update annually.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Draft : Factor Proposed
+    Draft --> Reviewed : Internal QA & Source Verification
+    Reviewed --> Approved : Enterprise Compliance Sign-off
+    Approved --> Active : Deployed to Registry Gateway
+    Active --> Deprecated : Superceded by New Annual Revision
+    Deprecated --> [*]
+```
+
+---
+
+## 3. Data Engineering Infrastructure & Pipelines
+
+### A. High-Throughput Batch Stream Ingestion & Idempotency Pipeline (`ingestionPipeline.js`)
+Bulk activity ingestion endpoints accept streaming NDJSON/CSV payloads. Incoming records are validated and deduplicated using transaction idempotency keys (`idempotencyKey`):
+
+```json
+{
+  "summary": {
+    "totalReceived": 3,
+    "successfullyProcessed": 2,
+    "duplicatesSkipped": 1,
+    "invalidCount": 0
+  },
+  "processed": [
+    { "index": 0, "idempotencyKey": "IDEM-2026-08-FAC-001", "canonicalRecord": { "transportKm": 180, "electricityKwh": 350 } }
+  ]
+}
+```
+
+---
+
+### B. Automated Data Quality & Schema Drift Engine (`dataQualityEngine.js`)
+Executes automated assertion suites over incoming payloads prior to calculation:
+- **Null & Missing Value Checks**: Verifies required activity fields.
+- **Physical Range Bound Assertions**: Validates $0 \le \text{transportKm} \le 100,000$, $0 \le \text{electricityKwh} \le 1,000,000$.
+- **Schema Drift Detection**: Flags unknown keys and schema mutations.
+
+---
+
+### C. Data Lineage Directed Acyclic Graph (DAG) (`lineageDagService.js`)
+Carbonly exposes a complete Directed Acyclic Graph (DAG) node/edge dependency tree mapping data lineage (`GET /api/carbon/lineage-dag/:calcId`):
+
+```mermaid
+graph LR
+    A[Raw Operational Inflow] --> B[Schema Validator & Normalization]
+    B --> C[Emission Factor Registry EFR v1.0]
+    C --> D[Deterministic Carbon Engine]
+    D --> E[Scope 1 Mobile Combustion]
+    D --> F[Scope 2 Grid Electricity]
+    D --> G[Scope 3 Value Chain]
+    E --> H[Evidence Store Proof calc_83a91f]
+    F --> H
+    G --> H
+```
+
+---
+
+### D. Columnar Warehouse Exporter (`export-warehouse-ndjson`)
+Bulk export API producing NDJSON files formatted for direct COPY INTO loading into Snowflake, Google BigQuery, or Databricks Delta Lake.
+
+---
+
+## 4. Advanced Data Science & Machine Learning Theory
+
+### A. Time-Series Model Selection & Cross-Validation (`modelSelectionEngine.js`)
 Competes 3 distinct time-series candidate models across held-out test data:
 1. **Holt-Winters Additive Triple Exponential Smoothing** ($\alpha, \beta, \gamma$ grid-tuned).
 2. **ARIMA(1,1,1) Auto-Regressive Moving Average Model** ($y_t = c + \phi_1 y_{t-1} + \theta_1 e_{t-1} + e_t$) with Conditional Sum of Squares (CSS) $\theta_1$ parameter optimization.
@@ -86,7 +176,23 @@ Competes 3 distinct time-series candidate models across held-out test data:
 
 ---
 
-### B. Multi-Variate Mahalanobis Distance Matrix Inversion Engine (`multivariateAnomaly.js`)
+### B. Holt-Winters Triple Exponential Smoothing with Out-of-Sample Holdout Evaluation (`forecastingEngine.js`)
+Future emissions are projected using true **Holt-Winters Additive Triple Exponential Smoothing** with level $\ell_t$, trend $b_t$, and seasonal $s_t$ ($m=12$) state equations:
+
+- **Level Update**: $\ell_t = \alpha (y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1} + b_{t-1})$
+- **Trend Update**: $b_t = \beta (\ell_t - \ell_{t-1}) + (1-\beta)b_{t-1}$
+- **Seasonal Update**: $s_t = \gamma (y_t - \ell_t) + (1-\gamma)s_{t-m}$
+- **Forecast Horizon**: $\hat{y}_{N+h} = \ell_N + h \cdot b_N + s_{N+h-m}$
+- **Genuine Train/Test Out-of-Sample Evaluation**:
+  - Split: 70% Training Set ($t = 1 \ldots N_{train}$), 30% Held-Out Test Set ($t = N_{train}+1 \ldots N$).
+  - Fits model parameters $\alpha, \beta, \gamma$ **strictly on Training Set**.
+  - Evaluates MAE, sMAPE, and MASE **strictly on unseen held-out Test Set** (`outOfSampleTestMetrics`).
+- **Explicit History Sufficiency Metadata**:
+  - When historical observations $< 24$ months, explicitly flags `sufficientHistoryForOutofSample: false` and sets `fallbackMode: "DEMO_UI_SYNTHETIC_SEASONAL_FALLBACK"`.
+
+---
+
+### C. Multi-Variate Mahalanobis Distance Matrix Inversion Engine (`multivariateAnomaly.js`)
 Inverts the sample covariance matrix $\Sigma^{-1}$ via $5 \times 5$ Gauss-Jordan matrix elimination to compute the full quadratic form capturing off-diagonal joint correlations:
 
 $$D_M(x) = \sqrt{(x - \mu)^T \Sigma^{-1} (x - \mu)}$$
@@ -95,14 +201,14 @@ Flags joint anomalies exceeding the Chi-Square critical threshold ($\chi^2_{5, 0
 
 ---
 
-### C. 10,000-Iteration Monte Carlo Uncertainty Quantification (`uncertaintyQuantification.js`)
+### D. 10,000-Iteration Monte Carlo Uncertainty Quantification (`uncertaintyQuantification.js`)
 Executes $N=10,000$ independent Box-Muller Gaussian and true Log-Normal stochastic draws $X = \exp(\mu_{\ln} + \sigma_{\ln} Z)$ over input activity metrics and DEFRA/EPA factor uncertainties to generate non-parametric confidence intervals:
 - **80% Central Predictive Uncertainty Interval**: $[P_{10}, P_{90}]$
 - **95% Central Predictive Uncertainty Interval**: $[P_{2.5}, P_{97.5}]$
 
 ---
 
-### D. KernelSHAP Surrogate Model Explainer (`shapExplainerService.js`)
+### E. KernelSHAP Surrogate Model Explainer (`shapExplainerService.js`)
 Formulates predictive surrogate model $f(x) = \text{EcoScore}(x)$, evaluates coalition subsets $S \subseteq M$ against background expectation $E[x]$, and calculates exact Shapley marginal feature contributions:
 
 $$\phi_i(f, x) = \sum_{S \subseteq M \setminus \{i\}} \frac{|S|!(|M|-|S|-1)!}{|M|!} \left[ f(x_{S \cup \{i\}}) - f(x_S) \right]$$
@@ -111,7 +217,19 @@ Satisfies the **Efficiency Axiom** ($\sum \phi_i = f(x) - E[f(x)]$).
 
 ---
 
-### E. Operations Research Primal Simplex Linear Programming Solver (`optimizerEngine.js`)
+### F. Shapley Value Cooperative Game Theory Attribution & Synergy Calibration (`anomalyAttribution.js`)
+Attributes anomaly variance drivers by formulating a 3-player cooperative game $N = \{\text{Transport}, \text{Grid}, \text{Travel}\}$ with characteristic function $v(S) = \left( \sum_{i \in S} \Delta_i \right)^{\eta}$:
+
+$$\phi_i(v) = \sum_{S \subseteq N \setminus \{i\}} \frac{|S|!(|N|-|S|-1)!}{|N|!} \left[ v(S \cup \{i\}) - v(S) \right]$$
+
+- **Synergy Exponent ($\eta = 1.15$)**: Physical representation of super-additive operational facility load compounding ($\eta > 1.0$), where simultaneous fleet mileage AND grid power spikes create non-linear facility HVAC & infrastructure load penalties.
+- Verifies the **Efficiency Axiom** ($\sum_{i \in N} \phi_i = v(N)$) to prove exact mathematical marginal attribution.
+
+---
+
+## 5. Operations Research & Constrained Optimization
+
+### Primal Simplex Method Linear Programming Solver (`optimizerEngine.js`)
 Formulates and solves a Primal Simplex Linear Program to **maximize carbon emissions avoided** subject to an annual target capital budget constraint:
 
 $$\max \quad Z = c_1 x_1 + c_2 x_2 + c_3 x_3 \quad \text{subject to} \quad w_1 x_1 + w_2 x_2 + w_3 x_3 \le B, \quad 0 \le x_j \le 1.0$$
@@ -120,7 +238,7 @@ Constructs a standard 5-row Simplex Tableau matrix and executes Gauss-Jordan piv
 
 ---
 
-## 3. Calculation Validation against Reference Examples & Real Public Datasets
+## 6. Empirical Calculation Validation & Public Datasets
 
 | Validation Metric | Benchmark Value | Technical Description |
 |---|---|---|
@@ -132,7 +250,26 @@ Constructs a standard 5-row Simplex Tableau matrix and executes Gauss-Jordan piv
 
 ---
 
-## 4. Repository Structure & Module Boundaries
+## 7. REST API Endpoint Reference
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/api/carbon/calculate` | Executes GHG calculations, EcoScore, forecast & lineage proofs | Bearer Token |
+| `POST` | `/api/carbon/model-competition` | Cross-validates Holt-Winters vs ARIMA(1,1,1) vs Seasonal Naive | Public |
+| `POST` | `/api/carbon/multivariate-anomaly` | Mahalanobis distance 5x5 matrix inversion correlation anomaly detection | Public |
+| `POST` | `/api/carbon/monte-carlo-uncertainty` | 10,000-Iteration Monte Carlo stochastic uncertainty simulation | Public |
+| `POST` | `/api/carbon/shap-explanation` | KernelSHAP global feature importance breakdown for EcoScore percentiles | Public |
+| `POST` | `/api/carbon/batch-ingest` | High-throughput stream batch ingestion & idempotency pipeline | Public |
+| `POST` | `/api/carbon/data-quality-audit` | Data Quality assertions & schema drift monitoring | Public |
+| `GET` | `/api/carbon/lineage-dag/:calcId` | Directed Acyclic Graph (DAG) node/edge data lineage visualizer | Public |
+| `GET` | `/api/carbon/export-warehouse-ndjson` | Bulk NDJSON export formatted for Snowflake / BigQuery / Databricks | Public |
+| `POST` | `/api/carbon/simulate` | Sensitivity simulator for Net-Zero 2030 target gaps | Optional |
+| `POST` | `/api/carbon/optimize` | Primal Simplex linear programming decarbonization solver | Optional |
+| `GET` | `/api/carbon/export-report` | Generates exportable Audit-Ready GHG Inventory Certificate | Bearer Token |
+
+---
+
+## 8. Repository Structure & Local Setup
 
 ```text
 Carbonly/
@@ -186,10 +323,7 @@ Carbonly/
 └── README.md
 ```
 
----
-
-## 5. Local Setup & Testing
-
+### Local Setup & Testing
 ```bash
 # 1. Clone Repository
 git clone https://github.com/Dhruvg334/Carbonly.git
@@ -207,5 +341,5 @@ npm test
 
 ---
 
-## 6. License
+## License
 Distributed under the Open Source **MIT License**.
