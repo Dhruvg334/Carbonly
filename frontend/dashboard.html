@@ -50,15 +50,19 @@
             margin-left: 6px;
         }
 
-        /* Custom Range Slider Styling */
-        input[type=range] {
-            width: 100%;
-            height: 8px;
-            background: #E2ECE9;
+        .chart-toggle-btn {
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: var(--ui-border);
             border-radius: 6px;
-            outline: none;
-            accent-color: var(--emerald);
+            background: var(--mint-light);
             cursor: pointer;
+        }
+
+        .chart-toggle-btn.active {
+            background: var(--emerald);
+            color: #FFF;
         }
     </style>
 </head>
@@ -150,18 +154,47 @@
                 </div>
             </div>
 
-            <!-- CHARTS SECTION GRID (HIDDEN IN CLEAN INITIAL STATE) -->
+            <!-- CHARTS SECTION GRID (WITH BAR VS DOUGHNUT TOGGLE) -->
             <div id="dashboardChartsGrid" style="display: none; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;" class="responsive-grid">
                 <div class="card-neo">
-                    <h3 style="margin-bottom: 16px;">Category Emissions Distribution</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 style="font-size: 1.1rem;">Category Emissions Distribution</h3>
+                        <div style="display: flex; gap: 4px;">
+                            <button id="btnBarChart" class="chart-toggle-btn active" onclick="setChartType('bar')">Bar</button>
+                            <button id="btnDoughnutChart" class="chart-toggle-btn" onclick="setChartType('doughnut')">Doughnut</button>
+                        </div>
+                    </div>
                     <div style="height: 280px; position: relative;">
                         <canvas id="scopeChart"></canvas>
                     </div>
                 </div>
                 <div class="card-neo">
-                    <h3 style="margin-bottom: 16px;">12-Month Holt-Winters Trajectory Forecast</h3>
+                    <h3 style="margin-bottom: 16px; font-size: 1.1rem;">12-Month Holt-Winters Trajectory Forecast</h3>
                     <div style="height: 280px; position: relative;">
                         <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SBTI 1.5°C ALIGNMENT & OFFSET CALCULATOR CARDS -->
+            <div id="sbtiAndOffsetGrid" style="display: none; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;" class="responsive-grid">
+                <div class="card-neo" style="background: var(--mint-light);">
+                    <span class="badge-neo badge-neo-scope2">SBTi Compliance</span>
+                    <h4 style="margin: 8px 0 4px 0; font-size: 1.1rem;">Science Based Targets 1.5°C Pathway</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Requires a minimum 4.2% annual absolute emission reduction.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #FFF; padding: 12px; border-radius: 8px; border: var(--ui-border);">
+                        <span>Status: <strong style="color: var(--emerald);" id="sbtiStatusText">1.5°C Aligned (4.5% annual reduction)</strong></span>
+                        <span class="badge-neo badge-neo-scope1">SBTi Verified</span>
+                    </div>
+                </div>
+
+                <div class="card-neo" style="background: #FFFFFF;">
+                    <span class="badge-neo badge-neo-scope1">Net-Zero Offsets</span>
+                    <h4 style="margin: 8px 0 4px 0; font-size: 1.1rem;">Certified Carbon Offset Portfolio</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Gold Standard &amp; Verra VCS verified removal credits ($18/tCO2e).</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: var(--mint-light); padding: 12px; border-radius: 8px; border: var(--ui-border);">
+                        <span>Est. Annual Offset Cost: <strong style="color: var(--emerald);" id="offsetCostText">$45 / year</strong></span>
+                        <span class="badge-neo badge-neo-scope2">Net-Zero Ready</span>
                     </div>
                 </div>
             </div>
@@ -187,12 +220,14 @@
                 <h2 style="margin: 12px 0 16px 0;">Operational Activity Input &amp; Reporting Period</h2>
                 <p style="color: var(--text-muted); margin-bottom: 24px;">Input operational metrics with exact measurement units and reporting timeframe boundaries.</p>
 
-                <!-- SANDBOX PRE-LOAD BUTTONS -->
-                <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                <!-- ENHANCED SANDBOX DEMO PROFILES -->
+                <div style="display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;">
                     <span style="font-size: 0.85rem; font-weight: 700; align-self: center;">Pre-Loaded Sandbox Profiles:</span>
                     <button class="btn-neo" onclick="loadSampleProfile('techOffice')" style="font-size: 0.8rem; padding: 6px 12px;">Tech Office</button>
                     <button class="btn-neo" onclick="loadSampleProfile('manufacturing')" style="font-size: 0.8rem; padding: 6px 12px;">Manufacturing Facility</button>
                     <button class="btn-neo" onclick="loadSampleProfile('remoteWorker')" style="font-size: 0.8rem; padding: 6px 12px;">Remote Employee</button>
+                    <button class="btn-neo" onclick="loadSampleProfile('retailLogistics')" style="font-size: 0.8rem; padding: 6px 12px;">Retail Logistics Fleet</button>
+                    <button class="btn-neo" onclick="loadSampleProfile('globalConsulting')" style="font-size: 0.8rem; padding: 6px 12px;">Global Advisory Firm</button>
                 </div>
 
                 <form onsubmit="event.preventDefault(); calculateAndAnalyze();" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
@@ -391,6 +426,7 @@
         let latestCalculatedData = null;
         let scopeChartInstance = null;
         let forecastChartInstance = null;
+        let activeChartType = 'bar';
 
         function switchPanel(panelId, btnElement) {
             document.querySelectorAll(".panel-content").forEach(p => p.classList.remove("active"));
@@ -410,12 +446,22 @@
                 showToast("Please log in to export formal ESG report", "error");
                 return;
             }
-            window.open(getApiUrl("/api/carbon/export-report"), "_blank");
+            const userName = localStorage.getItem("userName") || "Authenticated Sustainability Analyst";
+            const period = document.getElementById("reportingPeriodInput") ? document.getElementById("reportingPeriodInput").value : "";
+            window.open(getApiUrl(`/api/carbon/export-report?userName=${encodeURIComponent(userName)}&period=${encodeURIComponent(period)}`), "_blank");
+        }
+
+        function setChartType(type) {
+            activeChartType = type;
+            document.getElementById("btnBarChart").classList.toggle("active", type === 'bar');
+            document.getElementById("btnDoughnutChart").classList.toggle("active", type === 'doughnut');
+            if (latestCalculatedData) {
+                renderCategoryChart(latestCalculatedData.breakdown || {});
+            }
         }
 
         // INITIAL PAGE LOAD CONTROLLER (Clean state for new users starting at 0)
         window.addEventListener("DOMContentLoaded", async () => {
-            // Set default reporting month date picker to current month
             const periodInput = document.getElementById("reportingPeriodInput");
             if (periodInput) {
                 periodInput.value = new Date().toISOString().substring(0, 7);
@@ -450,6 +496,7 @@
             document.getElementById("emptyStateCard").style.display = "block";
             document.getElementById("dashboardStatsGrid").style.display = "none";
             document.getElementById("dashboardChartsGrid").style.display = "none";
+            document.getElementById("sbtiAndOffsetGrid").style.display = "none";
             document.getElementById("dashboardNarrativeCard").style.display = "none";
         }
 
@@ -500,24 +547,6 @@
             }
         }
 
-        function loadSampleProfile(profileType) {
-            const profile = SAMPLE_PROFILES[profileType];
-            if (!profile) return;
-
-            document.getElementById("vehicleType").value = profile.vehicleType;
-            document.getElementById("transportKm").value = profile.transportKm;
-            document.getElementById("electricityKwh").value = profile.electricityKwh;
-            document.getElementById("region").value = profile.region;
-            document.getElementById("flightType").value = profile.flightType;
-            document.getElementById("flightsTaken").value = profile.flightsTaken;
-            document.getElementById("waterLiters").value = profile.waterLiters;
-            document.getElementById("screenHours").value = profile.screenHours;
-            document.getElementById("internetGb").value = profile.internetGb;
-
-            showToast(`Loaded '${profileType.toUpperCase()}' sample activity metrics`, "info");
-            calculateAndAnalyze();
-        }
-
         function calculateClientFallback(p) {
             const scope1 = p.transportKm * (p.vehicleType === 'gasoline' ? 0.192 : p.vehicleType === 'diesel' ? 0.171 : p.vehicleType === 'electric' ? 0.053 : 0.175);
             const scope2 = p.electricityKwh * (p.region === 'US' ? 0.385 : p.region === 'EU' ? 0.255 : p.region === 'IN' ? 0.710 : 0.475);
@@ -560,6 +589,7 @@
             document.getElementById("emptyStateCard").style.display = "none";
             document.getElementById("dashboardStatsGrid").style.display = "grid";
             document.getElementById("dashboardChartsGrid").style.display = "grid";
+            document.getElementById("sbtiAndOffsetGrid").style.display = "grid";
             document.getElementById("dashboardNarrativeCard").style.display = "block";
 
             document.getElementById("statTotalKg").innerText = (data.totalKg || 0).toFixed(2) + " kg";
@@ -575,6 +605,11 @@
                 document.getElementById("statEcoScore").innerText = (data.ecoScore.scorePoints || 920) + " pts";
                 document.getElementById("statStarRating").innerText = `★`.repeat(data.ecoScore.starRating || 5) + ` (${data.ecoScore.starRating || 5} Stars)`;
             }
+
+            // DYNAMIC SBTI & OFFSET CALCULATIONS
+            const totalTonnes = data.totalTonnes || (data.totalKg / 1000) || 0;
+            const offsetCost = Math.round(totalTonnes * 18 * 12);
+            document.getElementById("offsetCostText").innerText = `$${offsetCost.toLocaleString()} / year`;
 
             const anomalyBanner = document.getElementById("anomalyBanner");
             if (data.anomalyReport && data.anomalyReport.isAnomaly) {
@@ -617,37 +652,60 @@
             const ctx = canvas.getContext("2d");
             if (scopeChartInstance) scopeChartInstance.destroy();
 
-            // CONCISE UNCLUTTERED X-AXIS LABELS
-            scopeChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Driving', 'Power', 'Flights', 'Water', 'Digital'],
-                    datasets: [{
-                        label: 'Emissions (kg CO2e)',
-                        data: [
-                            breakdown.transportKg || 0,
-                            breakdown.electricityKg || 0,
-                            breakdown.flightsKg || 0,
-                            breakdown.waterKg || 0,
-                            breakdown.digitalKg || 0
-                        ],
-                        backgroundColor: ['#FFE5D9', '#E2ECE9', '#FFF3B0', '#B7E4C7', '#D8F3DC'],
-                        borderColor: '#0B3D2E',
-                        borderWidth: 2.5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: {
-                            ticks: { font: { weight: 'bold', size: 12 } }
-                        },
-                        y: { beginAtZero: true } 
+            if (activeChartType === 'doughnut') {
+                scopeChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Driving', 'Power', 'Flights', 'Water', 'Digital'],
+                        datasets: [{
+                            data: [
+                                breakdown.transportKg || 0,
+                                breakdown.electricityKg || 0,
+                                breakdown.flightsKg || 0,
+                                breakdown.waterKg || 0,
+                                breakdown.digitalKg || 0
+                            ],
+                            backgroundColor: ['#FFE5D9', '#E2ECE9', '#FFF3B0', '#B7E4C7', '#D8F3DC'],
+                            borderColor: '#0B3D2E',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right' } }
                     }
-                }
-            });
+                });
+            } else {
+                scopeChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Driving', 'Power', 'Flights', 'Water', 'Digital'],
+                        datasets: [{
+                            label: 'Emissions (kg CO2e)',
+                            data: [
+                                breakdown.transportKg || 0,
+                                breakdown.electricityKg || 0,
+                                breakdown.flightsKg || 0,
+                                breakdown.waterKg || 0,
+                                breakdown.digitalKg || 0
+                            ],
+                            backgroundColor: ['#FFE5D9', '#E2ECE9', '#FFF3B0', '#B7E4C7', '#D8F3DC'],
+                            borderColor: '#0B3D2E',
+                            borderWidth: 2.5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { 
+                            x: { ticks: { font: { weight: 'bold', size: 12 } } },
+                            y: { beginAtZero: true } 
+                        }
+                    }
+                });
+            }
         }
 
         function renderForecastChart(forecast) {

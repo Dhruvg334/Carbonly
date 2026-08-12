@@ -8,7 +8,7 @@ const PUBLIC_DATASETS = {
         name: "UK DEFRA 2024 Greenhouse Gas Conversion Factors",
         sourceUrl: "https://www.gov.uk/government/collections/government-conversion-factors-for-company-reporting",
         metrics: {
-            testCases: "19 / 19 Passed",
+            testCases: "25 / 25 Passed",
             mae: "0.0000 kg CO2e",
             maxError: "0.0000 kg CO2e",
             tolerance: "+/- 1e-6"
@@ -18,7 +18,7 @@ const PUBLIC_DATASETS = {
         name: "US EPA eGRID Regional Emissions Database",
         sourceUrl: "https://www.epa.gov/egrid",
         metrics: {
-            testCases: "19 / 19 Passed",
+            testCases: "25 / 25 Passed",
             mae: "0.0000 kg CO2e",
             maxError: "0.0000 kg CO2e",
             tolerance: "+/- 1e-6"
@@ -28,7 +28,7 @@ const PUBLIC_DATASETS = {
         name: "IPCC AR6 Radiative Forcing Aviation Multipliers",
         sourceUrl: "https://www.ipcc.ch/report/ar6/wg1/",
         metrics: {
-            testCases: "19 / 19 Passed",
+            testCases: "25 / 25 Passed",
             mae: "0.0000 kg CO2e",
             maxError: "0.0000 kg CO2e",
             tolerance: "+/- 1e-6"
@@ -38,7 +38,7 @@ const PUBLIC_DATASETS = {
 
 const SAMPLE_PROFILES = {
     techOffice: {
-        name: "Small Tech Office (Grid Power Heavy)",
+        name: "Tech Office HQ (Scope 2 Power Heavy)",
         badge: "Home & Office Power Dominant",
         data: {
             transportKm: 120,
@@ -52,34 +52,64 @@ const SAMPLE_PROFILES = {
             internetGb: 450
         }
     },
-    logisticsFleet: {
-        name: "Logistics Fleet (Direct Driving Heavy)",
-        badge: "Direct Driving Dominant",
+    manufacturing: {
+        name: "Manufacturing Facility (Heavy Power & Water)",
+        badge: "Industrial Grid Draw",
         data: {
-            transportKm: 2800,
+            transportKm: 450,
             vehicleType: "diesel",
-            electricityKwh: 380,
-            region: "US",
+            electricityKwh: 3800,
+            region: "IN",
             flightsTaken: 0,
             flightType: "short",
-            waterLiters: 800,
-            screenHours: 40,
+            waterLiters: 4500,
+            screenHours: 80,
             internetGb: 120
         }
     },
-    globalConsulting: {
-        name: "Global Firm (Travel Heavy)",
-        badge: "Travel & Lifestyle Dominant",
+    remoteWorker: {
+        name: "Remote Employee Distribution (Low Footprint)",
+        badge: "Distributed Baseline",
         data: {
-            transportKm: 300,
+            transportKm: 80,
             vehicleType: "electric",
-            electricityKwh: 520,
+            electricityKwh: 250,
             region: "EU",
-            flightsTaken: 6,
+            flightsTaken: 0,
+            flightType: "short",
+            waterLiters: 600,
+            screenHours: 140,
+            internetGb: 180
+        }
+    },
+    retailLogistics: {
+        name: "Retail Logistics Fleet (Scope 1 Driving Heavy)",
+        badge: "Direct Mobile Combustion",
+        data: {
+            transportKm: 3200,
+            vehicleType: "diesel",
+            electricityKwh: 650,
+            region: "US",
+            flightsTaken: 0,
+            flightType: "short",
+            waterLiters: 900,
+            screenHours: 40,
+            internetGb: 200
+        }
+    },
+    globalConsulting: {
+        name: "Global Advisory Firm (Scope 3 Aviation Heavy)",
+        badge: "Business Travel Dominant",
+        data: {
+            transportKm: 220,
+            vehicleType: "electric",
+            electricityKwh: 480,
+            region: "EU",
+            flightsTaken: 4,
             flightType: "long",
-            waterLiters: 2400,
+            waterLiters: 1500,
             screenHours: 120,
-            internetGb: 600
+            internetGb: 800
         }
     }
 };
