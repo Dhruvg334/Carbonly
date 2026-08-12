@@ -1,378 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="stylesheet" href="style.css">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carbonly - Track Your Carbon</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-}
-
-body {
-  background: #f8fff9;
-  color: #1b1b1b;
-}
-
-/* ================= NAVBAR ================= */
-
-.top-strip {
-  width: 100%;
-  height: 70px;
-  background: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 80px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  border-bottom: 1px solid #eee;
-  z-index: 1000;
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: 700;
-  color: #2e7d32;
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: #1b1b1b;
-  margin-left: 35px;
-  font-weight: 500;
-  transition: 0.3s;
-}
-
-.nav-links a:hover {
-  color: #2e7d32;
-}
-
-
-/* ================= HERO ================= */
-
-.hero {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 80px;
-  margin-top: 70px;
-}
-
-.hero-text {
-  width: 50%;
-}
-
-.hero-text h1 {
-  font-size: 56px;
-  font-weight: 700;
-  margin-bottom: 20px;
-}
-
-.hero-text span {
-  color: #2e7d32;
-}
-
-.hero-text p {
-  font-size: 18px;
-  margin-bottom: 30px;
-  color: #555;
-}
-
-.hero-buttons button {
-  padding: 14px 30px;
-  margin-right: 15px;
-  border-radius: 30px;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  transition: 0.3s;
-}
-
-.start-btn {
-  background: #2e7d32;
-  color: white;
-}
-
-.start-btn:hover {
-  background: #1b5e20;
-}
-
-.learn-btn {
-  background: transparent;
-  border: 2px solid #2e7d32;
-  color: #2e7d32;
-}
-
-.learn-btn:hover {
-  background: #2e7d32;
-  color: white;
-}
-
-/* Hero Image */
-
-.hero-image {
-  width: 40%;
-}
-
-.hero-image img {
-  width: 100%;
-}
-
-/* ================= FEATURES ================= */
-
-.features {
-  padding: 100px 80px;
-  text-align: center;
-}
-
-.features h2 {
-  font-size: 36px;
-  margin-bottom: 60px;
-}
-
-.feature-cards {
-  display: flex;
-  justify-content: space-between;
-}
-
-.card {
-  width: 30%;
-  background: white;
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-  transition: 0.3s;
-}
-
-.card:hover {
-  transform: translateY(-10px);
-}
-
-.card h3 {
-  margin-bottom: 15px;
-  color: #2e7d32;
-}
-
-.card p {
-  color: #555;
-}
-
-/* ================= HOW IT WORKS ================= */
-
-.how {
-  padding: 100px 80px;
-  background: #eef7f0;
-  text-align: center;
-}
-
-.how h2 {
-  font-size: 36px;
-  margin-bottom: 60px;
-}
-
-.steps {
-  display: flex;
-  justify-content: space-between;
-}
-
-.step {
-  width: 30%;
-}
-
-.step h3 {
-  margin-bottom: 15px;
-  color: #2e7d32;
-}
-
-/* ================= FOOTER ================= */
-
-footer {
-  padding: 40px 80px;
-  background: white;
-  text-align: center;
-  border-top: 1px solid #eee;
-}
-
-footer p {
-  color: #777;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbonly | Enterprise ESG & Decarbonization Intelligence Platform</title>
+    <meta name="description" content="A high-performance carbon accounting platform providing deterministic GHG Protocol calculations, statistical anomaly detection, and interactive scenario modeling.">
+    <link rel="canonical" href="https://carbonly.netlify.app/">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Three.js for 3D Visualizations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Custom Neo-Brutalist Design System -->
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<!-- NAVBAR -->
-<div class="top-strip">
-  <div class="logo">Carbonly</div>
-  <div class="nav-links">
+    <!-- NAVBAR -->
+    <header class="top-strip">
+        <a href="index.html" class="logo">
+            <span>🌱</span> Carbonly
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="#features">Features</a>
+            <a href="#architecture">Architecture</a>
+            <a href="login.html" id="loginBtn" class="btn-neo">Login</a>
+            <a href="signup.html" id="signupBtn" class="btn-neo btn-neo-primary">Sign Up</a>
+            <a href="dashboard.html" id="dashboardBtn" class="btn-neo btn-neo-primary" style="display:none;">Dashboard</a>
+            <a href="#" id="logoutBtn" class="btn-neo" style="display:none;">Logout</a>
+        </nav>
+    </header>
 
-<a href="index.html">Home</a>
-<a href="#features">Features</a>
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-text">
+            <span class="badge-neo badge-neo-scope2">GHG Protocol Compliant Engine</span>
+            <h1 style="margin-top: 12px;">Track Your <span>Carbon.</span><br>Simulate Your Future.</h1>
+            <p>Transform operational emissions data into audit-ready metrics across Scope 1, Scope 2, and Scope 3. Run real-time "What-If" scenario simulations with instant carbon and cost savings feedback.</p>
 
-<a href="login.html" id="loginBtn">Login</a>
-<a href="signup.html" id="signupBtn" class="signup-btn">Sign Up</a>
+            <div class="hero-buttons">
+                <button class="btn-neo btn-neo-primary" onclick="startTracking()">Launch Dashboard</button>
+                <a href="#features" class="btn-neo">Explore Platform</a>
+            </div>
+        </div>
 
-<a href="dashboard.html" id="dashboardBtn" style="display:none;">Dashboard</a>
-<a href="#" id="logoutBtn" style="display:none;">Logout</a>
+        <!-- 3D IMMERSIVE CANVAS -->
+        <div class="hero-canvas-container">
+            <div id="heroCanvas"></div>
+            <div class="canvas-overlay-badge">
+                <span>🌐 Interactive 3D Eco-Particle Globe</span>
+            </div>
+        </div>
+    </section>
 
-</div>
-</div>
+    <!-- FEATURES SECTION -->
+    <section class="features" id="features" style="padding: 80px 40px; background: #FFFFFF; border-top: var(--neo-border); border-bottom: var(--neo-border);">
+        <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+            <span class="badge-neo badge-neo-scope1">Enterprise Features</span>
+            <h2 style="font-size: 2.5rem; margin: 12px 0 40px 0;">Why Choose Carbonly?</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; text-align: left;">
+                <div class="card-neo">
+                    <span class="badge-neo badge-neo-scope1">Scope 1, 2, & 3</span>
+                    <h3 style="margin: 16px 0 8px 0;">Deterministic GHG Accounting</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Calculates accurate metric tons of CO2e ($tCO_2e$) using verified DEFRA and EPA emission factors for transport, electricity grids, flights, water, and digital transfer.</p>
+                </div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-text">
-    <h1>Track your <span>carbon.</span><br>Change your future.</h1>
-    <p>Monitor your daily activities, calculate your carbon footprint, and take control of your environmental impact.</p>
+                <div class="card-neo">
+                    <span class="badge-neo badge-neo-scope3">Statistical Analytics</span>
+                    <h3 style="margin: 16px 0 8px 0;">Automated Anomaly Detection</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Employs rolling Z-score and Interquartile Range (IQR) algorithms to flag consumption spikes and isolate primary variance drivers.</p>
+                </div>
 
-    <div class="hero-buttons">
-      <button class="start-btn" onclick="startTracking()">Start Tracking</button>
-      <button class="learn-btn" id="purpose-btn">Eco Icons</button>
-    </div>
-  </div>
+                <div class="card-neo">
+                    <span class="badge-neo badge-neo-scope2">Scenario Modeling</span>
+                    <h3 style="margin: 16px 0 8px 0;">"What-If" Sensitivity Simulator</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Model fleet electrification, renewable power agreements, and commute adjustments in real time with instant financial and emissions ROI feedback.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <div class="hero-image">
-    <img src="https://cdn-icons-png.flaticon.com/512/427/427735.png" alt="Earth Illustration">
-  </div>
-</section>
+    <!-- ARCHITECTURE OVERVIEW -->
+    <section class="architecture" id="architecture" style="padding: 80px 40px; background: var(--mint-light);">
+        <div style="max-width: 1000px; margin: 0 auto; text-align: center;">
+            <span class="badge-neo badge-neo-scope2">System Architecture</span>
+            <h2 style="font-size: 2.2rem; margin: 12px 0 24px 0;">Decoupled Multi-Tier Platform</h2>
+            <p style="color: var(--text-muted); max-width: 700px; margin: 0 auto 40px auto;">Built with clean separation between client-side interactive UI components, deterministic calculation services, and Groq-powered AI decision support.</p>
+            
+            <div class="card-neo" style="background: #FFFFFF; text-align: left;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div>
+                        <h4 style="color: var(--emerald);">Frontend</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Vite, React, Three.js 3D Canvas, Recharts, Neo-Brutalist CSS System (Netlify Deployed)</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--emerald);">Engine API</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Node.js / Express REST Gateway, GHG Protocol Emission Engine, Z-Score Outlier Detector</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--emerald);">AI Intelligence</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Groq API (llama-3.3-70b-versatile) Executive Narrative & Action Planning Service</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<!-- FEATURES -->
-<section class="features" id="features">
-  <h2>Why Carbonly?</h2>
-  <div class="feature-cards">
-    <div class="card">
-      <h3>🌱 Track Daily Activity</h3>
-      <p>Enter transport, electricity and food data easily in your dashboard.</p>
-    </div>
+    <!-- FOOTER -->
+    <footer style="padding: 40px; background: #FFFFFF; border-top: var(--neo-border); text-align: center;">
+        <p style="font-weight: 600; color: var(--text-muted);">© 2026 Carbonly. Building verifiable technology for a sustainable future.</p>
+    </footer>
 
-    <div class="card">
-      <h3>📊 Instant Carbon Score</h3>
-      <p>Get real-time carbon footprint calculations instantly.</p>
-    </div>
-
-    <div class="card">
-      <h3>🌍 Reduce & Improve</h3>
-      <p>Receive personalized suggestions to lower your environmental impact.</p>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="how">
-  <h2>How It Works</h2>
-  <div class="steps">
-    <div class="step">
-      <h3>1. Enter Your Data</h3>
-      <p>Add transport distance, electricity usage and lifestyle habits.</p>
-    </div>
-
-    <div class="step">
-      <h3>2. Calculate</h3>
-      <p>Carbonly calculates your total carbon emissions automatically.</p>
-    </div>
-
-    <div class="step">
-      <h3>3. Take Action</h3>
-      <p>Track progress and reduce your footprint step by step.</p>
-    </div>
-  </div>
-</section>
-
-
-<!-- POPUP -->
-<div class="popup-overlay" id="popup-overlay">
-
-<div class="popup-large">
-
-<h2>Celebrities Fighting Climate Change 🌍</h2>
-
-<div class="celeb-container">
-
-<!-- 1 -->
-<div class="celeb-card">
-<img src="../images/emma.jpeg">
-<div class="celeb-text">
-<h3>Emma Watson</h3>
-<p>Emma promotes sustainable fashion and works with ethical brands to reduce environmental impact.</p>
-</div>
-</div>
-
-<!-- 2 -->
-<div class="celeb-card">
-<img src="../images/stella.jpeg">
-<div class="celeb-text">
-<h3>Stella McCartney</h3>
-<p>She created a luxury fashion brand that avoids leather and fur and focuses on sustainable materials.</p>
-</div>
-</div>
-
-<!-- 3 -->
-<div class="celeb-card">
-<img src="../images/shailene.jpeg">
-<div class="celeb-text">
-<h3>Shailene Woodley</h3>
-<p>She actively participates in climate protests and environmental protection movements.</p>
-</div>
-</div>
-
-<!-- 5 -->
-<div class="celeb-card">
-<img src="../images/elon.jpeg">
-<div class="celeb-text">
-<h3>Elon Musk</h3>
-<p>Through Tesla and renewable energy innovation he promotes electric vehicles and solar energy.</p>
-</div>
-</div>
-
-<!-- 6 -->
-<div class="celeb-card">
-<img src="../images/coldplay.jpeg">
-<div class="celeb-text">
-<h3>Coldplay</h3>
-<p>The band designed low-carbon concerts powered by renewable energy and kinetic floors.</p>
-</div>
-</div>
-
-<!-- 9 -->
-<div class="celeb-card">
-<img src="../images/anushka.jpeg">
-<div class="celeb-text">
-<h3>Anushka Sharma</h3>
-<p>Supports wildlife protection and promotes eco-friendly lifestyles.</p>
-</div>
-</div>
-
-
-<!-- 12 -->
-<div class="celeb-card">
-<img src="../images/jane.jpeg">
-<div class="celeb-text">
-<h3>Jane Fonda</h3>
-<p>She leads climate protests and campaigns for government action against climate change.</p>
-</div>
-</div>
-
-</div>
-
-<button class="close-popup" id="close-popup">Close</button>
-
-</div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <p>© 2026 Carbonly. Built for a greener tomorrow.</p>
-</footer>
-
-<script src="script.js"></script>
-
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script src="three-globe.js"></script>
 </body>
 </html>

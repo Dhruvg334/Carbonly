@@ -1,621 +1,611 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carbonly| Weekly Carbon Analytics</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Carbonly | ESG & Decarbonization Dashboard</title>
+    <meta name="description" content="Interactive Scope 1, Scope 2, Scope 3 carbon tracking dashboard with real-time What-If scenario simulation and Groq AI intelligence.">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for Emissions Visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Neo-Brutalist Design System -->
+    <link rel="stylesheet" href="style.css">
+    
     <style>
-        /* Modal background */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        /* Modal box */
-        .modal-content {
-            background: white;
-            width: 70%;
-            margin: 8% auto;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Close button */
-        .close-btn {
-            float: right;
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        /* History table */
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        .history-table th {
-            background: #B7E4C7;
-            padding: 10px;
-        }
-
-        .history-table td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-
-        :root {
-            --primary-dark: #0B3D2E;
-            --emerald: #2D6A4F;
-            --sage: #B7E4C7;
-            --light-mint: #F2F7F2;
-            --sidebar-bg: #F8FAF9;
-        }
-
         body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: #FFFFFF;
-            color: var(--primary-dark);
             display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* --- Sidebar Navigation --- */
         .sidebar {
-            width: 320px;
-            background-color: var(--sidebar-bg);
-            border-right: 1px solid #E0E0E0;
-            padding: 20px;
+            width: 360px;
+            background: #FFFFFF;
+            border-right: var(--neo-border);
+            padding: 24px;
             display: flex;
             flex-direction: column;
-        }
-
-        .sidebar-header {
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--sage);
-            margin-bottom: 20px;
-        }
-
-        .week-container {
-            flex: 1;
             overflow-y: auto;
-            padding-right: 5px;
         }
 
-        /* Stylized Week Cards */
-        .week-card {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #EEE;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-        }
-
-        .week-card h4 {
-            margin: 0 0 12px 0;
-            color: var(--emerald);
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .week-card h4::before {
-            content: '📅';
-            margin-right: 8px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: #666;
-            text-transform: uppercase;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #DDE2E0;
-            border-radius: 6px;
-            font-family: inherit;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
-
-        .btn-calculate {
-            background-color: var(--primary-dark);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s;
-        }
-
-        .btn-calculate:hover {
-            background-color: var(--emerald);
-            box-shadow: 0 4px 12px rgba(45, 106, 79, 0.2);
-        }
-
-        /* --- Main Content Area --- */
         .main-content {
             flex: 1;
-            padding: 40px;
+            padding: 32px 40px;
             overflow-y: auto;
-            background-color: #FBFCFB;
+            background-color: var(--mint-light);
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        /* Stats Grid from the image reference */
-        .stats-grid {
+        .grid-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
 
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid #F0F0F0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-            text-align: center;
+        .grid-dashboard-main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
         }
 
-        .stat-card span {
-            display: block;
-            font-size: 0.8rem;
-            color: #888;
-            margin-bottom: 5px;
+        /* Modal styling */
+        .modal-neo {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 61, 46, 0.5);
+            backdrop-filter: blur(4px);
         }
 
-        .stat-card h3 {
-            margin: 0;
-            font-size: 1.4rem;
-            color: var(--primary-dark);
+        .modal-content-neo {
+            background: #FFFFFF;
+            width: 80%;
+            max-width: 900px;
+            margin: 5% auto;
+            padding: 32px;
+            border: var(--neo-border);
+            border-radius: 16px;
+            box-shadow: var(--neo-shadow-hover);
         }
 
-        /* Placeholder for Future Graph */
-
-        .graph-area {
-            background: white;
-            border: 2px dashed #DDE2E0;
-            border-radius: 20px;
-            padding: 30px;
-            min-height: 380px;
+        /* Slider Controls */
+        .simulator-control {
+            margin-bottom: 16px;
         }
-
-        .icon-placeholder {
-            font-size: 4rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
+        .simulator-control label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 6px;
         }
     </style>
 </head>
-
 <body>
 
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2 style="margin:0; font-size:1.8rem;">
-                <a href="index.html" style="text-decoration:none; color:inherit;">
-                    🌱 Carbonly
-                </a>
-            </h2>
-            <small style="color: #888;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                &nbsp;&nbsp;&nbsp;Weekly Data Input</small>
+    <!-- SIDEBAR FORM -->
+    <aside class="sidebar">
+        <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: var(--neo-border);">
+            <a href="index.html" class="logo" style="font-size: 1.6rem;">
+                <span>🌱</span> Carbonly
+            </a>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; font-weight: 600;">Activity Stream Ingestion</p>
         </div>
 
-        <div class="week-container" id="weekInputs">
-        </div>
-
-        <button class="btn-calculate" onclick="analyzeData()">Generate Analysis</button>
-        <button class="btn-calculate" onclick="viewHistory()" style="margin-top:10px;background:#2D6A4F;">
-            View History
-        </button>
-    </div>
-
-    <div class="main-content">
-        <div class="header">
-            <h1>Carbon Footprint Dashboard</h1>
-            <div
-                style="background: var(--sage); padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
-                Active Period: 4 Weeks
-            </div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span>Avg. Travel</span>
-                <h3 id="stat-travel">0 km</h3>
-            </div>
-            <div class="stat-card">
-                <span>Screen Time</span>
-                <h3 id="stat-screen">0 hrs</h3>
-            </div>
-            <div class="stat-card">
-                <span>Water Use</span>
-                <h3 id="stat-water">--</h3>
-            </div>
-            <div class="stat-card" style="border-bottom: 4px solid var(--emerald);">
-                <span>Net CO2</span>
-                <h3 id="stat-co2">Pending</h3>
-            </div>
-        </div>
-
-        <div class="graph-area">
-            <div id="history-section" style="display:none; margin-top:30px;">
-                <h2>Past Activity Records</h2>
-
-                <table id="historyTable"
-                    style="width:100%; border-collapse:collapse; background:white; border-radius:10px; overflow:hidden;">
-                    <thead style="background:#B7E4C7;">
-                        <tr>
-                            <th>Week</th>
-                            <th>Vehicle Distance</th>
-                            <th>TV/PC</th>
-                            <th>Internet</th>
-                            <th>Water Consumption</th>
-                            <th>Air Travel</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <canvas id="carbonChart" height="150"></canvas>
-
-            <div id="recommendations" style="margin-top:20px;"></div>
-        </div>
-    </div>
-
-    <script>
-        const totalWeeks = 4;
-        const weekInputsDiv = document.getElementById('weekInputs');
-
-        // Dynamically create 4 weeks of inputs
-        for (let i = 1; i <= totalWeeks; i++) {
-            weekInputsDiv.innerHTML += `
-                <div class="week-card">
-                    <h4>Week ${i}</h4>
-                    
-                    <label>Vehicle Distance (km)</label>
-                    <input type="number" id="dist${i}" placeholder="0">
-
-                    <label>TV/PC Usage (hrs)</label>
-                    <input type="number" id="screen${i}" placeholder="0">
-
-                    <label>Internet Usage (hrs)</label>
-                    <input type="number" id="net${i}" placeholder="0">
-
-                    <label>Water Consumption</label>
-                    <select id="water${i}">
-                        <option value="never">Never</option>
-                        <option value="rarely">Rarely</option>
-                        <option value="daily">Daily</option>
-                        <option value="often">Often</option>
-                        <option value="twice a day">Twice/Day</option>
-                    </select>
-
-                    <label>Air Travel</label>
-                    <select id="air${i}">
-                        <option value="never">Never</option>
-                        <option value="rarely">Rarely</option>
-                        <option value="frequently">Frequently</option>
+        <form id="emissionsForm" onsubmit="event.preventDefault(); calculateAndAnalyze();" style="display: flex; flex-direction: column; gap: 14px;">
+            <!-- Scope 1: Transport -->
+            <div class="card-neo" style="padding: 16px;">
+                <span class="badge-neo badge-neo-scope1">Scope 1: Direct Fleet</span>
+                <div style="margin-top: 10px;">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Vehicle Distance (km)</label>
+                    <input type="number" id="transportKm" placeholder="0" min="0">
+                </div>
+                <div style="margin-top: 8px;">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Fuel / Engine Type</label>
+                    <select id="vehicleType">
+                        <option value="gasoline">Gasoline Vehicle</option>
+                        <option value="diesel">Diesel Vehicle</option>
+                        <option value="electric">Electric Vehicle (EV)</option>
+                        <option value="default" selected>Mixed / Default Average</option>
                     </select>
                 </div>
-            `;
+            </div>
+
+            <!-- Scope 2: Electricity -->
+            <div class="card-neo" style="padding: 16px;">
+                <span class="badge-neo badge-neo-scope2">Scope 2: Grid Power</span>
+                <div style="margin-top: 10px;">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Electricity Usage (kWh)</label>
+                    <input type="number" id="electricityKwh" placeholder="0" min="0">
+                </div>
+                <div style="margin-top: 8px;">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Regional Energy Grid</label>
+                    <select id="region">
+                        <option value="GLOBAL" selected>Global Average Grid</option>
+                        <option value="US">United States Grid</option>
+                        <option value="EU">European Union Grid</option>
+                        <option value="IN">India Power Grid</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Scope 3: Travel & Digital -->
+            <div class="card-neo" style="padding: 16px;">
+                <span class="badge-neo badge-neo-scope3">Scope 3: Value Chain</span>
+                <div style="margin-top: 10px;">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Flights Taken</label>
+                    <input type="number" id="flightsTaken" placeholder="0" min="0">
+                </div>
+                <div style="margin-top: 8px;">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Flight Haul Category</label>
+                    <select id="flightType">
+                        <option value="short" selected>Short-Haul (&lt;1500 km)</option>
+                        <option value="long">Long-Haul (&ge;1500 km)</option>
+                    </select>
+                </div>
+                <div style="margin-top: 8px;">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Water Consumption (Liters)</label>
+                    <input type="number" id="waterLiters" placeholder="0" min="0">
+                </div>
+                <div style="margin-top: 8px;">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Screen Hours / Internet (GB)</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <input type="number" id="screenHours" placeholder="Hrs" min="0">
+                        <input type="number" id="internetGb" placeholder="GB" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-neo btn-neo-primary" style="width: 100%; margin-top: 8px;">Calculate & Analyze</button>
+            <button type="button" class="btn-neo" onclick="fetchHistoryModal()" style="width: 100%;">View History Records</button>
+        </form>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="main-content">
+        <!-- HEADER -->
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div>
+                <h2>Decarbonization Analytics Dashboard</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Deterministic GHG Protocol Calculations & Groq AI Decision Intelligence</p>
+            </div>
+            <div class="badge-neo badge-neo-scope2" id="userBadge" style="font-size: 0.85rem; padding: 8px 16px;">
+                Logged in as: Guest User
+            </div>
+        </header>
+
+        <!-- TOP STATS GRID -->
+        <section class="grid-stats">
+            <div class="card-neo">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">TOTAL FOOTPRINT</span>
+                <h3 id="statTotalKg" style="font-size: 1.8rem; color: var(--emerald); margin-top: 4px;">0.00 kg</h3>
+                <span id="statTotalTonnes" style="font-size: 0.75rem; color: var(--text-muted);">0.000 tCO2e</span>
+            </div>
+
+            <div class="card-neo">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">SCOPE 1 (DIRECT)</span>
+                <h3 id="statScope1" style="font-size: 1.8rem; margin-top: 4px;">0.00 kg</h3>
+                <span id="statScope1Pct" style="font-size: 0.75rem; color: var(--text-muted);">0% of Total</span>
+            </div>
+
+            <div class="card-neo">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">SCOPE 2 (GRID)</span>
+                <h3 id="statScope2" style="font-size: 1.8rem; margin-top: 4px;">0.00 kg</h3>
+                <span id="statScope2Pct" style="font-size: 0.75rem; color: var(--text-muted);">0% of Total</span>
+            </div>
+
+            <div class="card-neo">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">SCOPE 3 (VALUE CHAIN)</span>
+                <h3 id="statScope3" style="font-size: 1.8rem; margin-top: 4px;">0.00 kg</h3>
+                <span id="statScope3Pct" style="font-size: 0.75rem; color: var(--text-muted);">0% of Total</span>
+            </div>
+        </section>
+
+        <!-- MAIN TWO-COLUMN LAYOUT -->
+        <div class="grid-dashboard-main">
+            <!-- LEFT COLUMN: CHARTS & SIMULATOR -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <!-- ANOMALY ALERT BANNER -->
+                <div id="anomalyBanner" class="card-neo" style="display: none; background: #FFF5F5; border-color: var(--alert-red);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.5rem;">⚠️</span>
+                        <div>
+                            <h4 style="color: var(--alert-red); margin: 0;" id="anomalyTitle">Statistical Consumption Anomaly Detected</h4>
+                            <p style="font-size: 0.85rem; color: #7F1D1D; margin-top: 2px;" id="anomalyDesc"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SCOPE BREAKDOWN CHART -->
+                <div class="card-neo">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h4>Emissions Category Breakdown</h4>
+                        <span class="badge-neo badge-neo-scope2">Recharts / Chart.js</span>
+                    </div>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="scopeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- WHAT-IF SCENARIO SIMULATOR -->
+                <div class="card-neo" style="background: #FFFFFF;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h4>"What-If" Decarbonization Simulator</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Adjust parameters to simulate future emissions & financial cost ROI</p>
+                        </div>
+                        <span class="badge-neo badge-neo-scope3">Real-time 60fps</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div class="simulator-control">
+                                <label>Vehicle Miles Reduction: <span id="valTransport">0%</span></label>
+                                <input type="range" id="simTransport" min="0" max="100" value="0" oninput="runSimulation()">
+                            </div>
+                            <div class="simulator-control">
+                                <label>Renewable Energy Adoption: <span id="valPpa">0%</span></label>
+                                <input type="range" id="simPpa" min="0" max="100" value="0" oninput="runSimulation()">
+                            </div>
+                            <div class="simulator-control">
+                                <label>Flight Travel Reduction: <span id="valFlight">0%</span></label>
+                                <input type="range" id="simFlight" min="0" max="100" value="0" oninput="runSimulation()">
+                            </div>
+                        </div>
+
+                        <!-- SIMULATION OUTPUT CARD -->
+                        <div style="background: var(--mint-light); border: var(--neo-border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: center;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">PROJECTED SAVINGS</span>
+                            <h3 id="simKgSaved" style="font-size: 1.6rem; color: var(--emerald); margin: 4px 0;">0.00 kg CO2e</h3>
+                            <p id="simDollarSaved" style="font-weight: 700; color: var(--primary-dark); font-size: 0.9rem;">Estimated Annual Cost Savings: $0</p>
+                            <span id="simPctReduced" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">0% Net Reduction Target</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: GROQ AI COPILOT & ACTION PLAN -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <!-- EXECUTIVE SUMMARY -->
+                <div class="card-neo" style="background: #F4F9F5;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                        <span class="badge-neo badge-neo-scope2">Groq AI Executive Narrative</span>
+                    </div>
+                    <p id="executiveNarrativeText" style="font-size: 0.9rem; color: var(--primary-dark); font-style: italic;">
+                        Submit metrics to generate your Groq AI Executive Briefing.
+                    </p>
+                </div>
+
+                <!-- PRIORITIZED RECOMMENDATIONS -->
+                <div class="card-neo">
+                    <h4 style="margin-bottom: 12px;">Prioritized Decarbonization Plan</h4>
+                    <div id="actionPlanList" style="display: flex; flex-direction: column; gap: 10px;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Action recommendations will populate after calculation.</p>
+                    </div>
+                </div>
+
+                <!-- INTERACTIVE GROQ AI COPILOT Q&A -->
+                <div class="card-neo" style="display: flex; flex-direction: column; gap: 10px;">
+                    <h4>Groq AI Copilot Assistant</h4>
+                    <div id="copilotChatWindow" style="height: 140px; overflow-y: auto; background: var(--mint-light); border: var(--neo-border); border-radius: 8px; padding: 10px; font-size: 0.85rem;">
+                        <p style="color: var(--text-muted);">Ask a question about decarbonization strategies, GHG accounting, or cost savings...</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="copilotInput" placeholder="Ask AI Copilot..." onkeypress="if(event.key==='Enter') askCopilot()">
+                        <button class="btn-neo btn-neo-primary" style="padding: 8px 16px;" onclick="askCopilot()">Ask</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- HISTORY MODAL -->
+    <div id="historyModal" class="modal-neo">
+        <div class="modal-content-neo">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Emissions Historical Records</h2>
+                <button class="btn-neo" onclick="closeHistoryModal()">Close</button>
+            </div>
+            
+            <div style="max-height: 350px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background: var(--sage-accent); border-bottom: var(--neo-border);">
+                            <th style="padding: 10px;">Timestamp</th>
+                            <th style="padding: 10px;">Total (kg CO2e)</th>
+                            <th style="padding: 10px;">Scope 1</th>
+                            <th style="padding: 10px;">Scope 2</th>
+                            <th style="padding: 10px;">Scope 3</th>
+                            <th style="padding: 10px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="6" style="padding: 16px; text-align: center;">No history loaded.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 12px;">
+                <button class="btn-neo btn-neo-accent" onclick="clearHistoryRecords()">Clear All History</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT CONTROLLER -->
+    <script>
+        let latestCalculatedData = null;
+        let chartInstance = null;
+
+        function getToken() {
+            return localStorage.getItem("token");
         }
 
-        function getCurrentUser() {
+        window.addEventListener("DOMContentLoaded", () => {
+            const token = getToken();
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split(".")[1]));
+                    document.getElementById("userBadge").innerText = "Logged in as: " + (payload.username || "Authenticated User");
+                } catch(e){}
+            }
+        });
 
-            let token = localStorage.getItem("token");
-
-            if (!token) return "guest";
-
-            let payload = JSON.parse(atob(token.split(".")[1]));
-
-            return payload.username || payload.id;
-
-        }
-
-        async function analyzeData() {
-
-            let token = localStorage.getItem("token");
-
-            let weeklyEmissions = [];
-            let recommendations = [];
-
-            let totalDist = 0;
-            let totalScreen = 0;
-            let totalInternet = 0;
-
-            let waterMap = {
-                "never": 0,
-                "rarely": 0.5,
-                "daily": 1,
-                "often": 1.5,
-                "twice a day": 2
+        async function calculateAndAnalyze() {
+            const token = getToken();
+            const payload = {
+                transportKm: Number(document.getElementById("transportKm").value || 0),
+                vehicleType: document.getElementById("vehicleType").value,
+                electricityKwh: Number(document.getElementById("electricityKwh").value || 0),
+                region: document.getElementById("region").value,
+                flightsTaken: Number(document.getElementById("flightsTaken").value || 0),
+                flightType: document.getElementById("flightType").value,
+                waterLiters: Number(document.getElementById("waterLiters").value || 0),
+                screenHours: Number(document.getElementById("screenHours").value || 0),
+                internetGb: Number(document.getElementById("internetGb").value || 0)
             };
 
-            let airMap = {
-                "never": 0,
-                "rarely": 1,
-                "frequently": 2
-            };
-
-            for (let i = 1; i <= 4; i++) {
-
-                let dist = Number(document.getElementById(`dist${i}`).value || 0);
-                let screen = Number(document.getElementById(`screen${i}`).value || 0);
-                let net = Number(document.getElementById(`net${i}`).value || 0);
-
-                /* SAVE HISTORY */
-
-                if (dist !== 0 || screen !== 0 || net !== 0) {
-
-                    let user = getCurrentUser();
-                    await fetch("http://localhost:5000/api/save-history", {
-
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Bearer " + token
-                        },
-
-                        body: JSON.stringify({
-                            week: i,
-                            distance: dist,
-                            screen: screen,
-                            internet: net,
-                            water: document.getElementById(`water${i}`).value,
-                            air: document.getElementById(`air${i}`).value
-                        })
-
-                    });
-
-
-                }
-
-                if (dist === 0 && screen === 0 && net === 0) {
-                    weeklyEmissions.push(0);
-                    continue;
-                }
-
-                totalDist += dist;
-                totalScreen += screen;
-                totalInternet += net;
-
-                let transport_km = dist;
-                let electricity_consumption = screen + net;
-                let energy_kwh = electricity_consumption;
-
-                let water_usage = waterMap[document.getElementById(`water${i}`).value];
-                let flights_taken = airMap[document.getElementById(`air${i}`).value];
-
-                const response = await fetch("http://localhost:5000/api/carbon/add", {
+            try {
+                const response = await fetch("http://localhost:5000/api/carbon/calculate", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + token
+                        "Authorization": token ? "Bearer " + token : ""
                     },
-                    body: JSON.stringify({
-                        energy_kwh,
-                        transport_km,
-                        electricity_consumption,
-                        water_usage,
-                        flights_taken
-                    })
+                    body: JSON.stringify(payload)
                 });
 
-                const data = await response.json();
-
-                weeklyEmissions.push(data.data.final_carbon_emission);
-
-                if (recommendations.length === 0) {
-                    recommendations = data.data.recommendations;
+                const json = await response.json();
+                if (response.ok && json.data) {
+                    latestCalculatedData = json.data;
+                    renderDashboard(json.data);
+                } else {
+                    alert(json.message || "Calculation failed");
                 }
-
-                showRecommendations(recommendations);
-
-
+            } catch (err) {
+                alert("Network error connecting to API server.");
             }
-
-            /* update stats */
-
-            document.getElementById("stat-travel").innerText =
-                (totalDist / 4).toFixed(1) + " km";
-
-            document.getElementById("stat-screen").innerText =
-                (totalScreen / 4).toFixed(1) + " hrs";
-
-            let waterText = document.getElementById("water1").value;
-
-            waterText = waterText.charAt(0).toUpperCase() + waterText.slice(1);
-
-            document.getElementById("stat-water").innerText = waterText;
-
-            document.getElementById("stat-co2").innerText =
-                weeklyEmissions.reduce((a, b) => a + b, 0).toFixed(3) + " kg";
-
-            /* draw graph */
-
-            drawCarbonChart(weeklyEmissions);
-
         }
 
-        async function viewHistory() {
+        function renderDashboard(data) {
+            // Stats
+            document.getElementById("statTotalKg").innerText = data.totalKg.toFixed(2) + " kg";
+            document.getElementById("statTotalTonnes").innerText = data.totalTonnes.toFixed(4) + " tCO2e";
 
-            let token = localStorage.getItem("token");
+            document.getElementById("statScope1").innerText = data.scopes.scope1.kg.toFixed(2) + " kg";
+            document.getElementById("statScope1Pct").innerText = data.scopes.scope1.percentage + "% of Total";
 
-            const response = await fetch("http://localhost:5000/api/history", {
+            document.getElementById("statScope2").innerText = data.scopes.scope2.kg.toFixed(2) + " kg";
+            document.getElementById("statScope2Pct").innerText = data.scopes.scope2.percentage + "% of Total";
 
-                headers: {
-                    "Authorization": "Bearer " + token
-                }
+            document.getElementById("statScope3").innerText = data.scopes.scope3.kg.toFixed(2) + " kg";
+            document.getElementById("statScope3Pct").innerText = data.scopes.scope3.percentage + "% of Total";
 
-            });
-
-            const history = await response.json();
-
-            let table = document.getElementById("historyBody");
-
-            table.innerHTML = "";
-
-            if (history.length === 0) {
-                table.innerHTML = "<tr><td colspan='6'>No history yet</td></tr>";
+            // Anomaly Banner
+            const anomalyBanner = document.getElementById("anomalyBanner");
+            if (data.anomalyReport && data.anomalyReport.isAnomaly) {
+                anomalyBanner.style.display = "block";
+                document.getElementById("anomalyTitle").innerText = `Anomaly Detected: Z-Score ${data.anomalyReport.zScore}`;
+                document.getElementById("anomalyDesc").innerText = data.anomalyReport.aiDiagnosis || data.anomalyReport.message;
+            } else {
+                anomalyBanner.style.display = "none";
             }
 
-            history.forEach(data => {
-
-                let row = `
-<tr>
-<td>${data.week}</td>
-<td>${data.distance} km</td>
-<td>${data.screen} hrs</td>
-<td>${data.internet} hrs</td>
-<td>${data.water}</td>
-<td>${data.air}</td>
-</tr>
-`;
-
-                table.innerHTML += row;
-
-            });
-
-            document.getElementById("historyModal").style.display = "block";
-
-        }
-
-        // Shows Analysis of the Results
-        function showRecommendations(tips) {
-
-            let container = document.getElementById("recommendations");
-
-            container.innerHTML = "<h3>AI Recommendations</h3>";
-
-            tips.forEach(tip => {
-                container.innerHTML += "<p>• " + tip + "</p>";
-            });
-
-        }
-
-        function drawCarbonChart(values) {
-
-            const canvas = document.getElementById("carbonChart");
-            if (!canvas) return;
-
-            const ctx = canvas.getContext("2d");
-
-            if (window.carbonChart && typeof window.carbonChart.destroy === "function") {
-                window.carbonChart.destroy();
+            // Executive Narrative
+            if (data.executiveSummary) {
+                document.getElementById("executiveNarrativeText").innerText = `"${data.executiveSummary}"`;
             }
 
-            window.carbonChart = new Chart(ctx, {
-                type: "line",
+            // Action Plan
+            const actionPlanList = document.getElementById("actionPlanList");
+            actionPlanList.innerHTML = "";
+            if (data.recommendations && data.recommendations.length > 0) {
+                data.recommendations.forEach((rec, idx) => {
+                    actionPlanList.innerHTML += `
+                        <div class="card-neo" style="padding: 10px; font-size: 0.85rem; border-left: 4px solid var(--emerald);">
+                            <strong>${idx + 1}.</strong> ${rec}
+                        </div>
+                    `;
+                });
+            }
+
+            // Render Chart
+            renderChart(data.breakdown);
+
+            // Trigger initial simulation update
+            runSimulation();
+        }
+
+        function renderChart(breakdown) {
+            const ctx = document.getElementById("scopeChart").getContext("2d");
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+                    labels: ['Transport (Scope 1)', 'Electricity (Scope 2)', 'Flights (Scope 3)', 'Water (Scope 3)', 'Digital (Scope 3)'],
                     datasets: [{
-                        label: "Carbon Emission (kg CO2)",
-                        data: values,
-                        borderColor: "#2D6A4F",
-                        backgroundColor: "rgba(45,106,79,0.2)",
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 5
+                        label: 'Emissions (kg CO2e)',
+                        data: [
+                            breakdown.transportKg || 0,
+                            breakdown.electricityKg || 0,
+                            breakdown.flightsKg || 0,
+                            breakdown.waterKg || 0,
+                            breakdown.digitalKg || 0
+                        ],
+                        backgroundColor: ['#FFE5D9', '#E2ECE9', '#FFF3B0', '#B7E4C7', '#D8F3DC'],
+                        borderColor: '#0B3D2E',
+                        borderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
                 }
             });
-
         }
 
-        async function clearHistory() {
+        async function runSimulation() {
+            if (!latestCalculatedData) return;
 
-            let token = localStorage.getItem("token");
+            const transportPct = Number(document.getElementById("simTransport").value);
+            const ppaPct = Number(document.getElementById("simPpa").value);
+            const flightPct = Number(document.getElementById("simFlight").value);
 
-            await fetch("http://localhost:5000/api/history", {
+            document.getElementById("valTransport").innerText = transportPct + "%";
+            document.getElementById("valPpa").innerText = ppaPct + "%";
+            document.getElementById("valFlight").innerText = flightPct + "%";
 
-                method: "DELETE",
+            const baseline = {
+                transportKm: Number(document.getElementById("transportKm").value || 0),
+                electricityKwh: Number(document.getElementById("electricityKwh").value || 0),
+                flightsTaken: Number(document.getElementById("flightsTaken").value || 0)
+            };
 
-                headers: {
-                    "Authorization": "Bearer " + token
+            try {
+                const response = await fetch("http://localhost:5000/api/carbon/simulate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        baseline,
+                        parameters: {
+                            transportReductionPct: transportPct,
+                            renewablePpaPct: ppaPct,
+                            flightReductionPct: flightPct
+                        }
+                    })
+                });
+
+                const json = await response.json();
+                if (json.impact) {
+                    document.getElementById("simKgSaved").innerText = json.impact.kgSaved.toFixed(2) + " kg CO2e";
+                    document.getElementById("simDollarSaved").innerText = `Estimated Annual Cost Savings: $${json.impact.estimatedAnnualDollarSavings}`;
+                    document.getElementById("simPctReduced").innerText = `${json.impact.percentReduced}% Net Reduction Target`;
+                }
+            } catch(e){}
+        }
+
+        async function askCopilot() {
+            const input = document.getElementById("copilotInput");
+            const q = input.value.trim();
+            if (!q) return;
+
+            const chatWindow = document.getElementById("copilotChatWindow");
+            chatWindow.innerHTML += `<p style="margin-bottom: 6px;"><strong>You:</strong> ${q}</p>`;
+            input.value = "";
+
+            try {
+                const token = getToken();
+                const res = await fetch("http://localhost:5000/api/carbon/ai-copilot", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": token ? "Bearer " + token : ""
+                    },
+                    body: JSON.stringify({
+                        question: q,
+                        latestEmissions: latestCalculatedData
+                    })
+                });
+
+                const json = await res.json();
+                chatWindow.innerHTML += `<p style="color: var(--emerald); margin-bottom: 8px;"><strong>Groq AI:</strong> ${json.answer}</p>`;
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            } catch(err) {
+                chatWindow.innerHTML += `<p style="color: var(--alert-red);">Error querying AI Copilot.</p>`;
+            }
+        }
+
+        async function fetchHistoryModal() {
+            const token = getToken();
+            if (!token) {
+                alert("Please log in to view saved history records.");
+                return;
+            }
+
+            try {
+                const res = await fetch("http://localhost:5000/api/carbon/history", {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                const history = await res.json();
+
+                const tbody = document.getElementById("historyTableBody");
+                tbody.innerHTML = "";
+
+                if (!Array.isArray(history) || history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="padding: 16px; text-align: center;">No history entries found.</td></tr>';
+                } else {
+                    history.forEach(item => {
+                        const date = new Date(item.timestamp).toLocaleDateString();
+                        const isAnom = item.anomalyReport && item.anomalyReport.isAnomaly;
+                        tbody.innerHTML += `
+                            <tr style="border-bottom: 1px solid #EEE;">
+                                <td style="padding: 8px;">${date}</td>
+                                <td style="padding: 8px;">${(item.emissions?.totalKg || 0).toFixed(2)}</td>
+                                <td style="padding: 8px;">${(item.emissions?.scopes?.scope1?.kg || 0).toFixed(2)}</td>
+                                <td style="padding: 8px;">${(item.emissions?.scopes?.scope2?.kg || 0).toFixed(2)}</td>
+                                <td style="padding: 8px;">${(item.emissions?.scopes?.scope3?.kg || 0).toFixed(2)}</td>
+                                <td style="padding: 8px;">${isAnom ? '<span style="color:red;font-weight:bold;">Anomaly Spike</span>' : 'Normal'}</td>
+                            </tr>
+                        `;
+                    });
                 }
 
-            });
-
-            document.getElementById("historyBody").innerHTML =
-                "<tr><td colspan='6'>History cleared</td></tr>";
-
+                document.getElementById("historyModal").style.display = "block";
+            } catch(e) {
+                alert("Error loading history.");
+            }
         }
 
-        function closeHistory() {
+        function closeHistoryModal() {
             document.getElementById("historyModal").style.display = "none";
         }
 
+        async function clearHistoryRecords() {
+            const token = getToken();
+            if (!token) return;
 
+            if (confirm("Are you sure you want to clear all emissions history?")) {
+                await fetch("http://localhost:5000/api/carbon/history", {
+                    method: "DELETE",
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                document.getElementById("historyTableBody").innerHTML = '<tr><td colspan="6" style="padding: 16px; text-align: center;">History cleared.</td></tr>';
+            }
+        }
     </script>
-    <div id="historyModal" class="modal">
-
-        <div class="modal-content">
-
-            <span class="close-btn" onclick="closeHistory()">✖</span>
-
-            <h2>Past Weekly Inputs</h2>
-
-            <table class="history-table" id="historyTable">
-
-                <thead>
-                    <tr>
-                        <th>Week</th>
-                        <th>Vehicle Distance</th>
-                        <th>TV/PC</th>
-                        <th>Internet</th>
-                        <th>Water Consumption</th>
-                        <th>Air Travel</th>
-                    </tr>
-                </thead>
-
-                <tbody id="historyBody"></tbody>
-
-            </table>
-
-            <button onclick="clearHistory()"
-                style="margin-top:15px;background:#0B3D2E;color:white;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">
-                Clear History
-            </button>
-
-        </div>
-    </div>
 </body>
-
 </html>
