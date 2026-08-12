@@ -15,7 +15,7 @@ router.post("/register", async (req, res) => {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+        const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
         if (!passwordPattern.test(password)) {
             return res.status(400).json({
                 message: "Password must contain at least one letter, one number, and be at least 6 characters long"
