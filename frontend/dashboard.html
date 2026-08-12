@@ -3,48 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carbonly | Decarbonization Analytics Dashboard</title>
-    <meta name="description" content="Subpaged ESG analytics dashboard featuring Scope 1, Scope 2, Scope 3 metric visualizers, What-If scenario simulation, and Groq AI intelligence.">
+    <title>ESG Analytics Dashboard | Carbonly Intelligence Platform</title>
+    <meta name="description" content="Subpaged ESG Analytics Dashboard Hub with GHG Protocol Scope breakdown, 12-Month Holt-Winters Forecasts, What-If Simulator, and Groq AI Decision Intelligence.">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Chart.js for Emissions Visualization & Forecasting -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Custom Design System -->
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         .dashboard-container {
             max-width: 1200px;
-            margin: 90px auto 60px auto;
+            margin: 100px auto 60px auto;
             padding: 0 24px;
         }
 
-        .grid-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 28px;
+        .action-card-neo {
+            background: #FFFFFF;
+            border: var(--ui-border);
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 2px 2px 0 #0B3D2E;
         }
 
-        .simulator-control {
-            margin-bottom: 20px;
+        .slider-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
         }
-        .simulator-control label {
+
+        .slider-label-row {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
-            margin-bottom: 8px;
         }
     </style>
 </head>
 <body>
 
-    <!-- UNIFIED TOP NAVBAR (EXPORT BUTTON MOVED TO OVERVIEW PANEL) -->
+    <!-- UNIFIED TOP NAVBAR -->
     <header class="top-strip">
         <a href="index.html" class="logo">
             <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
@@ -53,344 +51,251 @@
             <a href="dashboard.html" style="color: var(--emerald);">Dashboard</a>
             <a href="docs.html">Docs</a>
             <div class="auth-nav-item">
-                <a href="profile.html" class="btn-neo btn-neo-primary" style="font-size: 0.85rem; padding: 8px 16px;">Profile &amp; History</a>
+                <a href="login.html" class="btn-neo btn-neo-primary" style="font-size: 0.85rem; padding: 8px 16px;">Login</a>
             </div>
         </nav>
     </header>
 
-    <div class="dashboard-container">
-        
-        <!-- CENTERED SUBPAGE MINI-NAVBAR -->
+    <main class="dashboard-container">
+        <!-- HEADER TITLE BAR -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <span class="badge-neo badge-neo-scope2">Auditable ESG Intelligence</span>
+                <h1 style="font-size: 2.2rem; margin-top: 6px;">Enterprise Sustainability Hub</h1>
+            </div>
+            <div>
+                <button class="btn-neo btn-neo-primary" onclick="exportEsgReport()">📄 Export Audit-Ready ESG Report</button>
+            </div>
+        </div>
+
+        <!-- SUBPAGE MINI-NAVBAR -->
         <div class="mini-nav-container">
             <nav class="mini-nav">
-                <button class="tab-btn active" onclick="switchPanel('overviewPanel', this)">Overview &amp; Scopes</button>
-                <button class="tab-btn" onclick="switchPanel('ingestionPanel', this)">Activity Calculator</button>
+                <button class="tab-btn active" onclick="switchPanel('overviewPanel', this)">Overview &amp; Trends</button>
+                <button class="tab-btn" onclick="switchPanel('calculatorPanel', this)">Activity Calculator</button>
                 <button class="tab-btn" onclick="switchPanel('simulatorPanel', this)">What-If Simulator</button>
-                <button class="tab-btn" onclick="switchPanel('aiCopilotPanel', this)">AI Strategy Hub</button>
+                <button class="tab-btn" onclick="switchPanel('aiHubPanel', this)">AI Strategy Hub</button>
             </nav>
         </div>
 
-        <!-- TOP STATS KPI CARDS WITH ECOSCORE -->
-        <section class="grid-stats">
-            <div class="card-neo">
-                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">TOTAL FOOTPRINT</span>
-                <h3 id="statTotalKg" style="font-size: 1.8rem; color: var(--emerald); margin-top: 4px;">0.00 kg</h3>
-                <span id="statTotalTonnes" style="font-size: 0.75rem; color: var(--text-muted);">0.000 tCO2e</span>
-            </div>
-
-            <div class="card-neo">
-                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">DIRECT DRIVING &amp; FUEL</span>
-                <h3 id="statScope1" style="font-size: 1.8rem; margin-top: 4px;">0.00 kg</h3>
-                <span id="statScope1Pct" style="font-size: 0.75rem; color: var(--text-muted);">0% of Total</span>
-            </div>
-
-            <div class="card-neo">
-                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">HOME &amp; OFFICE POWER</span>
-                <h3 id="statScope2" style="font-size: 1.8rem; margin-top: 4px;">0.00 kg</h3>
-                <span id="statScope2Pct" style="font-size: 0.75rem; color: var(--text-muted);">0% of Total</span>
-            </div>
-
-            <div class="card-neo">
-                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">ECOSCORE BENCHMARK</span>
-                <h3 id="statEcoScore" style="font-size: 1.8rem; color: var(--emerald); margin-top: 4px;">920 pts</h3>
-                <span id="statStarRating" style="font-size: 0.75rem; color: var(--sunburst-yellow); font-weight:800;">★★★★★ (5 Stars)</span>
-            </div>
-        </section>
-
-        <!-- ANOMALY ALERT BANNER WITH SHAPLEY VARIANCE ATTRIBUTION -->
-        <div id="anomalyBanner" class="card-neo" style="display: none; background: #FFF5F5; border-color: var(--alert-red); margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span class="badge-neo" style="background: var(--alert-red); color: #FFFFFF;">ALERT</span>
-                    <div>
-                        <h4 style="color: var(--alert-red); margin: 0;" id="anomalyTitle">Statistical Consumption Anomaly Detected</h4>
-                        <p style="font-size: 0.85rem; color: #7F1D1D; margin-top: 2px;" id="anomalyDesc"></p>
-                    </div>
-                </div>
-                <span id="anomalyAttributionText" class="badge-neo badge-neo-scope1" style="font-size: 0.75rem;">Primary Driver: Direct Driving</span>
-            </div>
-        </div>
-
-        <!-- ===================================================================
-             PANEL 1: OVERVIEW, SCOPE CHARTS & 12-MONTH FORECAST
-             =================================================================== -->
+        <!-- PANEL 1: OVERVIEW & TRENDS -->
         <div id="overviewPanel" class="panel-content active">
-            <!-- INSTRUCTION BANNER WITH EXPORT ESG REPORT BUTTON -->
-            <div class="panel-info-banner" style="justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <span class="badge-neo badge-neo-scope2">Overview Guide</span>
-                    <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
-                        View your total footprint, metric breakdown, 12-month predictive forecast, and executive AI brief.
-                    </p>
+            <!-- ANOMALY ALERT BANNER (HIDDEN BY DEFAULT) -->
+            <div id="anomalyBanner" style="display: none; background: #FFEBEE; border: 2px solid #E53E3E; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <span class="badge-neo" style="background: #E53E3E; color: #FFF;" id="anomalyTitle">Statistical Anomaly Outlier Detected</span>
+                        <p style="font-size: 0.9rem; margin-top: 6px; font-weight: 600;" id="anomalyDesc">Operational consumption exceeds baseline Z-score threshold.</p>
+                        <p style="font-size: 0.8rem; color: #666; margin-top: 2px;" id="anomalyAttributionText">Attribution drivers calculated via Shapley-inspired decomposition.</p>
+                    </div>
                 </div>
-                <button class="btn-neo btn-neo-primary" style="padding: 8px 16px; font-size: 0.85rem; white-space: nowrap;" onclick="exportEsgReport()">Export ESG Audit Report</button>
             </div>
 
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
-                <!-- MAIN SCOPE BAR CHART -->
+            <!-- 4 SUMMARY CARDS GRID -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 24px;">
                 <div class="card-neo">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <div>
-                            <h3>Emissions Category Distribution</h3>
-                            <p style="font-size: 0.8rem; color: var(--text-muted);">Direct Driving, Grid Power, and Travel breakdown</p>
-                        </div>
-                        <span class="badge-neo badge-neo-scope2">Visualizer</span>
-                    </div>
+                    <span class="badge-neo badge-neo-scope1">Total Footprint</span>
+                    <h2 id="statTotalKg" style="font-size: 2rem; margin: 10px 0 4px 0;">0.00 kg</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);" id="statTotalTonnes">0.0000 tCO2e</p>
+                </div>
+                <div class="card-neo">
+                    <span class="badge-neo badge-neo-scope1">Scope 1 Mobile</span>
+                    <h3 id="statScope1" style="font-size: 1.6rem; margin: 10px 0 4px 0;">0.00 kg</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);" id="statScope1Pct">0% of Total</p>
+                </div>
+                <div class="card-neo">
+                    <span class="badge-neo badge-neo-scope2">Scope 2 Electricity</span>
+                    <h3 id="statScope2" style="font-size: 1.6rem; margin: 10px 0 4px 0;">0.00 kg</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);" id="statScope2Pct">0% of Total</p>
+                </div>
+                <div class="card-neo">
+                    <span class="badge-neo badge-neo-scope3">EcoScore Rating</span>
+                    <h3 id="statEcoScore" style="font-size: 1.6rem; margin: 10px 0 4px 0;">1000 pts</h3>
+                    <p style="font-size: 0.85rem; color: var(--emerald); font-weight: 700;" id="statStarRating">★★★★★ (5 Stars)</p>
+                </div>
+            </div>
+
+            <!-- CHARTS SECTION GRID -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;" class="responsive-grid">
+                <div class="card-neo">
+                    <h3 style="margin-bottom: 16px;">Category Emissions Distribution</h3>
                     <div style="height: 280px; position: relative;">
                         <canvas id="scopeChart"></canvas>
                     </div>
                 </div>
-
-                <!-- EXECUTIVE SUMMARY NARRATIVE CARD -->
-                <div style="display: flex; flex-direction: column; gap: 20px;">
-                    <div class="card-neo" style="background: #F4F9F5; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <span class="badge-neo badge-neo-scope2" style="margin-bottom: 12px;">Groq AI Executive Brief</span>
-                            <p id="executiveNarrativeText" style="font-size: 0.95rem; color: var(--primary-dark); font-style: italic; margin-top: 8px;">
-                                Select a sample dataset or input metrics in the Activity Calculator tab to generate your Groq AI Executive Brief.
-                            </p>
-                        </div>
-                        <div style="margin-top: 16px;">
-                            <button class="btn-neo btn-neo-accent" style="width: 100%; font-size: 0.85rem;" onclick="exportEsgReport()">Download Formal ESG Certificate</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MODULE 1: 12-MONTH TIME-SERIES FORECAST LINE CHART -->
-            <div class="card-neo">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <div>
-                        <h3>12-Month Time-Series Forecast &amp; Net-Zero Trajectory</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Holt-Winters exponential smoothing forecast with Net Zero reduction target</p>
-                    </div>
-                    <span class="badge-neo badge-neo-scope3">Predictive Engine</span>
-                </div>
-                <div style="height: 280px; position: relative;">
-                    <canvas id="forecastChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===================================================================
-             PANEL 2: ACTIVITY INGESTION & CALCULATOR
-             =================================================================== -->
-        <div id="ingestionPanel" class="panel-content">
-            <div class="panel-info-banner">
-                <span class="badge-neo badge-neo-scope1">Calculator Guide</span>
-                <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
-                    Enter your transport distance, electricity usage, flights, and water metrics to calculate emissions. You can also load pre-configured sample datasets.
-                </p>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
-                
-                <!-- PRE-LOADED SAMPLE DATASET SANDBOX -->
-                <div class="card-neo" style="background: #FFFFFF;">
-                    <span class="badge-neo badge-neo-scope1">Instant Sandbox</span>
-                    <h4 style="margin: 12px 0 8px 0;">Pre-Loaded Profiles</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Select a profile to load test metrics:</p>
-
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <button type="button" class="btn-neo" style="text-align: left; font-size: 0.85rem;" onclick="loadSampleProfile('techOffice')">
-                            Tech Office (Grid Power Heavy)
-                        </button>
-                        <button type="button" class="btn-neo" style="text-align: left; font-size: 0.85rem;" onclick="loadSampleProfile('logisticsFleet')">
-                            Logistics Fleet (Direct Driving Heavy)
-                        </button>
-                        <button type="button" class="btn-neo" style="text-align: left; font-size: 0.85rem;" onclick="loadSampleProfile('globalConsulting')">
-                            Global Firm (Travel Heavy)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- FORM INPUTS -->
                 <div class="card-neo">
-                    <h3 style="margin-bottom: 16px;">Input Activity Stream Metrics</h3>
-                    
-                    <form id="emissionsForm" onsubmit="event.preventDefault(); calculateAndAnalyze();" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        
-                        <!-- Direct Driving -->
-                        <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--ui-border); border-radius: 8px;">
-                            <span class="badge-neo badge-neo-scope1">Direct Driving &amp; Fuel</span>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
-                                <div>
-                                    <label style="font-size: 0.8rem; font-weight: 700;">Vehicle Distance (km)</label>
-                                    <input type="number" id="transportKm" placeholder="0" min="0">
-                                </div>
-                                <div>
-                                    <label style="font-size: 0.8rem; font-weight: 700;">Fuel / Engine Type</label>
-                                    <select id="vehicleType">
-                                        <option value="gasoline">Gasoline Vehicle</option>
-                                        <option value="diesel">Diesel Vehicle</option>
-                                        <option value="electric">Electric Vehicle (EV)</option>
-                                        <option value="default" selected>Mixed / Default Average</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                    <h3 style="margin-bottom: 16px;">12-Month Holt-Winters Trajectory Forecast</h3>
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Grid Power -->
-                        <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--ui-border); border-radius: 8px;">
-                            <span class="badge-neo badge-neo-scope2">Home &amp; Office Power</span>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
-                                <div>
-                                    <label style="font-size: 0.8rem; font-weight: 700;">Electricity Usage (kWh)</label>
-                                    <input type="number" id="electricityKwh" placeholder="0" min="0">
-                                </div>
-                                <div>
-                                    <label style="font-size: 0.8rem; font-weight: 700;">Regional Power Grid</label>
-                                    <select id="region">
-                                        <option value="GLOBAL" selected>Global Average Grid</option>
-                                        <option value="US">United States Grid</option>
-                                        <option value="EU">European Union Grid</option>
-                                        <option value="IN">India Power Grid</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+            <!-- EXECUTIVE BRIEF & ACTIONABLE PLAN -->
+            <div class="card-neo">
+                <span class="badge-neo badge-neo-scope2">AI &amp; Data Brief</span>
+                <h3 style="margin: 12px 0 8px 0;">Executive Summary &amp; Recommended Action Plan</h3>
+                <p id="executiveNarrativeText" style="font-size: 0.95rem; line-height: 1.6; color: var(--primary-dark); margin-bottom: 20px; font-style: italic;">
+                    "No activity records calculated yet. Enter your operational metrics in the Activity Calculator tab to generate your GHG Protocol inventory."
+                </p>
 
-                        <!-- Travel & Lifestyle -->
-                        <div style="grid-column: span 2; padding: 12px; background: var(--mint-light); border: var(--ui-border); border-radius: 8px;">
-                            <span class="badge-neo badge-neo-scope3">Travel, Water &amp; Digital</span>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
-                                <div>
-                                    <label style="font-size: 0.8rem; font-weight: 700;">Flights Count</label>
-                                    <input type="number" id="flightsTaken" placeholder="0" min="0">
-                                </div>
-                                <div>
-                                    <label style="font-size: 0.8rem; font-weight: 700;">Flight Haul Type</label>
-                                    <select id="flightType">
-                                        <option value="short" selected>Short-Haul (&lt;1500 km)</option>
-                                        <option value="long">Long-Haul (&ge;1500 km)</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style="font-size: 0.8rem; font-weight: 700;">Water Usage (Liters)</label>
-                                    <input type="number" id="waterLiters" placeholder="0" min="0">
-                                </div>
-                                <div>
-                                    <label style="font-size: 0.8rem; font-weight: 700;">Screen Hours / Internet GB</label>
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                                        <input type="number" id="screenHours" placeholder="Hrs" min="0">
-                                        <input type="number" id="internetGb" placeholder="GB" min="0">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="grid-column: span 2; margin-top: 8px;">
-                            <button type="submit" class="btn-neo btn-neo-primary" style="width: 100%;">Calculate &amp; Update Dashboard</button>
-                        </div>
-                    </form>
+                <div id="actionPlanList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                    <!-- Action Plan Cards Dynamically Rendered -->
                 </div>
             </div>
         </div>
 
-        <!-- ===================================================================
-             PANEL 3: "WHAT-IF" DECARBONIZATION SIMULATOR & CONSTRAINED SOLVER
-             =================================================================== -->
+        <!-- PANEL 2: ACTIVITY CALCULATOR -->
+        <div id="calculatorPanel" class="panel-content">
+            <div class="card-neo">
+                <span class="badge-neo badge-neo-scope1">Data Ingestion</span>
+                <h2 style="margin: 12px 0 16px 0;">Operational Activity Input</h2>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Input your fleet driving distance, power consumption, flight trips, water usage, and cloud digital workloads.</p>
+
+                <!-- SANDBOX PRE-LOAD BUTTONS -->
+                <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <span style="font-size: 0.85rem; font-weight: 700; align-self: center;">Pre-Loaded Sandbox Profiles:</span>
+                    <button class="btn-neo" onclick="loadSampleProfile('techOffice')" style="font-size: 0.8rem; padding: 6px 12px;">Tech Office</button>
+                    <button class="btn-neo" onclick="loadSampleProfile('manufacturing')" style="font-size: 0.8rem; padding: 6px 12px;">Manufacturing Facility</button>
+                    <button class="btn-neo" onclick="loadSampleProfile('remoteWorker')" style="font-size: 0.8rem; padding: 6px 12px;">Remote Employee</button>
+                </div>
+
+                <form onsubmit="event.preventDefault(); calculateAndAnalyze();" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Direct Fleet Driving (Scope 1)</label>
+                        <input type="number" id="transportKm" placeholder="Distance in km (e.g. 180)" min="0" value="0">
+                        <select id="vehicleType" style="margin-top: 8px;">
+                            <option value="gasoline">Gasoline Vehicle (0.192 kg/km)</option>
+                            <option value="diesel">Diesel Vehicle (0.171 kg/km)</option>
+                            <option value="electric">Electric Vehicle (0.053 kg/km)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Home &amp; Office Power (Scope 2)</label>
+                        <input type="number" id="electricityKwh" placeholder="Electricity in kWh (e.g. 350)" min="0" value="0">
+                        <select id="region" style="margin-top: 8px;">
+                            <option value="US">US Grid (0.385 kg/kWh)</option>
+                            <option value="EU">EU Grid (0.255 kg/kWh)</option>
+                            <option value="IN">India CEA Grid (0.710 kg/kWh)</option>
+                            <option value="GLOBAL">Global Average (0.475 kg/kWh)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Business Aviation Flights (Scope 3 Cat 6)</label>
+                        <input type="number" id="flightsTaken" placeholder="Flight count (e.g. 1)" min="0" value="0">
+                        <select id="flightType" style="margin-top: 8px;">
+                            <option value="short">Short Haul (&lt; 3 hours)</option>
+                            <option value="long">Long Haul (&gt; 3 hours)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Municipal Water Inflow (Scope 3 Cat 4/5)</label>
+                        <input type="number" id="waterLiters" placeholder="Water volume in Liters (e.g. 1200)" min="0" value="0">
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Digital Infrastructure Workload (Scope 3 Cat 3)</label>
+                        <input type="number" id="screenHours" placeholder="Display runtime in Hours (e.g. 160)" min="0" value="0" style="margin-bottom: 8px;">
+                        <input type="number" id="internetGb" placeholder="Data Transfer in GB (e.g. 450)" min="0" value="0">
+                    </div>
+
+                    <div style="grid-column: 1 / -1; margin-top: 10px;">
+                        <button type="submit" class="btn-neo btn-neo-primary" style="width: 100%; padding: 14px; font-size: 1rem;">🧮 Calculate Traceable Carbon Footprint</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- PANEL 3: WHAT-IF SIMULATOR -->
         <div id="simulatorPanel" class="panel-content">
-            <div class="panel-info-banner">
-                <span class="badge-neo badge-neo-scope3">Simulator Guide</span>
-                <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
-                    Adjust scenario sliders to model potential fleet electrification, renewable power adoption, or travel reductions—or use the automated solver.
-                </p>
-            </div>
-
-            <!-- CONSTRAINED OPTIMIZATION SOLVER WIDGET -->
-            <div class="card-neo" style="background: #E8F5E9; margin-bottom: 24px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                    <div>
-                        <span class="badge-neo badge-neo-scope1">Operations Research Solver</span>
-                        <h3 style="margin-top: 6px;">Auto-Optimize Sliders for Budget</h3>
-                    </div>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <label style="font-size: 0.85rem; font-weight: 700;">Annual Budget ($):</label>
-                        <input type="number" id="optBudgetInput" value="500" style="width: 110px;">
-                        <button class="btn-neo btn-neo-primary" style="padding: 8px 16px; font-size: 0.85rem;" onclick="runOptimizationSolver()">Run Linear Solver</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-neo">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <div>
-                        <h3>Decarbonization Sensitivity Simulator</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">Adjust scenario parameters to calculate metric tons of CO2e avoided and annual cost ROI.</p>
-                    </div>
-                    <span class="badge-neo badge-neo-scope3">Real-time 60fps</span>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
-                    <div>
-                        <div class="simulator-control">
-                            <label>Driving Distance Reduction: <span id="valTransport" style="color: var(--emerald);">0%</span></label>
-                            <input type="range" id="simTransport" min="0" max="100" value="0" oninput="runSimulation()">
-                        </div>
-
-                        <div class="simulator-control">
-                            <label>Renewable Power Purchase (PPA): <span id="valPpa" style="color: var(--emerald);">0%</span></label>
-                            <input type="range" id="simPpa" min="0" max="100" value="0" oninput="runSimulation()">
-                        </div>
-
-                        <div class="simulator-control">
-                            <label>Flight Travel Consolidation: <span id="valFlight" style="color: var(--emerald);">0%</span></label>
-                            <input type="range" id="simFlight" min="0" max="100" value="0" oninput="runSimulation()">
-                        </div>
-                    </div>
-
-                    <!-- SIMULATION RESULTS -->
-                    <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; justify-content: center; text-align: center;">
-                        <span style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted);">PROJECTED SCENARIO SAVINGS</span>
-                        <h2 id="simKgSaved" style="font-size: 2.2rem; color: var(--emerald); margin: 8px 0;">0.00 kg CO2e</h2>
-                        <p id="simDollarSaved" style="font-weight: 800; color: var(--primary-dark); font-size: 1.1rem;">Estimated Annual Cost Savings: $0</p>
-                        <span id="simPctReduced" class="badge-neo badge-neo-scope2" style="margin: 12px auto 0 auto; font-size: 0.85rem;">0% Net Reduction Target</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===================================================================
-             PANEL 4: AI COPILOT & STRATEGY HUB
-             =================================================================== -->
-        <div id="aiCopilotPanel" class="panel-content">
-            <div class="panel-info-banner">
-                <span class="badge-neo badge-neo-scope2">Strategy Guide</span>
-                <p style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 600;">
-                    Review prioritized decarbonization action items and ask custom questions to the AI Copilot.
-                </p>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" class="responsive-grid">
+                <!-- CONTROLS COLUMN -->
                 <div class="card-neo">
-                    <h3>Prioritized Action Cards</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Top decarbonization strategies ordered by carbon ROI:</p>
+                    <span class="badge-neo badge-neo-scope2">Scenario Modeling</span>
+                    <h2 style="margin: 12px 0 16px 0;">Interactive Net-Zero Decarbonization Simulator</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Adjust operational intervention sliders to model carbon reduction impact, financial cost savings, and 2030 target gap status.</p>
 
-                    <div id="actionPlanList">
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">Calculate metrics or select a sample profile to generate action cards.</p>
+                    <div class="slider-control-group">
+                        <div class="slider-label-row">
+                            <span>Fleet Electrification Share</span>
+                            <span id="valTransport" style="color: var(--emerald);">0%</span>
+                        </div>
+                        <input type="range" id="simTransport" min="0" max="100" value="0" oninput="runSimulation()">
+                    </div>
+
+                    <div class="slider-control-group">
+                        <div class="slider-label-row">
+                            <span>Renewable Electricity PPA Share</span>
+                            <span id="valPpa" style="color: var(--emerald);">0%</span>
+                        </div>
+                        <input type="range" id="simPpa" min="0" max="100" value="0" oninput="runSimulation()">
+                    </div>
+
+                    <div class="slider-control-group">
+                        <div class="slider-label-row">
+                            <span>Flight Travel Reduction Share</span>
+                            <span id="valFlight" style="color: var(--emerald);">0%</span>
+                        </div>
+                        <input type="range" id="simFlight" min="0" max="100" value="0" oninput="runSimulation()">
+                    </div>
+
+                    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #EEE;">
+                        <h4 style="margin-bottom: 8px;">Linear Programming Optimization Solver</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Enter your annual target capital budget to automatically calculate Pareto-optimal slider positions.</p>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="optBudgetInput" placeholder="Annual Budget ($)" value="500" style="width: 140px;">
+                            <button class="btn-neo btn-neo-primary" onclick="runOptimizationSolver()" style="font-size: 0.85rem;">⚡ Solve Optimal Portfolio</button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card-neo" style="display: flex; flex-direction: column; gap: 14px;">
+                <!-- OUTPUTS COLUMN -->
+                <div class="card-neo" style="display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
-                        <h3>Groq AI Copilot Assistant</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Ask custom questions regarding GHG accounting or decarbonization</p>
-                    </div>
+                        <span class="badge-neo badge-neo-scope1">Simulated Results</span>
+                        <h3 style="margin: 12px 0 16px 0;">Projected Decarbonization Impact</h3>
 
-                    <div id="copilotChatWindow" style="height: 220px; overflow-y: auto; background: var(--mint-light); border: var(--ui-border); border-radius: 10px; padding: 14px; font-size: 0.9rem;">
-                        <p style="color: var(--text-muted);">Ask a question below to consult the AI Copilot...</p>
-                    </div>
+                        <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 20px;">
+                            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Annual Carbon Emissions Avoided</span>
+                            <h1 id="simKgSaved" style="font-size: 2.6rem; color: var(--emerald); margin: 6px 0;">0.00 kg CO2e</h1>
+                            <span id="simPctReduced" class="badge-neo badge-neo-scope2" style="font-size: 0.9rem;">0% Net Reduction Target</span>
+                        </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="copilotInput" placeholder="Type a question..." onkeypress="if(event.key==='Enter') askCopilot()">
-                        <button class="btn-neo btn-neo-primary" style="padding: 10px 20px;" onclick="askCopilot()">Ask</button>
+                        <div style="background: #FFFFFF; border: var(--ui-border); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                            <h4 style="color: var(--emerald);" id="simDollarSaved">Estimated Annual Cost Savings: $0</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Calculated from reduced fuel purchases, grid demand charges, and avoided flight ticketing costs.</p>
+                        </div>
+
+                        <div id="targetGapBox" style="background: #FFFFFF; border: var(--ui-border); border-radius: 8px; padding: 16px;">
+                            <h4 style="color: var(--primary-dark);" id="targetGapTitle">2030 Net-Zero Target Status</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;" id="targetGapDesc">Calculate your footprint to evaluate remaining gap to 2030 reduction target.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-    </div>
+        <!-- PANEL 4: AI STRATEGY HUB -->
+        <div id="aiHubPanel" class="panel-content">
+            <div class="card-neo">
+                <span class="badge-neo badge-neo-scope2">Groq LLM Intelligence</span>
+                <h2 style="margin: 12px 0 16px 0;">Evidence-Grounded Decarbonization Copilot</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Ask strategic questions about your emissions footprint, ROI abatement curves, or GHG Protocol boundary rules. The Groq AI reasons strictly over verified calculation proofs.</p>
+
+                <div id="copilotChatWindow" style="height: 320px; border: var(--ui-border); border-radius: 10px; padding: 16px; background: var(--mint-light); overflow-y: auto; margin-bottom: 20px; font-size: 0.9rem;">
+                    <p style="color: var(--emerald); margin-bottom: 8px;"><strong>Groq AI Copilot:</strong> Hello! I am your AI Decarbonization Assistant. Ask me how to lower your Scope 1, 2, or 3 emissions, or how to allocate your capital budget for maximum carbon reduction.</p>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                    <input type="text" id="copilotInput" placeholder="Ask a question (e.g. 'How can I lower my electricity footprint by 30%?')" onkeypress="if(event.key === 'Enter') askCopilot()">
+                    <button class="btn-neo btn-neo-primary" onclick="askCopilot()" style="white-space: nowrap;">Send Prompt</button>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <!-- FOOTER WITH ACTIVE STANDARD LINKS -->
     <footer style="padding: 60px 40px 40px 40px; background: #FFFFFF; border-top: var(--ui-border); margin-top: 60px;">
@@ -400,7 +305,7 @@
                     <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
                 </a>
                 <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 320px; margin-top: 8px;">
-                    Enterprise ESG &amp; Decarbonization Intelligence Platform. Deterministic GHG accounting, statistical anomaly detection, and real-time sensitivity simulation.
+                    Auditable Carbon Data &amp; Decarbonization Decision Platform. Deterministic GHG accounting, statistical anomaly detection, and real-time sensitivity simulation.
                 </p>
             </div>
             <div>
@@ -458,11 +363,53 @@
             window.open(getApiUrl("/api/carbon/export-report"), "_blank");
         }
 
-        window.addEventListener("DOMContentLoaded", () => {
-            if (typeof loadSampleProfile === "function") {
-                loadSampleProfile("techOffice");
+        // INITIAL PAGE LOAD CONTROLLER (Clean state for new users starting at 0)
+        window.addEventListener("DOMContentLoaded", async () => {
+            const token = getToken();
+            if (token) {
+                try {
+                    const res = await fetch(getApiUrl("/api/carbon/history"), {
+                        headers: { "Authorization": "Bearer " + token }
+                    });
+                    const history = await res.json();
+                    if (res.ok && Array.isArray(history) && history.length > 0) {
+                        const latest = history[history.length - 1];
+                        if (latest && latest.emissions) {
+                            latestCalculatedData = latest.emissions;
+                            renderDashboard(latest.emissions);
+                            return;
+                        }
+                    }
+                } catch(e) {
+                    console.log("Starting initial user footprint state");
+                }
             }
+
+            // Default Clean Initial State (0 kg CO2e)
+            renderInitialCleanState();
         });
+
+        function renderInitialCleanState() {
+            const zeroData = {
+                totalKg: 0,
+                totalTonnes: 0,
+                scopes: {
+                    scope1: { kg: 0, percentage: 0 },
+                    scope2: { kg: 0, percentage: 0 },
+                    scope3: { kg: 0, percentage: 0 }
+                },
+                ecoScore: { scorePoints: 1000, starRating: 5 },
+                breakdown: { transportKg: 0, electricityKg: 0, flightsKg: 0, waterKg: 0, digitalKg: 0 },
+                executiveSummary: "Initial clean user state. Enter your activity metrics in the Activity Calculator tab to compute your GHG Protocol carbon inventory.",
+                recommendations: [
+                    "Input your fleet distance and vehicle type in the Activity Calculator.",
+                    "Input your monthly home or office electricity kWh consumption.",
+                    "Input your commercial business travel flights count."
+                ]
+            };
+            latestCalculatedData = zeroData;
+            renderDashboard(zeroData);
+        }
 
         async function calculateAndAnalyze() {
             const token = getToken();
@@ -479,7 +426,7 @@
             };
 
             try {
-                const response = await fetch("${window.API_BASE_URL}/api/carbon/calculate", {
+                const response = await fetch(getApiUrl("/api/carbon/calculate"), {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -507,6 +454,24 @@
             }
         }
 
+        function loadSampleProfile(profileType) {
+            const profile = SAMPLE_PROFILES[profileType];
+            if (!profile) return;
+
+            document.getElementById("vehicleType").value = profile.vehicleType;
+            document.getElementById("transportKm").value = profile.transportKm;
+            document.getElementById("electricityKwh").value = profile.electricityKwh;
+            document.getElementById("region").value = profile.region;
+            document.getElementById("flightType").value = profile.flightType;
+            document.getElementById("flightsTaken").value = profile.flightsTaken;
+            document.getElementById("waterLiters").value = profile.waterLiters;
+            document.getElementById("screenHours").value = profile.screenHours;
+            document.getElementById("internetGb").value = profile.internetGb;
+
+            showToast(`Loaded '${profileType.toUpperCase()}' sample activity metrics`, "info");
+            calculateAndAnalyze();
+        }
+
         function calculateClientFallback(p) {
             const scope1 = p.transportKm * (p.vehicleType === 'gasoline' ? 0.192 : p.vehicleType === 'diesel' ? 0.171 : p.vehicleType === 'electric' ? 0.053 : 0.175);
             const scope2 = p.electricityKwh * (p.region === 'US' ? 0.385 : p.region === 'EU' ? 0.255 : p.region === 'IN' ? 0.710 : 0.475);
@@ -528,10 +493,12 @@
                     scope2: { kg: scope2, percentage: totalKg > 0 ? Number(((scope2/totalKg)*100).toFixed(1)) : 0 },
                     scope3: { kg: scope3, percentage: totalKg > 0 ? Number(((scope3/totalKg)*100).toFixed(1)) : 0 }
                 },
-                ecoScore: { scorePoints: 920, starRating: 5 },
+                ecoScore: { scorePoints: totalKg === 0 ? 1000 : 920, starRating: 5 },
                 forecast: { forecastMonths: months, asIsSeries, targetSeries },
                 breakdown: { transportKg: scope1, electricityKg: scope2, flightsKg, waterKg, digitalKg },
-                executiveSummary: `Activity footprint totals ${totalKg.toFixed(2)} kg CO2e across direct driving, home power, and travel vectors.`,
+                executiveSummary: totalKg === 0 
+                    ? "Initial clean state. Enter metrics to calculate your footprint."
+                    : `Activity footprint totals ${totalKg.toFixed(2)} kg CO2e across direct driving, home power, and travel vectors.`,
                 recommendations: [
                     "Prioritize vehicle electrification to lower direct driving footprint.",
                     "Subscribe to renewable energy purchasing to lower grid power emissions.",
@@ -541,17 +508,17 @@
         }
 
         function renderDashboard(data) {
-            document.getElementById("statTotalKg").innerText = data.totalKg.toFixed(2) + " kg";
-            document.getElementById("statTotalTonnes").innerText = data.totalTonnes.toFixed(4) + " tCO2e";
+            document.getElementById("statTotalKg").innerText = (data.totalKg || 0).toFixed(2) + " kg";
+            document.getElementById("statTotalTonnes").innerText = (data.totalTonnes || 0).toFixed(4) + " tCO2e";
 
-            document.getElementById("statScope1").innerText = data.scopes.scope1.kg.toFixed(2) + " kg";
-            document.getElementById("statScope1Pct").innerText = data.scopes.scope1.percentage + "% of Total";
+            document.getElementById("statScope1").innerText = (data.scopes?.scope1?.kg || 0).toFixed(2) + " kg";
+            document.getElementById("statScope1Pct").innerText = (data.scopes?.scope1?.percentage || 0) + "% of Total";
 
-            document.getElementById("statScope2").innerText = data.scopes.scope2.kg.toFixed(2) + " kg";
-            document.getElementById("statScope2Pct").innerText = data.scopes.scope2.percentage + "% of Total";
+            document.getElementById("statScope2").innerText = (data.scopes?.scope2?.kg || 0).toFixed(2) + " kg";
+            document.getElementById("statScope2Pct").innerText = (data.scopes?.scope2?.percentage || 0) + "% of Total";
 
             if (data.ecoScore) {
-                document.getElementById("statEcoScore").innerText = (data.ecoScore.scorePoints || 920) + " pts";
+                document.getElementById("statEcoScore").innerText = (data.ecoScore.scorePoints || 1000) + " pts";
                 document.getElementById("statStarRating").innerText = `★`.repeat(data.ecoScore.starRating || 5) + ` (${data.ecoScore.starRating || 5} Stars)`;
             }
 
@@ -585,7 +552,7 @@
                 });
             }
 
-            renderCategoryChart(data.breakdown);
+            renderCategoryChart(data.breakdown || {});
             renderForecastChart(data.forecast);
             runSimulation();
         }
@@ -625,18 +592,18 @@
 
         function renderForecastChart(forecast) {
             const canvas = document.getElementById("forecastChart");
-            if (!canvas || !forecast) return;
+            if (!canvas) return;
             const ctx = canvas.getContext("2d");
             if (forecastChartInstance) forecastChartInstance.destroy();
 
             forecastChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: forecast.forecastMonths || ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                    labels: forecast && forecast.forecastMonths ? forecast.forecastMonths : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
                     datasets: [
                         {
                             label: 'As-Is Business Trajectory (kg CO2e)',
-                            data: forecast.asIsSeries || [150, 148, 145, 142, 140, 138, 136, 135, 133, 131, 130, 128],
+                            data: forecast && forecast.asIsSeries ? forecast.asIsSeries : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             borderColor: '#FF6B6B',
                             backgroundColor: 'rgba(255, 107, 107, 0.1)',
                             borderWidth: 3,
@@ -644,7 +611,7 @@
                         },
                         {
                             label: 'Net-Zero Reduction Target (kg CO2e)',
-                            data: forecast.targetSeries || [150, 142, 135, 128, 120, 112, 105, 98, 90, 82, 75, 68],
+                            data: forecast && forecast.targetSeries ? forecast.targetSeries : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             borderColor: '#2D6A4F',
                             backgroundColor: 'rgba(45, 106, 79, 0.15)',
                             borderWidth: 3,
@@ -664,7 +631,7 @@
         async function runOptimizationSolver() {
             const budget = Number(document.getElementById("optBudgetInput").value || 500);
             try {
-                const res = await fetch("${window.API_BASE_URL}/api/carbon/optimize", {
+                const res = await fetch(getApiUrl("/api/carbon/optimize"), {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -686,11 +653,9 @@
         }
 
         async function runSimulation() {
-            if (!latestCalculatedData) return;
-
-            const transportPct = Number(document.getElementById("simTransport").value);
-            const ppaPct = Number(document.getElementById("simPpa").value);
-            const flightPct = Number(document.getElementById("simFlight").value);
+            const transportPct = Number(document.getElementById("simTransport").value || 0);
+            const ppaPct = Number(document.getElementById("simPpa").value || 0);
+            const flightPct = Number(document.getElementById("simFlight").value || 0);
 
             document.getElementById("valTransport").innerText = transportPct + "%";
             document.getElementById("valPpa").innerText = ppaPct + "%";
@@ -703,7 +668,7 @@
             };
 
             try {
-                const response = await fetch("${window.API_BASE_URL}/api/carbon/simulate", {
+                const response = await fetch(getApiUrl("/api/carbon/simulate"), {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -721,6 +686,19 @@
                     document.getElementById("simKgSaved").innerText = json.impact.kgSaved.toFixed(2) + " kg CO2e";
                     document.getElementById("simDollarSaved").innerText = `Estimated Annual Cost Savings: $${json.impact.estimatedAnnualDollarSavings}`;
                     document.getElementById("simPctReduced").innerText = `${json.impact.percentReduced}% Net Reduction Target`;
+
+                    // Update 2030 Net-Zero Target Status Box
+                    const gapBoxTitle = document.getElementById("targetGapTitle");
+                    const gapBoxDesc = document.getElementById("targetGapDesc");
+                    if (json.impact.percentReduced >= 50) {
+                        gapBoxTitle.innerText = "2030 Net-Zero Target: On Track 🎉";
+                        gapBoxTitle.style.color = "var(--emerald)";
+                        gapBoxDesc.innerText = `Simulated reductions achieve ${json.impact.percentReduced}% reduction, meeting the 50% Net-Zero target window.`;
+                    } else {
+                        gapBoxTitle.innerText = "2030 Net-Zero Target: Gap Remaining";
+                        gapBoxTitle.style.color = "var(--primary-dark)";
+                        gapBoxDesc.innerText = `Simulated reductions achieve ${json.impact.percentReduced}%. Increase renewable PPA or fleet electrification to close the remaining gap.`;
+                    }
                 }
             } catch(e) {
                 const bScope1 = baseline.transportKm * 0.175;
