@@ -29,7 +29,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .slider-label-row {
@@ -37,6 +37,28 @@
             justify-content: space-between;
             font-size: 0.85rem;
             font-weight: 700;
+        }
+
+        .unit-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--emerald);
+            background: var(--mint-light);
+            border: 1px solid var(--emerald);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            width: 100%;
+            height: 8px;
+            background: #E2ECE9;
+            border-radius: 6px;
+            outline: none;
+            accent-color: var(--emerald);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -91,8 +113,18 @@
                 </div>
             </div>
 
-            <!-- 4 SUMMARY CARDS GRID -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 24px;">
+            <!-- EMPTY STATE CARD FOR UNCALCULATED USERS -->
+            <div id="emptyStateCard" style="background: #FFFFFF; border: var(--ui-border); border-radius: 12px; padding: 36px; text-align: center; margin-bottom: 24px; box-shadow: 4px 4px 0 #0B3D2E;">
+                <span class="badge-neo badge-neo-scope2">Get Started</span>
+                <h2 style="margin: 12px 0 8px 0;">No Emissions Calculated Yet</h2>
+                <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 20px auto;">
+                    Enter your fleet distance, electricity draw, flights, and digital workloads in the <strong>Activity Calculator</strong> tab to calculate your traceable GHG Protocol inventory, unlock your EcoScore rating, and view 12-month forecasts!
+                </p>
+                <button class="btn-neo btn-neo-primary" onclick="switchPanel('calculatorPanel', document.querySelectorAll('.tab-btn')[1])">⚡ Go to Activity Calculator</button>
+            </div>
+
+            <!-- 4 SUMMARY CARDS GRID (HIDDEN IN CLEAN INITIAL STATE) -->
+            <div id="dashboardStatsGrid" style="display: none; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 24px;">
                 <div class="card-neo">
                     <span class="badge-neo badge-neo-scope1">Total Footprint</span>
                     <h2 id="statTotalKg" style="font-size: 2rem; margin: 10px 0 4px 0;">0.00 kg</h2>
@@ -110,13 +142,13 @@
                 </div>
                 <div class="card-neo">
                     <span class="badge-neo badge-neo-scope3">EcoScore Rating</span>
-                    <h3 id="statEcoScore" style="font-size: 1.6rem; margin: 10px 0 4px 0;">1000 pts</h3>
-                    <p style="font-size: 0.85rem; color: var(--emerald); font-weight: 700;" id="statStarRating">★★★★★ (5 Stars)</p>
+                    <h3 id="statEcoScore" style="font-size: 1.6rem; margin: 10px 0 4px 0;">-- pts</h3>
+                    <p style="font-size: 0.85rem; color: var(--emerald); font-weight: 700;" id="statStarRating">Unrated</p>
                 </div>
             </div>
 
-            <!-- CHARTS SECTION GRID -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;" class="responsive-grid">
+            <!-- CHARTS SECTION GRID (HIDDEN IN CLEAN INITIAL STATE) -->
+            <div id="dashboardChartsGrid" style="display: none; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;" class="responsive-grid">
                 <div class="card-neo">
                     <h3 style="margin-bottom: 16px;">Category Emissions Distribution</h3>
                     <div style="height: 280px; position: relative;">
@@ -132,11 +164,11 @@
             </div>
 
             <!-- EXECUTIVE BRIEF & ACTIONABLE PLAN -->
-            <div class="card-neo">
+            <div id="dashboardNarrativeCard" class="card-neo" style="display: none;">
                 <span class="badge-neo badge-neo-scope2">AI &amp; Data Brief</span>
                 <h3 style="margin: 12px 0 8px 0;">Executive Summary &amp; Recommended Action Plan</h3>
                 <p id="executiveNarrativeText" style="font-size: 0.95rem; line-height: 1.6; color: var(--primary-dark); margin-bottom: 20px; font-style: italic;">
-                    "No activity records calculated yet. Enter your operational metrics in the Activity Calculator tab to generate your GHG Protocol inventory."
+                    "No activity records calculated yet."
                 </p>
 
                 <div id="actionPlanList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
@@ -149,8 +181,8 @@
         <div id="calculatorPanel" class="panel-content">
             <div class="card-neo">
                 <span class="badge-neo badge-neo-scope1">Data Ingestion</span>
-                <h2 style="margin: 12px 0 16px 0;">Operational Activity Input</h2>
-                <p style="color: var(--text-muted); margin-bottom: 24px;">Input your fleet driving distance, power consumption, flight trips, water usage, and cloud digital workloads.</p>
+                <h2 style="margin: 12px 0 16px 0;">Operational Activity Input &amp; Reporting Period</h2>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Input operational metrics with exact measurement units and reporting timeframe boundaries.</p>
 
                 <!-- SANDBOX PRE-LOAD BUTTONS -->
                 <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
@@ -161,43 +193,52 @@
                 </div>
 
                 <form onsubmit="event.preventDefault(); calculateAndAnalyze();" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    <!-- REPORTING PERIOD DATE SELECTION -->
+                    <div style="grid-column: 1 / -1; background: var(--mint-light); border: var(--ui-border); border-radius: 8px; padding: 16px;">
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Reporting Period / Month <span class="unit-badge">YYYY-MM</span></label>
+                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                            <input type="month" id="reportingPeriodInput" style="max-width: 220px;" required>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Defines the GHG accounting temporal boundary for calculation provenance.</span>
+                        </div>
+                    </div>
+
                     <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Direct Fleet Driving (Scope 1)</label>
-                        <input type="number" id="transportKm" placeholder="Distance in km (e.g. 180)" min="0" value="0">
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Direct Fleet Driving <span class="unit-badge">km / period</span></label>
+                        <input type="number" id="transportKm" placeholder="Distance in kilometers (e.g. 180)" min="0" value="0">
                         <select id="vehicleType" style="margin-top: 8px;">
-                            <option value="gasoline">Gasoline Vehicle (0.192 kg/km)</option>
-                            <option value="diesel">Diesel Vehicle (0.171 kg/km)</option>
-                            <option value="electric">Electric Vehicle (0.053 kg/km)</option>
+                            <option value="gasoline">Gasoline Vehicle (0.192 kgCO2e/km)</option>
+                            <option value="diesel">Diesel Vehicle (0.171 kgCO2e/km)</option>
+                            <option value="electric">Electric Vehicle (0.053 kgCO2e/km)</option>
                         </select>
                     </div>
 
                     <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Home &amp; Office Power (Scope 2)</label>
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Home &amp; Office Power <span class="unit-badge">kWh / period</span></label>
                         <input type="number" id="electricityKwh" placeholder="Electricity in kWh (e.g. 350)" min="0" value="0">
                         <select id="region" style="margin-top: 8px;">
-                            <option value="US">US Grid (0.385 kg/kWh)</option>
-                            <option value="EU">EU Grid (0.255 kg/kWh)</option>
-                            <option value="IN">India CEA Grid (0.710 kg/kWh)</option>
-                            <option value="GLOBAL">Global Average (0.475 kg/kWh)</option>
+                            <option value="US">US eGRID Subregion (0.385 kgCO2e/kWh)</option>
+                            <option value="EU">EU Grid Average (0.255 kgCO2e/kWh)</option>
+                            <option value="IN">India CEA Grid (0.710 kgCO2e/kWh)</option>
+                            <option value="GLOBAL">Global Baseline Average (0.475 kgCO2e/kWh)</option>
                         </select>
                     </div>
 
                     <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Business Aviation Flights (Scope 3 Cat 6)</label>
-                        <input type="number" id="flightsTaken" placeholder="Flight count (e.g. 1)" min="0" value="0">
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Business Aviation Flights <span class="unit-badge">trips / period</span></label>
+                        <input type="number" id="flightsTaken" placeholder="Flight passenger trip count (e.g. 1)" min="0" value="0">
                         <select id="flightType" style="margin-top: 8px;">
-                            <option value="short">Short Haul (&lt; 3 hours)</option>
-                            <option value="long">Long Haul (&gt; 3 hours)</option>
+                            <option value="short">Short Haul (&lt; 3 hours / 800 km)</option>
+                            <option value="long">Long Haul (&gt; 3 hours / 3500 km)</option>
                         </select>
                     </div>
 
                     <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Municipal Water Inflow (Scope 3 Cat 4/5)</label>
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Municipal Water Inflow <span class="unit-badge">Liters / period</span></label>
                         <input type="number" id="waterLiters" placeholder="Water volume in Liters (e.g. 1200)" min="0" value="0">
                     </div>
 
                     <div>
-                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Digital Infrastructure Workload (Scope 3 Cat 3)</label>
+                        <label style="display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 6px;">Digital Infrastructure Workload <span class="unit-badge">Hours &amp; GB</span></label>
                         <input type="number" id="screenHours" placeholder="Display runtime in Hours (e.g. 160)" min="0" value="0" style="margin-bottom: 8px;">
                         <input type="number" id="internetGb" placeholder="Data Transfer in GB (e.g. 450)" min="0" value="0">
                     </div>
@@ -223,7 +264,7 @@
                             <span>Fleet Electrification Share</span>
                             <span id="valTransport" style="color: var(--emerald);">0%</span>
                         </div>
-                        <input type="range" id="simTransport" min="0" max="100" value="0" oninput="runSimulation()">
+                        <input type="range" id="simTransport" min="0" max="100" step="1" value="0" oninput="runSimulation()">
                     </div>
 
                     <div class="slider-control-group">
@@ -231,7 +272,7 @@
                             <span>Renewable Electricity PPA Share</span>
                             <span id="valPpa" style="color: var(--emerald);">0%</span>
                         </div>
-                        <input type="range" id="simPpa" min="0" max="100" value="0" oninput="runSimulation()">
+                        <input type="range" id="simPpa" min="0" max="100" step="1" value="0" oninput="runSimulation()">
                     </div>
 
                     <div class="slider-control-group">
@@ -239,7 +280,7 @@
                             <span>Flight Travel Reduction Share</span>
                             <span id="valFlight" style="color: var(--emerald);">0%</span>
                         </div>
-                        <input type="range" id="simFlight" min="0" max="100" value="0" oninput="runSimulation()">
+                        <input type="range" id="simFlight" min="0" max="100" step="1" value="0" oninput="runSimulation()">
                     </div>
 
                     <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #EEE;">
@@ -365,6 +406,12 @@
 
         // INITIAL PAGE LOAD CONTROLLER (Clean state for new users starting at 0)
         window.addEventListener("DOMContentLoaded", async () => {
+            // Set default reporting month date picker to current month
+            const periodInput = document.getElementById("reportingPeriodInput");
+            if (periodInput) {
+                periodInput.value = new Date().toISOString().substring(0, 7);
+            }
+
             const token = getToken();
             if (token) {
                 try {
@@ -390,30 +437,17 @@
         });
 
         function renderInitialCleanState() {
-            const zeroData = {
-                totalKg: 0,
-                totalTonnes: 0,
-                scopes: {
-                    scope1: { kg: 0, percentage: 0 },
-                    scope2: { kg: 0, percentage: 0 },
-                    scope3: { kg: 0, percentage: 0 }
-                },
-                ecoScore: { scorePoints: 1000, starRating: 5 },
-                breakdown: { transportKg: 0, electricityKg: 0, flightsKg: 0, waterKg: 0, digitalKg: 0 },
-                executiveSummary: "Initial clean user state. Enter your activity metrics in the Activity Calculator tab to compute your GHG Protocol carbon inventory.",
-                recommendations: [
-                    "Input your fleet distance and vehicle type in the Activity Calculator.",
-                    "Input your monthly home or office electricity kWh consumption.",
-                    "Input your commercial business travel flights count."
-                ]
-            };
-            latestCalculatedData = zeroData;
-            renderDashboard(zeroData);
+            latestCalculatedData = null;
+            document.getElementById("emptyStateCard").style.display = "block";
+            document.getElementById("dashboardStatsGrid").style.display = "none";
+            document.getElementById("dashboardChartsGrid").style.display = "none";
+            document.getElementById("dashboardNarrativeCard").style.display = "none";
         }
 
         async function calculateAndAnalyze() {
             const token = getToken();
             const payload = {
+                reportingPeriod: document.getElementById("reportingPeriodInput").value,
                 transportKm: Number(document.getElementById("transportKm").value || 0),
                 vehicleType: document.getElementById("vehicleType").value,
                 electricityKwh: Number(document.getElementById("electricityKwh").value || 0),
@@ -440,17 +474,20 @@
                     latestCalculatedData = json.data;
                     renderDashboard(json.data);
                     showToast("Emissions calculated successfully!", "success");
+                    switchPanel("overviewPanel", document.querySelectorAll(".tab-btn")[0]);
                 } else {
                     const fallback = calculateClientFallback(payload);
                     latestCalculatedData = fallback;
                     renderDashboard(fallback);
                     showToast("Calculated via high-speed deterministic engine", "success");
+                    switchPanel("overviewPanel", document.querySelectorAll(".tab-btn")[0]);
                 }
             } catch (err) {
                 const fallback = calculateClientFallback(payload);
                 latestCalculatedData = fallback;
                 renderDashboard(fallback);
                 showToast("Calculated via high-speed deterministic engine", "success");
+                switchPanel("overviewPanel", document.querySelectorAll(".tab-btn")[0]);
             }
         }
 
@@ -496,9 +533,7 @@
                 ecoScore: { scorePoints: totalKg === 0 ? 1000 : 920, starRating: 5 },
                 forecast: { forecastMonths: months, asIsSeries, targetSeries },
                 breakdown: { transportKg: scope1, electricityKg: scope2, flightsKg, waterKg, digitalKg },
-                executiveSummary: totalKg === 0 
-                    ? "Initial clean state. Enter metrics to calculate your footprint."
-                    : `Activity footprint totals ${totalKg.toFixed(2)} kg CO2e across direct driving, home power, and travel vectors.`,
+                executiveSummary: `Activity footprint totals ${totalKg.toFixed(2)} kg CO2e across direct driving, home power, and travel vectors.`,
                 recommendations: [
                     "Prioritize vehicle electrification to lower direct driving footprint.",
                     "Subscribe to renewable energy purchasing to lower grid power emissions.",
@@ -508,6 +543,16 @@
         }
 
         function renderDashboard(data) {
+            if (!data || data.totalKg === 0) {
+                renderInitialCleanState();
+                return;
+            }
+
+            document.getElementById("emptyStateCard").style.display = "none";
+            document.getElementById("dashboardStatsGrid").style.display = "grid";
+            document.getElementById("dashboardChartsGrid").style.display = "grid";
+            document.getElementById("dashboardNarrativeCard").style.display = "block";
+
             document.getElementById("statTotalKg").innerText = (data.totalKg || 0).toFixed(2) + " kg";
             document.getElementById("statTotalTonnes").innerText = (data.totalTonnes || 0).toFixed(4) + " tCO2e";
 
@@ -518,7 +563,7 @@
             document.getElementById("statScope2Pct").innerText = (data.scopes?.scope2?.percentage || 0) + "% of Total";
 
             if (data.ecoScore) {
-                document.getElementById("statEcoScore").innerText = (data.ecoScore.scorePoints || 1000) + " pts";
+                document.getElementById("statEcoScore").innerText = (data.ecoScore.scorePoints || 920) + " pts";
                 document.getElementById("statStarRating").innerText = `★`.repeat(data.ecoScore.starRating || 5) + ` (${data.ecoScore.starRating || 5} Stars)`;
             }
 
@@ -563,10 +608,11 @@
             const ctx = canvas.getContext("2d");
             if (scopeChartInstance) scopeChartInstance.destroy();
 
+            // CONCISE UNCLUTTERED X-AXIS LABELS
             scopeChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Direct Driving', 'Home/Office Power', 'Flights Travel', 'Water Usage', 'Digital Activity'],
+                    labels: ['Driving', 'Power', 'Flights', 'Water', 'Digital'],
                     datasets: [{
                         label: 'Emissions (kg CO2e)',
                         data: [
@@ -585,7 +631,12 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
+                    scales: { 
+                        x: {
+                            ticks: { font: { weight: 'bold', size: 12 } }
+                        },
+                        y: { beginAtZero: true } 
+                    }
                 }
             });
         }

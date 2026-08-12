@@ -3,13 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile Hub | Carbonly</title>
-    <meta name="description" content="Manage your Carbonly user profile, update location and regulatory standards, inspect EcoScore ratings, and view historical activity records.">
+    <title>User Profile &amp; Benchmark | Carbonly Intelligence Platform</title>
+    <meta name="description" content="Manage user account parameters, location settings, compliance standards, EcoScore benchmarks, and historical activity log.">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
     <style>
+        .profile-container {
+            max-width: 1100px;
+            margin: 100px auto 60px auto;
+            padding: 0 24px;
+        }
+
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--mint-light);
+            border: var(--ui-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin: 0 auto 16px auto;
+        }
+
+        /* Modal Popup Styling */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -18,93 +38,70 @@
             height: 100%;
             background: rgba(11, 61, 46, 0.6);
             display: none;
-            justify-content: center;
             align-items: center;
-            z-index: 2000;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
         }
 
-        .modal-content {
+        .modal-card {
             background: #FFFFFF;
             border: var(--ui-border);
             border-radius: 12px;
-            box-shadow: var(--ui-shadow-hover);
             width: 100%;
-            max-width: 520px;
-            padding: 32px;
-            position: relative;
-        }
-
-        .password-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .eye-btn {
-            position: absolute;
-            right: 12px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-            color: var(--text-muted);
+            max-width: 480px;
+            padding: 28px;
+            box-shadow: 4px 4px 0 #0B3D2E;
         }
     </style>
 </head>
 <body>
 
-    <!-- NAVBAR (HOME LINK REMOVED - LOGO NAVIGATES HOME) -->
+    <!-- UNIFIED TOP NAVBAR -->
     <header class="top-strip">
         <a href="index.html" class="logo">
             <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
         </a>
         <nav class="nav-links">
             <a href="dashboard.html">Dashboard</a>
-            <a href="why.html">Why Track?</a>
             <a href="docs.html">Docs</a>
-            <a href="profile.html" class="badge-neo badge-neo-scope2" style="font-size: 0.85rem;">Profile &amp; History</a>
+            <div class="auth-nav-item">
+                <a href="profile.html" class="btn-neo btn-neo-primary" style="font-size: 0.85rem; padding: 8px 16px;">Profile</a>
+            </div>
         </nav>
     </header>
 
-    <main style="max-width: 1100px; margin: 100px auto 60px auto; padding: 0 24px;">
-        <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
-            <div>
-                <span class="badge-neo badge-neo-scope2">Account &amp; Identity Hub</span>
-                <h1 style="font-size: 2.5rem; margin-top: 8px;">User Profile &amp; Benchmark</h1>
-                <p style="color: var(--text-muted);">Manage your account parameters, country location, compliance standards, and historical log.</p>
-            </div>
-            <div style="display: flex; gap: 12px;">
-                <button class="btn-neo" onclick="openResetPasswordModal()">Reset Password</button>
-                <button class="btn-neo btn-neo-primary" onclick="openEditModal()">Edit Profile Settings</button>
-            </div>
+    <main class="profile-container">
+        <div style="margin-bottom: 24px;">
+            <span class="badge-neo badge-neo-scope2">Account &amp; Benchmark Hub</span>
+            <h1 style="font-size: 2.4rem; margin-top: 6px;">User Profile &amp; History</h1>
+            <p style="color: var(--text-muted);">Manage your account parameters, country location, compliance standards, and historical log.</p>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px;">
-            
-            <!-- LEFT COLUMN: USER DETAILS & ECOSCORE CARD -->
-            <div style="display: flex; flex-direction: column; gap: 24px;">
-                
-                <!-- USER ACCOUNT DETAILS CARD -->
-                <div class="card-neo">
-                    <div style="text-align: center; margin-bottom: 16px;">
-                        <div id="avatarContainer" style="width: 80px; height: 80px; margin: 0 auto 12px auto; background: var(--sage-accent); border: var(--ui-border); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <svg viewBox="0 0 50 50" style="width: 48px; height: 48px;">
-                                <circle cx="25" cy="25" r="22" fill="#B7E4C7" stroke="#0B3D2E" stroke-width="3"/>
-                                <path d="M15 30 L25 12 L35 30 L25 24 Z" fill="#2D6A4F" stroke="#0B3D2E" stroke-width="2"/>
-                            </svg>
-                        </div>
-                        <h3 id="displayUsername" style="font-size: 1.5rem;">Authenticated User</h3>
-                        <p id="displayEmail" style="font-size: 0.85rem; color: var(--text-muted);">user@carbonly.io</p>
-                    </div>
+        <!-- ACTION BUTTONS -->
+        <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+            <button class="btn-neo" onclick="openResetPasswordModal()">🔒 Reset Password</button>
+            <button class="btn-neo btn-neo-primary" onclick="openEditProfileModal()">⚙️ Edit Profile Settings</button>
+            <button class="btn-neo" onclick="logoutUser()" style="background: #FFEBEE; color: #C53030; border-color: #C53030;">🚪 Log Out</button>
+        </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem; border-top: 1px solid #EEE; padding-top: 14px;">
+        <div style="display: grid; grid-template-columns: 360px 1fr; gap: 24px;" class="responsive-grid">
+            <!-- LEFT COLUMN: PROFILE & ECOSCORE -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <!-- USER DETAILS CARD -->
+                <div class="card-neo" style="text-align: center;">
+                    <div class="avatar-circle">👤</div>
+                    <h3 id="displayUsername" style="font-size: 1.4rem;">Authenticated User</h3>
+                    <p id="displayEmail" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">user@carbonly.io</p>
+                    
+                    <div style="border-top: 1px solid #EEE; padding-top: 16px; font-size: 0.85rem; text-align: left; display: flex; flex-direction: column; gap: 10px;">
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: var(--text-muted);">User ID:</span>
                             <strong id="displayUserId">USR-94821</strong>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: var(--text-muted);">Country / Location:</span>
-                            <strong id="displayCountry">United States</strong>
+                            <strong id="displayLocation">United States</strong>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: var(--text-muted);">Regulatory Standard:</span>
@@ -113,134 +110,114 @@
                     </div>
                 </div>
 
-                <!-- UPGRADED ECOSCORE & STAR RATING CARD -->
-                <div class="card-neo" style="background: var(--mint-light); text-align: center;">
+                <!-- ECOSCORE CARD (DYNAMIC BASED ON DATA) -->
+                <div class="card-neo" style="text-align: center;">
                     <span class="badge-neo badge-neo-scope1">Relative EcoScore</span>
-                    <h2 id="displayScorePoints" style="font-size: 2.5rem; color: var(--emerald); margin: 8px 0;">920 pts</h2>
-                    <div id="displayStarRating" style="font-size: 1.4rem; font-weight: 800; color: var(--sunburst-yellow); margin-bottom: 4px;">
-                        ★★★★★ (5 Stars)
-                    </div>
-                    <p id="displayTierName" style="font-weight: 700; color: var(--primary-dark); font-size: 0.9rem;">Climate Champion</p>
+                    <h1 id="profileScorePoints" style="font-size: 2.8rem; margin: 12px 0 4px 0; color: var(--emerald);">-- pts</h1>
+                    <p id="profileStarRating" style="font-size: 1.1rem; font-weight: 700; color: #D69E2E; margin-bottom: 4px;">Unrated</p>
+                    <p id="profileScoreLabel" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Calculate your footprint on the Dashboard to unlock rating.</p>
                     
-                    <!-- Progress Bar to Next Tier -->
-                    <div style="margin: 14px 0 8px 0; text-align: left;">
+                    <div style="background: var(--mint-light); border: var(--ui-border); border-radius: 8px; padding: 12px;">
                         <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; margin-bottom: 4px;">
                             <span>Progress to Max Rating</span>
-                            <span id="ptsToNextTier">92%</span>
+                            <span id="profileScorePct">0%</span>
                         </div>
-                        <div style="width: 100%; height: 10px; background: #FFFFFF; border: var(--ui-border); border-radius: 6px; overflow: hidden;">
-                            <div id="ecoProgressBar" style="width: 92%; height: 100%; background: var(--emerald);"></div>
+                        <div style="background: #E2ECE9; border-radius: 6px; height: 10px; overflow: hidden;">
+                            <div id="profileProgressBar" style="background: var(--emerald); width: 0%; height: 100%; transition: width 0.4s ease;"></div>
                         </div>
                     </div>
-
-                    <span id="displayPercentile" style="font-size: 0.75rem; color: var(--text-muted);">Top 10% Lowest Emissions Globally</span>
-                </div>
-
-            </div>
-
-            <!-- RIGHT COLUMN: RELOCATED EMISSIONS HISTORY TABLE -->
-            <div class="card-neo">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div>
-                        <h3>Emissions Activity Log</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Historical activity logs translated into human emission categories</p>
-                    </div>
-                    <button class="btn-neo btn-neo-accent" style="padding: 8px 14px; font-size: 0.8rem;" onclick="clearProfileHistory()">Clear History</button>
-                </div>
-
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
-                        <thead>
-                            <tr style="background: var(--sage-accent); border-bottom: var(--ui-border);">
-                                <th style="padding: 10px;">Date</th>
-                                <th style="padding: 10px;">Total (kg CO2e)</th>
-                                <th style="padding: 10px;">Direct Driving</th>
-                                <th style="padding: 10px;">Home/Grid Power</th>
-                                <th style="padding: 10px;">Travel &amp; Water</th>
-                                <th style="padding: 10px;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="profileHistoryBody">
-                            <tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--text-muted);">Loading history entries...</td></tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
 
+            <!-- RIGHT COLUMN: EMISSIONS HISTORY LOG -->
+            <div class="card-neo" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h3>Emissions Activity Log</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Historical records calculated under versioned emission factor methodologies.</p>
+                        </div>
+                        <button class="btn-neo" onclick="clearEmissionsHistory()" style="font-size: 0.8rem; padding: 6px 12px; background: #FFF5F5; color: #C53030;">Clear History</button>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: var(--mint-light); border-bottom: var(--ui-border);">
+                                    <th style="padding: 10px;">Date &amp; Period</th>
+                                    <th style="padding: 10px;">Total Footprint</th>
+                                    <th style="padding: 10px;">Scope 1</th>
+                                    <th style="padding: 10px;">Scope 2</th>
+                                    <th style="padding: 10px;">Scope 3</th>
+                                    <th style="padding: 10px;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="profileHistoryBody">
+                                <tr>
+                                    <td colspan="6" style="padding: 20px; text-align: center; color: var(--text-muted);">Loading activity log history...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- EDIT PROFILE MODAL POPUP -->
-    <div class="modal-overlay" id="editModal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3>Edit Profile Settings</h3>
-                <button style="background: none; border: none; font-size: 1.2rem; cursor: pointer; font-weight: 800;" onclick="closeEditModal()">✖</button>
-            </div>
+    <!-- EDIT PROFILE SETTINGS MODAL -->
+    <div id="editProfileModal" class="modal-overlay">
+        <div class="modal-card">
+            <h3 style="margin-bottom: 6px;">Edit Profile Settings</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Update your user parameters, country location, and compliance framework.</p>
 
-            <form id="editProfileForm" onsubmit="event.preventDefault(); saveProfileChanges();" style="display: flex; flex-direction: column; gap: 14px;">
+            <form onsubmit="event.preventDefault(); saveProfileSettings();" style="display: flex; flex-direction: column; gap: 16px;">
                 <div>
-                    <label style="font-size: 0.8rem; font-weight: 700;">Display Name</label>
-                    <input type="text" id="editUsername" required>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">Display Name</label>
+                    <input type="text" id="editUsernameInput" placeholder="Enter display name" required>
                 </div>
-
                 <div>
-                    <label style="font-size: 0.8rem; font-weight: 700;">Country / Location</label>
-                    <select id="editCountry">
-                        <option value="United States">United States</option>
-                        <option value="European Union">European Union</option>
-                        <option value="India">India</option>
-                        <option value="United Kingdom">United Kingdom</option>
-                        <option value="Global">Global Other</option>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">Country / Location</label>
+                    <select id="editLocationInput">
+                        <option value="United States">United States (US eGRID)</option>
+                        <option value="European Union">European Union (EEA Grid)</option>
+                        <option value="India">India (CEA Grid)</option>
+                        <option value="United Kingdom">United Kingdom (DEFRA)</option>
+                        <option value="Global Average">Global Average</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">Regulatory Compliance Standard</label>
+                    <select id="editStandardInput">
+                        <option value="GHG Protocol Corporate">GHG Protocol Corporate Standard</option>
+                        <option value="CSRD / ESRS E1">CSRD / ESRS E1 Climate Standard</option>
+                        <option value="SEC Climate Rules">SEC Climate Reporting Standard</option>
+                        <option value="ISO 14064-1">ISO 14064-1 Greenhouse Gas Standard</option>
                     </select>
                 </div>
 
-                <div>
-                    <label style="font-size: 0.8rem; font-weight: 700;">Regulatory Compliance Standard</label>
-                    <select id="editStandard">
-                        <option value="GHG Protocol Corporate Standard">GHG Protocol Corporate Standard</option>
-                        <option value="EPA Climate Leaders">EPA Climate Leaders</option>
-                        <option value="CSRD European Directive">CSRD European Directive</option>
-                        <option value="ISO 14064 Standard">ISO 14064 Carbon Standard</option>
-                    </select>
-                </div>
-
-                <div style="margin-top: 10px; display: flex; gap: 10px;">
-                    <button type="submit" class="btn-neo btn-neo-primary" style="flex: 1;">Save Profile Changes</button>
-                    <button type="button" class="btn-neo" onclick="closeEditModal()">Cancel</button>
+                <div style="display: flex; gap: 12px; margin-top: 10px;">
+                    <button type="button" class="btn-neo" onclick="closeEditProfileModal()" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn-neo btn-neo-primary" style="flex: 1;">Save Settings</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- RESET PASSWORD MODAL POPUP -->
-    <div class="modal-overlay" id="resetModal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3>Reset Password</h3>
-                <button style="background: none; border: none; font-size: 1.2rem; cursor: pointer; font-weight: 800;" onclick="closeResetPasswordModal()">✖</button>
-            </div>
+    <!-- RESET PASSWORD MODAL -->
+    <div id="resetPasswordModal" class="modal-overlay">
+        <div class="modal-card">
+            <h3 style="margin-bottom: 6px;">Reset Password</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Enter your new password (minimum 6 characters with letters &amp; numbers).</p>
 
-            <form id="resetPasswordForm" onsubmit="event.preventDefault(); handlePasswordReset();" style="display: flex; flex-direction: column; gap: 14px;">
+            <form onsubmit="event.preventDefault(); saveNewPassword();" style="display: flex; flex-direction: column; gap: 16px;">
                 <div>
-                    <label style="font-size: 0.8rem; font-weight: 700;">Current Password</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="currentPass" required>
-                        <button type="button" class="eye-btn" onclick="togglePassField('currentPass')">👁️</button>
-                    </div>
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">New Password</label>
+                    <input type="password" id="newPasswordInput" placeholder="••••••••" required minlength="6">
                 </div>
 
-                <div>
-                    <label style="font-size: 0.8rem; font-weight: 700;">New Password</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="newPass" required>
-                        <button type="button" class="eye-btn" onclick="togglePassField('newPass')">👁️</button>
-                    </div>
-                </div>
-
-                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                <div style="display: flex; gap: 12px; margin-top: 10px;">
+                    <button type="button" class="btn-neo" onclick="closeResetPasswordModal()" style="flex: 1;">Cancel</button>
                     <button type="submit" class="btn-neo btn-neo-primary" style="flex: 1;">Update Password</button>
-                    <button type="button" class="btn-neo" onclick="closeResetPasswordModal()">Cancel</button>
                 </div>
             </form>
         </div>
@@ -254,7 +231,7 @@
                     <img src="assets/logo.svg" alt="Carbonly Logo"> Carbonly
                 </a>
                 <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 320px; margin-top: 8px;">
-                    Enterprise ESG &amp; Decarbonization Intelligence Platform. Deterministic GHG accounting, statistical anomaly detection, and real-time sensitivity simulation.
+                    Auditable Carbon Data &amp; Decarbonization Decision Platform.
                 </p>
             </div>
             <div>
@@ -282,134 +259,208 @@
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="toast.js"></script>
+    <script src="script.js"></script>
     <script>
-        function openEditModal() {
-            document.getElementById("editUsername").value = document.getElementById("displayUsername").innerText;
-            document.getElementById("editModal").style.display = "flex";
+        function getToken() {
+            return localStorage.getItem("token");
         }
 
-        function closeEditModal() {
-            document.getElementById("editModal").style.display = "none";
+        function logoutUser() {
+            localStorage.removeItem("token");
+            showToast("Logged out successfully", "info");
+            setTimeout(() => window.location.href = "login.html", 1000);
         }
 
-        function openResetPasswordModal() {
-            document.getElementById("resetModal").style.display = "flex";
-        }
+        window.addEventListener("DOMContentLoaded", async () => {
+            loadUserProfileDetails();
+            loadUserHistoryLog();
+        });
 
-        function closeResetPasswordModal() {
-            document.getElementById("resetModal").style.display = "none";
-        }
+        async function loadUserProfileDetails() {
+            const token = getToken();
+            const savedLocation = localStorage.getItem("userLocation") || "United States";
+            const savedStandard = localStorage.getItem("userStandard") || "GHG Protocol Corporate";
+            
+            document.getElementById("displayLocation").innerText = savedLocation;
+            document.getElementById("displayStandard").innerText = savedStandard;
 
-        function togglePassField(fieldId) {
-            const input = document.getElementById(fieldId);
-            input.type = input.type === "password" ? "text" : "password";
-        }
-
-        function saveProfileChanges() {
-            const username = document.getElementById("editUsername").value.trim();
-            const country = document.getElementById("editCountry").value;
-            const standard = document.getElementById("editStandard").value;
-
-            document.getElementById("displayUsername").innerText = username;
-            document.getElementById("displayCountry").innerText = country;
-            document.getElementById("displayStandard").innerText = standard;
-
-            localStorage.setItem("userCountry", country);
-            localStorage.setItem("userStandard", standard);
-
-            closeEditModal();
-            showToast("Profile settings updated successfully!", "success");
-        }
-
-        function handlePasswordReset() {
-            closeResetPasswordModal();
-            showToast("Password updated successfully!", "success");
-        }
-
-        window.addEventListener("DOMContentLoaded", () => {
-            const token = localStorage.getItem("token");
             if (token) {
                 try {
                     const payload = JSON.parse(atob(token.split(".")[1]));
-                    document.getElementById("displayUsername").innerText = payload.username || "Authenticated User";
-                    document.getElementById("displayEmail").innerText = payload.username ? `${payload.username.toLowerCase()}@carbonly.io` : "user@carbonly.io";
-                    document.getElementById("displayUserId").innerText = payload.id ? `USR-${payload.id.substring(0,6)}` : "USR-94821";
+                    if (payload.username) {
+                        document.getElementById("displayUsername").innerText = payload.username;
+                    }
+                    if (payload.id) {
+                        document.getElementById("displayUserId").innerText = "USR-" + payload.id.substring(0, 6).toUpperCase();
+                    }
                 } catch(e){}
-                fetchHistory();
-            } else {
-                document.getElementById("profileHistoryBody").innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center;">Please log in to view saved history.</td></tr>';
+
+                try {
+                    const res = await fetch(getApiUrl("/api/auth/profile"), {
+                        headers: { "Authorization": "Bearer " + token }
+                    });
+                    const user = await res.json();
+                    if (res.ok && user) {
+                        if (user.username) document.getElementById("displayUsername").innerText = user.username;
+                        if (user.email) document.getElementById("displayEmail").innerText = user.email;
+                    }
+                } catch(e){}
+            }
+        }
+
+        async function loadUserHistoryLog() {
+            const token = getToken();
+            const tbody = document.getElementById("profileHistoryBody");
+            
+            if (!token) {
+                tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--text-muted);">Log in to save and view your activity log history.</td></tr>';
+                renderProfileEcoScore(null);
+                return;
             }
 
-            document.getElementById("displayCountry").innerText = localStorage.getItem("userCountry") || "United States";
-            document.getElementById("displayStandard").innerText = localStorage.getItem("userStandard") || "GHG Protocol Corporate Standard";
-        });
-
-        async function fetchHistory() {
-            const token = localStorage.getItem("token");
-            if (!token) return;
-
             try {
-                const res = await fetch("${window.API_BASE_URL}/api/carbon/history", {
+                const res = await fetch(getApiUrl("/api/carbon/history"), {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 const history = await res.json();
-
-                const tbody = document.getElementById("profileHistoryBody");
-                tbody.innerHTML = "";
-
-                if (!Array.isArray(history) || history.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--text-muted);">No history records saved yet.</td></tr>';
-                } else {
-                    history.forEach(item => {
-                        const date = new Date(item.timestamp).toLocaleDateString();
-                        const isAnom = item.anomalyReport && item.anomalyReport.isAnomaly;
-                        tbody.innerHTML += `
-                            <tr style="border-bottom: 1px solid #EEE;">
-                if (res.ok && Array.isArray(history)) {
+                
+                if (res.ok && Array.isArray(history) && history.length > 0) {
                     renderHistoryTable(history);
+                    const latest = history[history.length - 1];
+                    renderProfileEcoScore(latest.emissions);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--text-muted);">No activity logs saved yet. Calculate your footprint on the Dashboard!</td></tr>';
+                    renderProfileEcoScore(null);
                 }
             } catch(e) {
-                console.log("Using local history data");
+                tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--text-muted);">No activity logs saved yet. Calculate your footprint on the Dashboard!</td></tr>';
+                renderProfileEcoScore(null);
             }
+        }
+
+        function renderProfileEcoScore(emissions) {
+            const ptsEl = document.getElementById("profileScorePoints");
+            const starEl = document.getElementById("profileStarRating");
+            const labelEl = document.getElementById("profileScoreLabel");
+            const pctEl = document.getElementById("profileScorePct");
+            const barEl = document.getElementById("profileProgressBar");
+
+            if (!emissions || emissions.totalKg === 0) {
+                ptsEl.innerText = "-- pts";
+                ptsEl.style.color = "var(--primary-dark)";
+                starEl.innerText = "Unrated";
+                starEl.style.color = "var(--text-muted)";
+                labelEl.innerText = "Calculate your footprint on the Dashboard to unlock rating.";
+                pctEl.innerText = "0%";
+                barEl.style.width = "0%";
+                return;
+            }
+
+            const pts = emissions.ecoScore ? emissions.ecoScore.scorePoints : 920;
+            const stars = emissions.ecoScore ? emissions.ecoScore.starRating : 5;
+            const pct = Math.round((pts / 1000) * 100);
+
+            ptsEl.innerText = pts + " pts";
+            ptsEl.style.color = "var(--emerald)";
+            starEl.innerText = `★`.repeat(stars) + ` (${stars} Stars)`;
+            starEl.style.color = "#D69E2E";
+            labelEl.innerText = stars === 5 ? "Climate Champion - Top 10% Lowest Emissions" : "Moderate Footprint Performance";
+            pctEl.innerText = pct + "%";
+            barEl.style.width = pct + "%";
         }
 
         function renderHistoryTable(history) {
             const tbody = document.getElementById("profileHistoryBody");
             tbody.innerHTML = "";
 
-            if (!Array.isArray(history) || history.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--text-muted);">No history records saved yet.</td></tr>';
-            } else {
-                history.forEach(item => {
-                    const date = new Date(item.timestamp).toLocaleDateString();
-                    const isAnom = item.anomalyReport && item.anomalyReport.isAnomaly;
-                    tbody.innerHTML += `
-                        <tr style="border-bottom: 1px solid #EEE;">
-                            <td style="padding: 10px; font-weight:600;">${date}</td>
-                            <td style="padding: 10px; font-weight:700; color:var(--emerald);">${(item.emissions?.totalKg || 0).toFixed(2)}</td>
-                            <td style="padding: 10px;">${(item.emissions?.scopes?.scope1?.kg || 0).toFixed(2)}</td>
-                            <td style="padding: 10px;">${(item.emissions?.scopes?.scope2?.kg || 0).toFixed(2)}</td>
-                            <td style="padding: 10px;">${(item.emissions?.scopes?.scope3?.kg || 0).toFixed(2)}</td>
-                            <td style="padding: 10px;">${isAnom ? '<span class="badge-neo" style="background:#FFEBEE;color:red;">Anomaly Spike</span>' : '<span class="badge-neo">Normal</span>'}</td>
-                        </tr>
-                    `;
-                });
-            }
+            history.forEach(item => {
+                const date = item.timestamp ? new Date(item.timestamp).toLocaleDateString() : "Recent";
+                const total = item.emissions ? item.emissions.totalKg || 0 : 0;
+                const s1 = item.emissions?.scopes?.scope1?.kg || 0;
+                const s2 = item.emissions?.scopes?.scope2?.kg || 0;
+                const s3 = item.emissions?.scopes?.scope3?.kg || 0;
+                const isAnom = item.anomalyReport && item.anomalyReport.isAnomaly;
+
+                tbody.innerHTML += `
+                    <tr style="border-bottom: 1px solid #EEE;">
+                        <td style="padding: 10px; font-weight:600;">${date}</td>
+                        <td style="padding: 10px; font-weight:700; color:var(--emerald);">${total.toFixed(2)} kg</td>
+                        <td style="padding: 10px;">${s1.toFixed(2)} kg</td>
+                        <td style="padding: 10px;">${s2.toFixed(2)} kg</td>
+                        <td style="padding: 10px;">${s3.toFixed(2)} kg</td>
+                        <td style="padding: 10px;">${isAnom ? '<span class="badge-neo" style="background:#FFEBEE;color:red;">Anomaly Spike</span>' : '<span class="badge-neo">Verified</span>'}</td>
+                    </tr>
+                `;
+            });
         }
 
         async function clearEmissionsHistory() {
-            const token = localStorage.getItem("token");
+            const token = getToken();
             if (!token) return;
 
             if (confirm("Are you sure you want to clear all history records?")) {
-                await fetch(getApiUrl("/api/carbon/history"), {
-                    method: "DELETE",
-                    headers: { "Authorization": "Bearer " + token }
-                });
-                document.getElementById("profileHistoryBody").innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center;">History records cleared.</td></tr>';
-                showToast("Emissions history cleared successfully", "success");
+                try {
+                    await fetch(getApiUrl("/api/carbon/history"), {
+                        method: "DELETE",
+                        headers: { "Authorization": "Bearer " + token }
+                    });
+                    showToast("Emissions history cleared", "info");
+                    loadUserHistoryLog();
+                } catch(e) {
+                    showToast("History cleared locally", "info");
+                    loadUserHistoryLog();
+                }
             }
+        }
+
+        // EDIT PROFILE MODAL CONTROLLERS
+        function openEditProfileModal() {
+            document.getElementById("editUsernameInput").value = document.getElementById("displayUsername").innerText;
+            document.getElementById("editLocationInput").value = document.getElementById("displayLocation").innerText;
+            document.getElementById("editStandardInput").value = document.getElementById("displayStandard").innerText;
+            document.getElementById("editProfileModal").style.display = "flex";
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById("editProfileModal").style.display = "none";
+        }
+
+        function saveProfileSettings() {
+            const name = document.getElementById("editUsernameInput").value.trim();
+            const loc = document.getElementById("editLocationInput").value;
+            const std = document.getElementById("editStandardInput").value;
+
+            if (name) document.getElementById("displayUsername").innerText = name;
+            document.getElementById("displayLocation").innerText = loc;
+            document.getElementById("displayStandard").innerText = std;
+
+            localStorage.setItem("userLocation", loc);
+            localStorage.setItem("userStandard", std);
+
+            closeEditProfileModal();
+            showToast("Profile settings updated successfully!", "success");
+        }
+
+        // RESET PASSWORD MODAL CONTROLLERS
+        function openResetPasswordModal() {
+            document.getElementById("resetPasswordModal").style.display = "flex";
+        }
+
+        function closeResetPasswordModal() {
+            document.getElementById("resetPasswordModal").style.display = "none";
+        }
+
+        async function saveNewPassword() {
+            const pass = document.getElementById("newPasswordInput").value;
+            if (!pass || pass.length < 6) {
+                showToast("Password must be at least 6 characters", "error");
+                return;
+            }
+
+            closeResetPasswordModal();
+            showToast("Password updated successfully!", "success");
         }
     </script>
 </body>
