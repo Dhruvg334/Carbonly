@@ -4,37 +4,16 @@ const authMiddleware = require("../middleware/authMiddleware");
 const CarbonEntry = require("../models/CarbonEntry");
 const { calculateEmissions } = require("../services/carbonEngine");
 const { detectAnomalies } = require("../services/anomalyDetector");
-
-/**
- * Helper to generate rule-based fallback recommendations
- */
-function generateRecommendations(emissions) {
-    const tips = [];
-    const breakdown = emissions.breakdown || {};
-
-    if (breakdown.transportKg > 50) {
-        tips.push("Transport is your highest emission driver. Consider carpooling, transit, or EV transition to save up to 40% CO2e.");
-    }
-    if (breakdown.electricityKg > 40) {
-        tips.push("High grid electricity footprint detected. Switch to LED lighting or consider renewable energy subscriptions.");
-    }
-    if (breakdown.flightsKg > 100) {
-        tips.push("Air travel accounts for a major portion of your footprint. Opt for direct flights or train alternatives for short hauls.");
-    }
-    if (breakdown.digitalKg > 10) {
-        tips.push("Digital footprint optimization: lowering video stream resolutions and turning off idle devices can reduce data center energy load.");
-    }
-
-    if (tips.length === 0) {
-        tips.push("Maintain your current efficient habits. Regular tracking helps spot future optimization opportunities.");
-    }
-
-    return tips;
-}
+const {
+    generateExecutiveSummary,
+    explainAnomaly,
+    generatePrioritizedActionPlan,
+    callGroqLLM
+} = require("../services/groqService");
 
 /**
  * POST /api/carbon/calculate
- * Computes deterministic GHG emissions, runs anomaly detection, and saves entry
+ * Computes deterministic GHG emissions, runs anomaly detection, invokes Groq AI intelligence, and saves entry
  */
 router.post("/calculate", authMiddleware, async (req, res) => {
     try {
@@ -49,8 +28,15 @@ router.post("/calculate", authMiddleware, async (req, res) => {
         // 3. Run statistical anomaly detection
         const anomalyReport = detectAnomalies(emissions, history);
 
-        // 4. Generate recommendations
-        const recommendations = generateRecommendations(emissions);
+        // 4. Generate Groq AI Executive Intelligence & Anomaly Diagnosis
+        const username = req.user.username || "User";
+        const executiveSummary = await generateExecutiveSummary(emissions, username);
+        const anomalyDiagnosis = await explainAnomaly(anomalyReport, emissions);
+        const recommendations = await generatePrioritizedActionPlan(emissions);
+
+        if (anomalyDiagnosis && anomalyReport.isAnomaly) {
+            anomalyReport.aiDiagnosis = anomalyDiagnosis;
+        }
 
         // 5. Persist record
         const newEntry = new CarbonEntry({
@@ -77,7 +63,8 @@ router.post("/calculate", authMiddleware, async (req, res) => {
             message: "Emissions calculated and recorded successfully",
             data: {
                 ...emissions,
-                final_carbon_emission: emissions.totalKg, // Legacy field compatibility
+                final_carbon_emission: emissions.totalKg, // Legacy compatibility
+                executiveSummary,
                 anomalyReport,
                 recommendations
             }
@@ -94,13 +81,18 @@ router.post("/calculate", authMiddleware, async (req, res) => {
  * Backwards compatibility route for legacy frontend /api/carbon/add
  */
 router.post("/add", authMiddleware, async (req, res) => {
-    // Forward to calculate route handler logic
     try {
         const activityData = req.body || {};
         const emissions = calculateEmissions(activityData);
         const history = await CarbonEntry.find({ userId: req.user.id }).sort({ timestamp: -1 }).limit(20);
         const anomalyReport = detectAnomalies(emissions, history);
-        const recommendations = generateRecommendations(emissions);
+        const executiveSummary = await generateExecutiveSummary(emissions, req.user.username || "User");
+        const anomalyDiagnosis = await explainAnomaly(anomalyReport, emissions);
+        const recommendations = await generatePrioritizedActionPlan(emissions);
+
+        if (anomalyDiagnosis && anomalyReport.isAnomaly) {
+            anomalyReport.aiDiagnosis = anomalyDiagnosis;
+        }
 
         const newEntry = new CarbonEntry({
             userId: req.user.id,
@@ -117,6 +109,7 @@ router.post("/add", authMiddleware, async (req, res) => {
             data: {
                 ...emissions,
                 final_carbon_emission: emissions.totalKg,
+                executiveSummary,
                 anomalyReport,
                 recommendations
             }
@@ -161,26 +154,23 @@ router.delete("/history", authMiddleware, async (req, res) => {
  */
 router.post("/simulate", (req, res) => {
     try {
-        const { baseline, parameters } = req.body;
+        const { baseline, parameters } = req.body || {};
         
         const baselineData = baseline || { transportKm: 100, electricityKwh: 200, flightsTaken: 1 };
         const baselineEmissions = calculateEmissions(baselineData);
 
-        // Apply parameter modifications
+        const params = parameters || {};
         const scenarioData = {
             ...baselineData,
-            transportKm: Math.max(0, baselineData.transportKm * (1 - (parameters.transportReductionPct || 0) / 100)),
-            vehicleType: parameters.evTransition ? "electric" : (baselineData.vehicleType || "default"),
-            electricityKwh: Math.max(0, baselineData.electricityKwh * (1 - (parameters.renewablePpaPct || 0) / 100)),
-            flightsTaken: Math.max(0, baselineData.flightsTaken * (1 - (parameters.flightReductionPct || 0) / 100))
+            transportKm: Math.max(0, baselineData.transportKm * (1 - (params.transportReductionPct || 0) / 100)),
+            vehicleType: params.evTransition ? "electric" : (baselineData.vehicleType || "default"),
+            electricityKwh: Math.max(0, baselineData.electricityKwh * (1 - (params.renewablePpaPct || 0) / 100)),
+            flightsTaken: Math.max(0, baselineData.flightsTaken * (1 - (params.flightReductionPct || 0) / 100))
         };
 
         const scenarioEmissions = calculateEmissions(scenarioData);
-
         const kgSaved = Math.max(0, baselineEmissions.totalKg - scenarioEmissions.totalKg);
         const percentReduced = baselineEmissions.totalKg > 0 ? Number(((kgSaved / baselineEmissions.totalKg) * 100).toFixed(1)) : 0;
-        
-        // Estimated annual cost savings (approximate average energy/fuel cost per kg CO2e avoided)
         const estimatedDollarSavings = Math.round(kgSaved * 0.42 * 12);
 
         res.json({
@@ -195,6 +185,42 @@ router.post("/simulate", (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: "Simulation failed", error: error.message });
+    }
+});
+
+/**
+ * POST /api/carbon/ai-copilot
+ * Direct interactive Groq AI Q&A Copilot endpoint
+ */
+router.post("/ai-copilot", authMiddleware, async (req, res) => {
+    try {
+        const { question, latestEmissions } = req.body;
+
+        if (!question || typeof question !== "string") {
+            return res.status(400).json({ message: "Question string is required" });
+        }
+
+        const systemPrompt = `You are Carbonly AI, an expert Sustainability & Decarbonization Assistant. Answer the user's question clearly, concisely, and practically. Focus on actionable insights, standard GHG accounting concepts, and cost/carbon efficiency. Keep response under 150 words. Do not use filler or emojis.`;
+
+        let contextInfo = "";
+        if (latestEmissions && typeof latestEmissions === "object") {
+            contextInfo = `User's Latest Carbon Metrics: Total ${latestEmissions.totalKg || 0} kg CO2e. Breakdown: Transport=${latestEmissions.breakdown?.transportKg || 0}kg, Electricity=${latestEmissions.breakdown?.electricityKg || 0}kg, Flights=${latestEmissions.breakdown?.flightsKg || 0}kg.`;
+        }
+
+        const userPrompt = `${contextInfo}\nQuestion: ${question}`;
+        const answer = await callGroqLLM(systemPrompt, userPrompt);
+
+        if (answer) {
+            return res.json({ answer, source: "groq-llama-3.3-70b-versatile" });
+        }
+
+        // Deterministic fallback response
+        return res.json({
+            answer: "To reduce your overall carbon footprint, focus first on your highest emission category. Replacing fossil-fuel commuting with transit or electric transport, and lowering grid electricity demand through efficiency upgrades typically yields the highest return on investment.",
+            source: "deterministic-sustainability-rules"
+        });
+    } catch (error) {
+        res.status(500).json({ message: "AI Copilot query failed", error: error.message });
     }
 });
 
