@@ -1,158 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>CarbonDash Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="login.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Carbonly Intelligence Platform</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--mint-light);">
 
-<div class="top-strip">
-
-  <!-- LEFT SIDE (Website Name = Home Link) -->
-  <div class="strip-left">
-    <a href="index.html" class="logo">
-      Carbonly
-    </a>
-  </div>
-
-  <!-- RIGHT SIDE -->
-  <div class="strip-right">
-    <span id="purposeBtn" class="nav-link">Know Our Purpose</span>
-    <span id="aboutBtn" class="nav-link">About Us</span>
-  </div>
-
-</div>
-
-<div class="container">
-
-  <!-- LEFT IMAGE SECTION -->
-  <div class="image-section">
-    <div class="overlay-text">
-      It’s time to invest in your <span>PLANET.</span>
-    </div>
-  </div>
-
-  <!-- RIGHT LOGIN SECTION -->
-  <div class="login-section">
-    <div class="login-box">
-
-      <h2>Login</h2>
-
-      <form action="/login" method="POST">
-
-        <input 
-          type="text" 
-          name="username"
-          placeholder="Username"
-          required
-        >
-
-        <div class="password-wrapper">
-          <input 
-            type="password" 
-            id="password" 
-            name="password"
-            placeholder="Password"
-            required
-          >
-          <span id="togglePassword" class="eye"></span>
+    <main class="card-neo" style="width: 100%; max-width: 420px; background: #FFFFFF; padding: 36px;">
+        <div style="text-align: center; margin-bottom: 28px;">
+            <a href="index.html" class="logo" style="justify-content: center; font-size: 1.8rem; margin-bottom: 8px;">
+                <img src="assets/icon.svg" alt="Carbonly Logo"> Carbonly
+            </a>
+            <span class="badge-neo badge-neo-scope2">Secure Gateway Login</span>
         </div>
 
-        <button type="submit">Sign In</button>
+        <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();" style="display: flex; flex-direction: column; gap: 16px;">
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
+            </div>
 
-      </form>
+            <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px;">Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
 
-      <a href="forgot-password.html" class="forgot">
-        Forgot your password?
-      </a>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                <a href="forgot-password.html" style="color: var(--emerald); font-weight: 700; text-decoration: none;">Forgot Password?</a>
+            </div>
 
-      <p class="signup">
-        Don't have an account?
-        <a href="signup.html"><font color="green">Sign up!</font></a>
-      </p>
+            <button type="submit" class="btn-neo btn-neo-primary" style="width: 100%; margin-top: 8px;">Log In</button>
+        </form>
 
-    </div>
-  </div>
+        <div style="text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--text-muted);">
+            Don't have an account? <a href="signup.html" style="color: var(--emerald); font-weight: 700; text-decoration: none;">Sign Up</a>
+        </div>
+    </main>
 
-</div>
+    <script src="toast.js"></script>
+    <script>
+        async function handleLogin() {
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value;
 
+            try {
+                const res = await fetch("http://localhost:5000/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
 
-<script src="login.js"></script>
+                const data = await res.json();
 
-
-<!-- PURPOSE MODAL -->
-<div class="modal" id="purposeModal">
-  <div class="modal-content">
-
-    <div class="modal-decor-top"></div>
-    <div class="modal-decor-bottom"></div>
-
-    <span class="close-btn" id="closeModal">&times;</span>
-
-    <h2>Why Track Carbon Footprint?</h2>
-
-    <p>
-      Tracking our carbon footprint is essential in understanding the
-      environmental impact of our daily actions. Every choice we make —
-      from transportation to energy consumption — contributes to global emissions.
-    </p>
-
-    <p>
-      By individually monitoring and reducing our footprint, we create
-      collective impact. Small consistent actions multiply into meaningful
-      environmental change.
-    </p>
-
-    <p>
-      This platform empowers individuals to become climate-conscious
-      decision makers and actively participate in building a sustainable future.
-    </p>
-
-  </div>
-</div>
-
-
-<!-- ABOUT MODAL -->
-<div class="modal" id="aboutModal">
-  <div class="modal-content">
-
-    <div class="modal-decor-top"></div>
-    <div class="modal-decor-bottom"></div>
-
-    <span class="close-btn" id="closeAbout">&times;</span>
-
-    <h2>About Carbonly</h2>
-
-    <p>
-      Carbonly is a web-based platform designed to help individuals
-      monitor and reduce their carbon footprint by tracking their
-      weekly lifestyle activities.
-    </p>
-
-    <p>
-      Users enter information such as transportation distance,
-      electricity usage, water consumption, and air travel.
-      The system processes this data and estimates carbon emissions
-      using a machine learning model.
-    </p>
-
-    <p>
-      The platform then visualizes carbon trends and provides
-      AI-based recommendations to help users adopt more
-      sustainable habits.
-    </p>
-
-    <p>
-      This project integrates modern web technologies,
-      machine learning, and data analytics to promote
-      environmental awareness and responsible living.
-    </p>
-
-  </div>
-</div>
-
+                if (res.ok && data.token) {
+                    localStorage.setItem("token", data.token);
+                    showToast("Login successful! Redirecting to dashboard...", "success");
+                    setTimeout(() => {
+                        window.location.href = "dashboard.html";
+                    }, 1200);
+                } else {
+                    showToast(data.message || "Invalid credentials", "error");
+                }
+            } catch (err) {
+                showToast("Network error connecting to API server", "error");
+            }
+        }
+    </script>
 </body>
 </html>

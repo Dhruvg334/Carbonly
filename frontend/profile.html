@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile & Avatar Hub | Carbonly</title>
+    <meta name="description" content="Manage your Carbonly user profile, select custom animal/bird avatar icons, and view historical activity records.">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="top-strip">
+        <a href="index.html" class="logo">
+            <img src="assets/icon.svg" alt="Carbonly Logo"> Carbonly
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="docs.html">Docs</a>
+            <a href="about.html">About</a>
+            <a href="profile.html" class="badge-neo badge-neo-scope2" style="font-size: 0.85rem;">Profile & History</a>
+        </nav>
+    </header>
+
+    <main style="max-width: 1100px; margin: 100px auto 60px auto; padding: 0 24px;">
+        <div style="margin-bottom: 32px;">
+            <span class="badge-neo badge-neo-scope2">Account & Identity Settings</span>
+            <h1 style="font-size: 2.5rem; margin-top: 8px;">User Profile Hub</h1>
+            <p style="color: var(--text-muted);">Customize your profile avatar, view grid preferences, and review your historical emissions entries.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px;">
+            
+            <!-- LEFT COLUMN: AVATAR SELECTION & USER INFO -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <!-- USER CARD -->
+                <div class="card-neo" style="text-align: center;">
+                    <div id="currentAvatarDisplay" style="font-size: 4rem; margin-bottom: 8px;">🦅</div>
+                    <h3 id="profileUsername" style="font-size: 1.4rem;">Authenticated User</h3>
+                    <p id="profileEmail" style="font-size: 0.85rem; color: var(--text-muted);">user@carbonly.io</p>
+                    <span class="badge-neo badge-neo-scope1" style="margin-top: 12px;">Active Member</span>
+                </div>
+
+                <!-- ANIMAL & BIRD AVATAR PICKER -->
+                <div class="card-neo">
+                    <h4>Select Profile Avatar</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Choose between custom Neo-Brutalist animal & bird avatars:</p>
+
+                    <div class="avatar-grid" id="avatarPickerGrid">
+                        <div class="avatar-card selected" onclick="selectAvatar('🦅', 'Eagle')">
+                            <span class="avatar-icon">🦅</span>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Eagle</span>
+                        </div>
+                        <div class="avatar-card" onclick="selectAvatar('🦊', 'Fox')">
+                            <span class="avatar-icon">🦊</span>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Fox</span>
+                        </div>
+                        <div class="avatar-card" onclick="selectAvatar('🦉', 'Owl')">
+                            <span class="avatar-icon">🦉</span>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Owl</span>
+                        </div>
+                        <div class="avatar-card" onclick="selectAvatar('🐺', 'Wolf')">
+                            <span class="avatar-icon">🐺</span>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Wolf</span>
+                        </div>
+                        <div class="avatar-card" onclick="selectAvatar('🐯', 'Tiger')">
+                            <span class="avatar-icon">🐯</span>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Tiger</span>
+                        </div>
+                        <div class="avatar-card" onclick="selectAvatar('🐻', 'Bear')">
+                            <span class="avatar-icon">🐻</span>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Bear</span>
+                        </div>
+                        <div class="avatar-card" onclick="selectAvatar('🐬', 'Dolphin')">
+                            <span class="avatar-icon">🐬</span>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Dolphin</span>
+                        </div>
+                        <div class="avatar-card" onclick="selectAvatar('🦁', 'Lion')">
+                            <span class="avatar-icon">🦁</span>
+                            <span style="font-size: 0.75rem; font-weight: 700;">Lion</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: RELOCATED EMISSIONS HISTORY TABLE -->
+            <div class="card-neo">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <h3>Emissions History Records</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">Historical time-series logging for baseline tracking</p>
+                    </div>
+                    <button class="btn-neo btn-neo-accent" style="padding: 8px 14px; font-size: 0.8rem;" onclick="clearProfileHistory()">Clear Records</button>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: var(--sage-accent); border-bottom: var(--neo-border);">
+                                <th style="padding: 10px;">Timestamp</th>
+                                <th style="padding: 10px;">Total (kg CO2e)</th>
+                                <th style="padding: 10px;">Scope 1</th>
+                                <th style="padding: 10px;">Scope 2</th>
+                                <th style="padding: 10px;">Scope 3</th>
+                                <th style="padding: 10px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profileHistoryBody">
+                            <tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--text-muted);">Loading history entries...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer style="padding: 40px; background: #FFFFFF; border-top: var(--neo-border); text-align: center; margin-top: 60px;">
+        <p style="font-weight: 600; color: var(--text-muted);">© 2026 Carbonly. Building verifiable technology for a sustainable future.</p>
+    </footer>
+
+    <script src="toast.js"></script>
+    <script>
+        function selectAvatar(iconSymbol, name) {
+            document.getElementById("currentAvatarDisplay").innerText = iconSymbol;
+            localStorage.setItem("userAvatar", iconSymbol);
+
+            const cards = document.querySelectorAll(".avatar-card");
+            cards.forEach(card => card.classList.remove("selected"));
+
+            event.currentTarget.classList.add("selected");
+            showToast(`Profile avatar updated to ${name}!`, "success");
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedAvatar = localStorage.getItem("userAvatar") || "🦅";
+            document.getElementById("currentAvatarDisplay").innerText = savedAvatar;
+
+            const token = localStorage.getItem("token");
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split(".")[1]));
+                    document.getElementById("profileUsername").innerText = payload.username || "Authenticated User";
+                    document.getElementById("profileEmail").innerText = payload.username ? `${payload.username.toLowerCase()}@carbonly.io` : "user@carbonly.io";
+                } catch(e){}
+                fetchHistory();
+            } else {
+                document.getElementById("profileHistoryBody").innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center;">Please log in to view saved history.</td></tr>';
+            }
+        });
+
+        async function fetchHistory() {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            try {
+                const res = await fetch("http://localhost:5000/api/carbon/history", {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                const history = await res.json();
+
+                const tbody = document.getElementById("profileHistoryBody");
+                tbody.innerHTML = "";
+
+                if (!Array.isArray(history) || history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--text-muted);">No history records saved yet.</td></tr>';
+                } else {
+                    history.forEach(item => {
+                        const date = new Date(item.timestamp).toLocaleDateString();
+                        const isAnom = item.anomalyReport && item.anomalyReport.isAnomaly;
+                        tbody.innerHTML += `
+                            <tr style="border-bottom: 1px solid #EEE;">
+                                <td style="padding: 10px; font-weight:600;">${date}</td>
+                                <td style="padding: 10px; font-weight:700; color:var(--emerald);">${(item.emissions?.totalKg || 0).toFixed(2)}</td>
+                                <td style="padding: 10px;">${(item.emissions?.scopes?.scope1?.kg || 0).toFixed(2)}</td>
+                                <td style="padding: 10px;">${(item.emissions?.scopes?.scope2?.kg || 0).toFixed(2)}</td>
+                                <td style="padding: 10px;">${(item.emissions?.scopes?.scope3?.kg || 0).toFixed(2)}</td>
+                                <td style="padding: 10px;">${isAnom ? '<span class="badge-neo" style="background:#FFEBEE;color:red;">Anomaly Spike</span>' : '<span class="badge-neo">Normal</span>'}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch(e) {
+                showToast("Error loading history records", "error");
+            }
+        }
+
+        async function clearProfileHistory() {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            if (confirm("Are you sure you want to clear all history records?")) {
+                await fetch("http://localhost:5000/api/carbon/history", {
+                    method: "DELETE",
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                document.getElementById("profileHistoryBody").innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center;">History records cleared.</td></tr>';
+                showToast("Emissions history cleared successfully", "success");
+            }
+        }
+    </script>
+</body>
+</html>

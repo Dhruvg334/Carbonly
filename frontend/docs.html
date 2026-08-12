@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Documentation | Carbonly Engineering Guide</title>
+    <meta name="description" content="Technical documentation detailing GHG Protocol Scope 1/2/3 formulas, DEFRA/EPA factor databases, Z-score statistical anomaly detection, and API specifications.">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <header class="top-strip">
+        <a href="index.html" class="logo">
+            <img src="assets/icon.svg" alt="Carbonly Logo"> Carbonly
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="docs.html" style="color: var(--emerald);">Docs</a>
+            <a href="about.html">About</a>
+            <a href="profile.html">Profile</a>
+        </nav>
+    </header>
+
+    <main style="max-width: 1000px; margin: 100px auto 60px auto; padding: 0 24px;">
+        <div style="margin-bottom: 40px; text-align: center;">
+            <span class="badge-neo badge-neo-scope2">Engineering & Science Specification</span>
+            <h1 style="font-size: 2.8rem; margin-top: 10px;">Platform Documentation</h1>
+            <p style="color: var(--text-muted); max-width: 650px; margin: 0 auto;">Standardized GHG Protocol equations, statistical anomaly algorithms, Groq LLM integration, and REST API reference.</p>
+        </div>
+
+        <!-- SECTION 1: GHG CALCULATIONS -->
+        <section class="card-neo" style="margin-bottom: 28px;">
+            <span class="badge-neo badge-neo-scope1">Section 1</span>
+            <h2 style="margin: 12px 0 16px 0;">Deterministic GHG Accounting Engine</h2>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">Carbonly calculates emissions deterministically following global standards (GHG Protocol Corporate Standard, DEFRA, and EPA guidelines):</p>
+
+            <div style="background: var(--mint-light); border: var(--neo-border); border-radius: 8px; padding: 16px; font-family: monospace; font-size: 0.9rem; margin-bottom: 16px;">
+                Emissions (kg CO2e) = Activity Data × Verified Emission Factor
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                <div style="background: #FFFFFF; border: var(--neo-border); border-radius: 8px; padding: 14px;">
+                    <h4 style="color: var(--emerald);">Scope 1: Direct Emissions</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Fleet transport mileage and direct fuel combustion. Gasoline ~0.192 kg/km, Diesel ~0.171 kg/km, EV ~0.053 kg/km grid average.</p>
+                </div>
+                <div style="background: #FFFFFF; border: var(--neo-border); border-radius: 8px; padding: 14px;">
+                    <h4 style="color: var(--emerald);">Scope 2: Purchased Electricity</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Adjusted by regional power grid carbon intensity: US (0.385 kg/kWh), EU (0.255 kg/kWh), India (0.710 kg/kWh), Global (0.475 kg/kWh).</p>
+                </div>
+                <div style="background: #FFFFFF; border: var(--neo-border); border-radius: 8px; padding: 14px;">
+                    <h4 style="color: var(--emerald);">Scope 3: Value Chain & Travel</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Commercial flights (with 1.9x radiative forcing multiplier), water supply/treatment lifecycle, and digital data transfer.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: STATISTICAL ANOMALY DETECTION -->
+        <section class="card-neo" style="margin-bottom: 28px;">
+            <span class="badge-neo badge-neo-scope3">Section 2</span>
+            <h2 style="margin: 12px 0 16px 0;">Statistical Anomaly Detection (Z-Score & IQR)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">To identify unexpected energy or transport spikes, the engine calculates the time-series Z-score over user historical entries:</p>
+
+            <div style="background: var(--mint-light); border: var(--neo-border); border-radius: 8px; padding: 16px; font-family: monospace; font-size: 0.9rem;">
+                Z = (Current Emissions - Mean Baseline) / Standard Deviation
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">Entries exceeding Z &gt; 2.0 trigger an automated anomaly alert and invoke Groq AI for root-cause diagnosis.</p>
+        </section>
+
+        <!-- SECTION 3: REST API SPECIFICATIONS -->
+        <section class="card-neo">
+            <span class="badge-neo badge-neo-scope2">Section 3</span>
+            <h2 style="margin: 12px 0 16px 0;">REST API Endpoint Reference</h2>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                    <thead>
+                        <tr style="background: var(--sage-accent); border-bottom: var(--neo-border);">
+                            <th style="padding: 10px;">Method</th>
+                            <th style="padding: 10px;">Endpoint</th>
+                            <th style="padding: 10px;">Description</th>
+                            <th style="padding: 10px;">Auth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #EEE;">
+                            <td style="padding: 10px; font-weight:700;">POST</td>
+                            <td style="padding: 10px; font-family:monospace;">/api/carbon/calculate</td>
+                            <td style="padding: 10px;">Calculates Scope 1/2/3 emissions & runs anomaly evaluation</td>
+                            <td style="padding: 10px;">Bearer Token</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #EEE;">
+                            <td style="padding: 10px; font-weight:700;">POST</td>
+                            <td style="padding: 10px; font-family:monospace;">/api/carbon/simulate</td>
+                            <td style="padding: 10px;">Sensitivity simulator for What-If scenario parameters</td>
+                            <td style="padding: 10px;">Optional</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #EEE;">
+                            <td style="padding: 10px; font-weight:700;">POST</td>
+                            <td style="padding: 10px; font-family:monospace;">/api/carbon/ai-copilot</td>
+                            <td style="padding: 10px;">Interactive Groq AI Q&amp;A assistant query endpoint</td>
+                            <td style="padding: 10px;">Bearer Token</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer style="padding: 40px; background: #FFFFFF; border-top: var(--neo-border); text-align: center; margin-top: 60px;">
+        <p style="font-weight: 600; color: var(--text-muted);">© 2026 Carbonly. Building verifiable technology for a sustainable future.</p>
+    </footer>
+</body>
+</html>

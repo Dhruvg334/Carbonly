@@ -1,6 +1,6 @@
 /* ==========================================================================
    CARBONLY NEO-BRUTALIST & IMMERSIVE DESIGN SYSTEM
-   Enforces high-contrast geometry, 60fps GPU animation standards, and responsive depth.
+   Enforces high-contrast geometry, sub-200ms GPU animation standards, and decluttered UI.
    ========================================================================== */
 
 :root {
@@ -26,7 +26,7 @@
   --neo-shadow-active: 2px 2px 0px var(--neo-border-color);
   --neo-radius: 10px;
 
-  /* Emil Kowalski Animation Standards (GPU properties under 250ms) */
+  /* Animation Standards (GPU properties under 200ms) */
   --motion-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
   --motion-normal: 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -42,22 +42,21 @@
 body {
   background-color: var(--mint-light);
   color: var(--text-dark);
-  line-height: 1.5;
+  line-height: 1.55;
   overflow-x: hidden;
 }
 
 /* Base Typography */
 h1, h2, h3, h4, h5, h6 {
   color: var(--primary-dark);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.025em;
 }
 
 /* ==========================================================================
-   NEO-BRUTALIST UI COMPONENTS
+   HIGH CONTRAST NEO-BRUTALIST BUTTONS
    ========================================================================== */
 
-/* Buttons */
 .btn-neo {
   display: inline-flex;
   align-items: center;
@@ -88,14 +87,15 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--neo-shadow-active);
 }
 
+/* Dark Green Primary Button - Guaranteed Bright White Text */
 .btn-neo-primary {
-  background-color: var(--emerald);
-  color: #FFFFFF;
+  background-color: var(--emerald) !important;
+  color: #FFFFFF !important; /* Strictly white text for high contrast */
 }
 
 .btn-neo-primary:hover {
-  background-color: #24553f;
-  color: #FFFFFF;
+  background-color: #1f4f3a !important;
+  color: #FFFFFF !important;
 }
 
 .btn-neo-accent {
@@ -119,12 +119,12 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--neo-shadow-hover);
 }
 
-/* Badge System */
+/* Badges */
 .badge-neo {
   display: inline-block;
   padding: 4px 12px;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   background-color: var(--mint-light);
@@ -137,7 +137,7 @@ h1, h2, h3, h4, h5, h6 {
 .badge-neo-scope2 { background-color: #E2ECE9; color: #1D3557; }
 .badge-neo-scope3 { background-color: #FFF3B0; color: #7F5539; }
 
-/* Input Fields */
+/* Inputs */
 input, select, textarea {
   width: 100%;
   padding: 10px 14px;
@@ -157,7 +157,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ==========================================================================
-   NAVIGATION BAR
+   NAVIGATION BAR & BRANDING
    ========================================================================== */
 
 .top-strip {
@@ -182,7 +182,12 @@ input:focus, select:focus, textarea:focus {
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+}
+
+.logo img {
+  width: 32px;
+  height: 32px;
 }
 
 .nav-links {
@@ -194,7 +199,7 @@ input:focus, select:focus, textarea:focus {
 .nav-links a {
   text-decoration: none;
   color: var(--primary-dark);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.95rem;
   transition: color var(--motion-fast);
 }
@@ -204,75 +209,164 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ==========================================================================
-   IMMERSIVE HERO & 3D CANVAS
+   DECLUTTERED DASHBOARD PANEL NAVIGATION
    ========================================================================== */
 
-.hero {
-  min-height: calc(100vh - 72px);
-  margin-top: 72px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  padding: 60px 80px;
-  gap: 40px;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-text h1 {
-  font-size: 3.5rem;
-  line-height: 1.15;
-  margin-bottom: 20px;
-}
-
-.hero-text h1 span {
-  color: var(--emerald);
-  background: linear-gradient(180deg, transparent 60%, var(--sage-accent) 60%);
-}
-
-.hero-text p {
-  font-size: 1.15rem;
-  color: var(--text-muted);
-  margin-bottom: 32px;
-  max-width: 520px;
-}
-
-.hero-buttons {
+.mini-nav-container {
   display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
-/* 3D Canvas Container */
-.hero-canvas-container {
-  width: 100%;
-  height: 480px;
-  position: relative;
+.mini-nav {
+  display: inline-flex;
+  background: #FFFFFF;
   border: var(--neo-border);
-  border-radius: 16px;
-  background: radial-gradient(circle at center, #E8F5E9 0%, #C8E6C9 100%);
-  box-shadow: var(--neo-shadow-hover);
-  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: var(--neo-shadow);
+  padding: 6px;
+  gap: 8px;
 }
 
-#heroCanvas {
-  width: 100%;
-  height: 100%;
+.tab-btn {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: var(--neo-border);
+  border-radius: 8px;
+  background: var(--mint-light);
+  color: var(--primary-dark);
+  cursor: pointer;
+  transition: transform var(--motion-fast), background-color var(--motion-fast);
+}
+
+.tab-btn:hover {
+  background: var(--sage-accent);
+}
+
+.tab-btn.active {
+  background: var(--emerald);
+  color: #FFFFFF !important;
+  box-shadow: 2px 2px 0px var(--neo-border-color);
+}
+
+.panel-content {
+  display: none;
+}
+
+.panel-content.active {
   display: block;
 }
 
-.canvas-overlay-badge {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  padding: 8px 16px;
+/* ==========================================================================
+   ANIMAL / BIRD AVATAR PICKER GRID
+   ========================================================================== */
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.avatar-card {
+  background: #FFFFFF;
   border: var(--neo-border);
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  border-radius: 12px;
   box-shadow: 2px 2px 0px var(--neo-border-color);
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform var(--motion-fast), box-shadow var(--motion-fast), border-color var(--motion-fast);
+}
+
+.avatar-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px var(--neo-border-color);
+}
+
+.avatar-card.selected {
+  border-color: var(--emerald);
+  background: var(--sage-accent);
+  box-shadow: 4px 4px 0px var(--emerald);
+}
+
+.avatar-icon {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ==========================================================================
+   ACTION CARDS & TIPS SHOWCASE
+   ========================================================================== */
+
+.action-card-neo {
+  background: #FFFFFF;
+  border: var(--neo-border);
+  border-radius: 10px;
+  box-shadow: 3px 3px 0px var(--neo-border-color);
+  padding: 16px;
+  margin-bottom: 12px;
+  border-left: 6px solid var(--emerald);
+  transition: transform var(--motion-fast);
+}
+
+.action-card-neo:hover {
+  transform: translateX(4px);
+}
+
+/* ==========================================================================
+   TOAST NOTIFICATION SYSTEM
+   ========================================================================== */
+
+#toastContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast-neo {
+  min-width: 280px;
+  padding: 14px 20px;
+  border: var(--neo-border);
+  border-radius: 10px;
+  box-shadow: 4px 4px 0px var(--neo-border-color);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--primary-dark);
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideIn 200ms ease-out forwards;
+}
+
+.toast-neo-success { background: #E8F5E9; border-color: var(--emerald); }
+.toast-neo-error { background: #FFEBEE; border-color: var(--alert-red); color: #9D0208; }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Loading Spinner */
+.spinner-neo {
+  width: 28px;
+  height: 28px;
+  border: 4px solid var(--sage-accent);
+  border-top: 4px solid var(--emerald);
+  border-radius: 50%;
+  animation: spin 600ms linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* ==========================================================================
@@ -284,11 +378,11 @@ input:focus, select:focus, textarea:focus {
     grid-template-columns: 1fr;
     padding: 40px 24px;
   }
-  .hero-text h1 {
-    font-size: 2.5rem;
-  }
   .top-strip {
     padding: 0 20px;
+  }
+  .avatar-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
