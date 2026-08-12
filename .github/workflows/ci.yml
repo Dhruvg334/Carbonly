@@ -1,0 +1,33 @@
+name: Carbonly Enterprise CI/CD Test Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Automated Unit & Benchmark Test Runner
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x, 24.x]
+
+    steps:
+    - name: Checkout Code Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install Dependencies
+      working-directory: ./backend
+      run: npm install
+
+    - name: Execute 39 Automated Unit & Public Dataset Benchmark Tests
+      working-directory: ./backend
+      run: npm test

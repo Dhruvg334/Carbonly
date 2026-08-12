@@ -242,15 +242,39 @@
                             </tr>
                             <tr style="border-bottom: 1px solid #EEE;">
                                 <td style="padding: 10px; font-weight:700;">POST</td>
-                                <td style="padding: 10px; font-family:monospace;">/api/carbon/simulate</td>
-                                <td style="padding: 10px;">Sensitivity simulator for Net-Zero 2030 target gaps</td>
-                                <td style="padding: 10px;">Optional</td>
+                                <td style="padding: 10px; font-family:monospace;">/api/carbon/model-competition</td>
+                                <td style="padding: 10px;">Cross-validates Holt-Winters vs ARIMA(1,1,1) vs Seasonal Naive</td>
+                                <td style="padding: 10px;">Public</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #EEE;">
                                 <td style="padding: 10px; font-weight:700;">POST</td>
-                                <td style="padding: 10px; font-family:monospace;">/api/carbon/optimize</td>
-                                <td style="padding: 10px;">Linear solver for budget-constrained decarbonization</td>
-                                <td style="padding: 10px;">Optional</td>
+                                <td style="padding: 10px; font-family:monospace;">/api/carbon/multivariate-anomaly</td>
+                                <td style="padding: 10px;">Mahalanobis distance multi-variate correlation anomaly detection</td>
+                                <td style="padding: 10px;">Public</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #EEE;">
+                                <td style="padding: 10px; font-weight:700;">POST</td>
+                                <td style="padding: 10px; font-family:monospace;">/api/carbon/monte-carlo-uncertainty</td>
+                                <td style="padding: 10px;">10,000-Iteration Monte Carlo stochastic uncertainty simulation</td>
+                                <td style="padding: 10px;">Public</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #EEE;">
+                                <td style="padding: 10px; font-weight:700;">POST</td>
+                                <td style="padding: 10px; font-family:monospace;">/api/carbon/shap-explanation</td>
+                                <td style="padding: 10px;">SHAP global feature importance breakdown for EcoScore percentiles</td>
+                                <td style="padding: 10px;">Public</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #EEE;">
+                                <td style="padding: 10px; font-weight:700;">POST</td>
+                                <td style="padding: 10px; font-family:monospace;">/api/carbon/batch-ingest</td>
+                                <td style="padding: 10px;">High-throughput stream batch ingestion &amp; idempotency pipeline</td>
+                                <td style="padding: 10px;">Public</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #EEE;">
+                                <td style="padding: 10px; font-weight:700;">GET</td>
+                                <td style="padding: 10px; font-family:monospace;">/api/carbon/lineage-dag/:calcId</td>
+                                <td style="padding: 10px;">Directed Acyclic Graph (DAG) node/edge data lineage visualizer</td>
+                                <td style="padding: 10px;">Public</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #EEE;">
                                 <td style="padding: 10px; font-weight:700;">GET</td>
