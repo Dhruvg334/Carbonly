@@ -5,6 +5,11 @@
 </p>
 
 <p align="center">
+  <a href="https://carbonlyai.netlify.app/"><strong>🌐 Live Production Web App</strong></a> &nbsp;|&nbsp;
+  <a href="https://carbonly-qpet.onrender.com/health"><strong>⚡ Live Backend API Gateway</strong></a>
+</p>
+
+<p align="center">
   An enterprise-grade ESG accounting platform providing deterministic GHG Protocol calculations across Scope 1, Scope 2, and Scope 3, versioned emission factor registries, calculation provenance lineage, uncertainty propagation, Holt-Winters time-series forecasting, constrained linear optimization, and evidence-grounded AI decision intelligence.
 </p>
 
