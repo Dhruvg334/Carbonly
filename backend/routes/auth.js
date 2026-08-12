@@ -1,38 +1,33 @@
-const authMiddleware = require("../middleware/authMiddleware");
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const History = require("../models/history");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-
-// ===================== Register User =====================
 router.post("/register", async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
-        // Password validation
-        const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
 
+        const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
         if (!passwordPattern.test(password)) {
             return res.status(400).json({
                 message: "Password must contain at least one letter, one number, and be at least 6 characters long"
             });
         }
 
-        if (!username || !email || !password) {
-            return res.status(400).json({ message: "All fields are required" });
-        }
-
-        const existingUser = await User.findOne({ username });
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
-            return res.status(400).json({ message: "Username already exists" });
+            return res.status(400).json({ message: "Username or email already exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-
         const newUser = new User({
             username,
             email,
@@ -40,16 +35,12 @@ router.post("/register", async (req, res) => {
         });
 
         await newUser.save();
-
         res.status(201).json({ message: "User registered successfully" });
-
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
 });
 
-
-// ===================== Login =====================
 router.post("/login", async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -69,19 +60,20 @@ router.post("/login", async (req, res) => {
         }
 
         const token = jwt.sign(
-            {
-                id: user._id,
-                username: user.username
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
+            { id: user._id, username: user.username },
+            process.env.JWT_SECRET || "default_jwt_secret",
+            { expiresIn: "7d" }
         );
 
         res.json({
             message: "Login successful",
-            token
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
         });
-
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
@@ -90,72 +82,64 @@ router.post("/login", async (req, res) => {
 router.get("/profile", authMiddleware, async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
         res.json(user);
     } catch (error) {
         res.status(500).json({ message: "Server error" });
     }
 });
 
-// =================== Forgot Password ======================
 router.post("/forgot-password", async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
 
-    const { email } = req.body
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.json({ message: "If that email exists in our system, a reset link has been generated." });
+        }
 
-    const user = await User.findOne({ email })
+        const secret = process.env.RESET_TOKEN_SECRET || process.env.JWT_SECRET || "default_reset_secret";
+        const token = jwt.sign({ id: user._id }, secret, { expiresIn: "15m" });
 
-    if (!user) {
-        return res.json({ message: "Email not registered" })
+        res.json({
+            message: "Reset token generated",
+            token
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
     }
+});
 
-    const token = jwt.sign({ id: user._id }, "resetSecret", { expiresIn: "15m" })
-
-    res.json({
-        message: "Reset link generated",
-        resetLink: `http://localhost:5500/reset-password.html?token=${token}`
-    })
-
-    console.log("Forgot password route hit")
-
-})
-
-// =================== Reset Password =======================
 router.post("/reset-password", async (req, res) => {
-
-    const { token, password } = req.body
-
     try {
+        const { token, password } = req.body;
+        if (!token || !password) {
+            return res.status(400).json({ message: "Token and new password are required" });
+        }
 
-        const decoded = jwt.verify(token, "resetSecret")
+        const secret = process.env.RESET_TOKEN_SECRET || process.env.JWT_SECRET || "default_reset_secret";
+        const decoded = jwt.verify(token, secret);
 
-        const hashed = await bcrypt.hash(password, 10)
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await User.findByIdAndUpdate(decoded.id, { password: hashedPassword });
 
-        await User.findByIdAndUpdate(decoded.id, {
-            password: hashed
-        })
-
-        res.json({ message: "Password updated successfully" })
-
+        res.json({ message: "Password updated successfully" });
+    } catch (err) {
+        res.status(400).json({ message: "Invalid or expired reset token" });
     }
-    catch (err) {
+});
 
-        res.json({ message: "Invalid or expired link" })
-
-    }
-
-})
-
-// ================ User History ==================
-router.post("/save-history", async (req, res) => {
-
+router.post("/save-history", authMiddleware, async (req, res) => {
     try {
-
         const { week, distance, screen, internet, water, air } = req.body;
 
-        const token = req.headers.authorization.split(" ")[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
         const history = new History({
-            userId: decoded.id,
+            userId: req.user.id,
             week,
             distance,
             screen,
@@ -165,47 +149,28 @@ router.post("/save-history", async (req, res) => {
         });
 
         await history.save();
-
-        res.json({ message: "History saved" });
-
+        res.status(201).json({ message: "History entry saved successfully" });
     } catch (err) {
-
-        res.status(500).json({ error: "Server error" });
-
+        res.status(500).json({ error: "Server error saving history entry" });
     }
-
 });
 
-// =============== Get History ===============
-router.get("/history", async (req, res) => {
-
+router.get("/history", authMiddleware, async (req, res) => {
     try {
-
-        const token = req.headers.authorization.split(" ")[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        const history = await History.find({ userId: decoded.id }).sort({ week: 1 });
-
+        const history = await History.find({ userId: req.user.id }).sort({ week: 1 });
         res.json(history);
-
     } catch (err) {
-
-        res.status(500).json({ error: "Server error" });
-
+        res.status(500).json({ error: "Server error retrieving history" });
     }
-
 });
 
-// ============= Clear History ================
-router.delete("/history", async (req,res)=>{
-
-const token = req.headers.authorization.split(" ")[1];
-const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-await History.deleteMany({userId:decoded.id});
-
-res.json({message:"History cleared"});
-
+router.delete("/history", authMiddleware, async (req, res) => {
+    try {
+        await History.deleteMany({ userId: req.user.id });
+        res.json({ message: "History cleared successfully" });
+    } catch (err) {
+        res.status(500).json({ error: "Server error clearing history" });
+    }
 });
 
 module.exports = router;

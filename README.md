@@ -1,309 +1,164 @@
-# Carbonly 🌱
+<h1 align="center">Carbonly</h1>
+<p align="center">
+  <b>Enterprise ESG & Decarbonization Intelligence Platform</b>
+</p>
 
-### AI-Powered Carbon Footprint Tracking Platform
+<p align="center">
+  A high-performance carbon accounting platform providing deterministic GHG Protocol calculations, statistical anomaly detection, interactive decarbonization scenario modeling, and automated executive intelligence.
+</p>
 
-Carbonly is a full-stack web application that helps individuals **track, analyze, and reduce their carbon footprint** based on their lifestyle activities.
-The system collects weekly user data such as transportation distance, electricity usage, internet usage, water consumption, and air travel, then calculates estimated carbon emissions using a **machine learning model**.
+---
 
-The platform visualizes carbon emission trends and provides **AI-based recommendations** to encourage more sustainable lifestyle choices.
+## Overview
 
-# Project Overview
+Carbonly is an end-to-end sustainability analytics application designed to measure, analyze, and optimize greenhouse gas (GHG) emissions across personal, operational, and organizational activity streams.
 
-Climate change is strongly influenced by individual lifestyle decisions such as transportation habits, electricity consumption, and travel patterns. However, most people lack tools that allow them to understand the **environmental impact of their daily activities**.
+Unlike traditional estimation tools, Carbonly enforces deterministic calculation standards aligned with global accounting standards (**GHG Protocol Corporate Standard**, **DEFRA**, and **EPA** emission factor datasets), paired with real-time scenario simulation and statistical outlier detection.
 
-Carbonly addresses this problem by providing a **data-driven platform** where users can:
+---
 
-• Track weekly lifestyle activities
-• Estimate carbon emissions using machine learning
-• Visualize emission trends through graphs
-• Receive recommendations for reducing emissions
+## System Architecture
 
-The goal of the project is to **increase environmental awareness and promote sustainable behavior** through technology.
+The application is structured as a decoupled multi-tier system separating deterministic calculation engines, analytical processing, persistent storage, and interactive visualization interfaces.
 
-
-# System Architecture
-
-The application follows a **full-stack architecture** composed of three main components:
-
-Frontend (User Interface)
-Backend (API & Authentication)
-Machine Learning Model (Emission Prediction)
-
-```
-User → Frontend (HTML/CSS/JS)
-        ↓
-Backend API (Node.js + Express)
-        ↓
-Database (MongoDB)
-        ↓
-Machine Learning API (Python)
-        ↓
-Carbon Emission Prediction
-        ↓
-Dashboard Visualization (Chart.js)
+```mermaid
+graph TD
+    Client[Client Dashboard / Web Interface] --> API[Express REST API Gateway]
+    API --> Auth[JWT & Password Security]
+    API --> CalcEngine[Deterministic GHG Emission Engine<br/>Scope 1, Scope 2, Scope 3]
+    API --> AnomalyModule[Statistical Outlier & Trend Engine]
+    API --> LLMProxy[Executive Intelligence Service]
+    API --> Database[(MongoDB Document Store)]
 ```
 
+---
 
-# Machine Learning Model Repository
+## Key Technical Features
 
-The machine learning model used for carbon emission prediction is developed and maintained in a separate repository.
+### 1. Deterministic Carbon Engine (Scope 1, 2, & 3)
+- **Scope 1 (Direct Emissions)**: Fleet transport mileage, direct fuel combustion, heating.
+- **Scope 2 (Indirect Emissions)**: Purchased electricity adjusted for regional grid carbon intensity factors.
+- **Scope 3 (Value Chain Emissions)**: Commercial flights (with radiative forcing adjustments), water supply/wastewater lifecycle, digital data transfer, and equipment screen usage.
 
-Machine Learning Repository:
-https://github.com/Mishti-05/Carbon-emissions
+### 2. Statistical Anomaly & Trend Analytics
+- Automated detection of historical consumption spikes using rolling Z-score and Interquartile Range (IQR) statistical algorithms.
+- Historical time-series logging to track progression toward target reduction benchmarks.
 
-The backend communicates with this model through API calls to generate carbon emission predictions based on user input data.
+### 3. Interactive "What-If" Decarbonization Simulator
+- Real-time client-side sensitivity engine evaluating fleet electrification, renewable power purchase agreements (PPAs), and lifestyle adjustments.
+- Instant quantification of metric tons ($tCO_2e$) avoided alongside financial cost impact estimates.
 
+### 4. Executive Intelligence Summaries
+- Context-aware narrative generation synthesizing emissions metrics, category drivers, and prioritized mitigation roadmaps.
 
-# Key Features
+---
 
-### User Authentication
+## Technology Stack
 
-Secure user login and registration using:
+### Frontend Application
+- **Framework**: Vite, React, JavaScript (ES6+)
+- **Styling & Design System**: Neo-Brutalist CSS Architecture, TailwindCSS
+- **Visualizations & 3D Graphics**: Three.js, Recharts, Chart.js, Framer Motion
+- **Deployment Target**: Netlify (Global CDN)
 
-• JWT (JSON Web Tokens)
-• Password hashing with bcrypt
+### Backend API
+- **Runtime & Gateway**: Node.js, Express.js
+- **Authentication**: JSON Web Tokens (JWT), bcrypt password hashing
+- **Database ORM**: MongoDB, Mongoose
+- **Validation & Security**: Environment secret isolation, CORS enforcement
 
-This ensures secure authentication and session management.
+---
 
+## Installation & Setup
 
-### Carbon Footprint Calculation
+### Prerequisites
+- Node.js (v18.0.0 or higher)
+- npm (v9.0.0 or higher)
+- MongoDB instance (Local or MongoDB Atlas URI)
 
-Users enter weekly activity data such as:
+### Backend Setup
 
-• Vehicle distance travelled
-• TV / PC usage
-• Internet usage
-• Water consumption frequency
-• Air travel frequency
-
-This data is sent to the backend API which communicates with the **machine learning model** to predict carbon emissions.
-
-
-### Data Visualization
-
-Carbon emission results are displayed through an interactive dashboard using **Chart.js**, allowing users to see emission trends over multiple weeks.
-
-
-### Personalized Recommendations
-
-Based on the predicted emissions, the system provides **AI-generated sustainability recommendations** such as reducing electricity usage or optimizing travel habits.
-
-
-### User Activity History
-
-The dashboard stores weekly activity records so users can track their past data and monitor progress.
-
-Each user only sees **their own stored history**, implemented using **JWT-based user identification**.
-
-
-# Technologies Used
-
-## Frontend
-
-• HTML5
-• CSS3
-• JavaScript
-• Chart.js
-
-Used for building the interactive dashboard, login system, and visualization components.
-
-
-## Backend
-
-• Node.js
-• Express.js
-• JWT Authentication
-• bcrypt (password hashing)
-
-Responsible for handling API requests, authentication, and communication with the machine learning model.
-
-
-## Database
-
-• MongoDB
-• Mongoose ORM
-
-Used to store:
-
-• User credentials
-• Weekly activity data
-• Carbon emission records
-
-
-## Machine Learning
-
-• Python
-• Scikit-Learn
-
-A trained ML model estimates carbon emissions based on lifestyle inputs.
-
-The backend sends user data to the ML pipeline and retrieves emission predictions.
-
-
-# Project Repository Structure
-
-```
-Carbonly
-│
-├── backend
-│   ├── models
-│   ├── routes
-│   ├── middleware
-│   ├── server.js
-│   └── package.json
-│
-├── frontend
-│   ├── index.html
-│   ├── dashboard.html
-│   ├── login.html
-│   ├── signup.html
-│   ├── login.css
-│   ├── signup.css
-│   ├── style.css
-│   ├── login.js
-│   ├── signup.js
-│   ├── script.js
-│   ├── forgot-password.html
-│   └── reset-password.html
-│
-├── images
-│
-├── results
-│   └── screenshots
-│
-├── README.md
-└── .gitignore
-```
-
-
-# Installation & Setup
-
-## 1 Clone the Repository
-
-```
-git clone https://github.com/yourusername/carbonly.git
-cd carbonly
-```
-
-
-## 2 Install Backend Dependencies
-
-```
+1. Navigate to the backend directory:
+```bash
 cd backend
+```
+
+2. Install dependencies:
+```bash
 npm install
 ```
 
-
-## 3 Start Backend Server
-
-```
-node server.js
-```
-
-The backend will start on:
-
-```
-http://localhost:5000
+3. Configure environment variables in `.env`:
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/carbonly
+JWT_SECRET=your_secure_jwt_secret_key
+RESET_TOKEN_SECRET=your_secure_reset_secret_key
+GROQ_API_KEY=your_groq_api_key
 ```
 
-
-## 4 Run Machine Learning Service
-
-The machine learning model is hosted in a separate repository.
-
-Clone and run the ML service:
-
-```
-git clone https://github.com/Mishti-05/Carbon-emissions
-cd Carbon-emissions
-python main.py
+4. Start the development server:
+```bash
+npm start
 ```
 
-This service provides the carbon emission prediction API used by the backend.
+The API server will run at `http://localhost:5000`.
 
-## 5 Launch Frontend
+### Frontend Setup
 
-Open the frontend homepage:
-
+1. Navigate to the frontend directory:
+```bash
+cd frontend
 ```
-frontend/index.html
+
+2. Install dependencies (if applicable):
+```bash
+npm install
 ```
 
-in your browser.
+3. Launch the development server:
+```bash
+npm run dev
+```
 
+---
 
-# How the System Works
+## API Specifications
 
-### Step 1 — User Login
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/register` | Registers a new user account | No |
+| `POST` | `/api/login` | Authenticates credentials and returns JWT | No |
+| `POST` | `/api/carbon/calculate` | Computes Scope 1/2/3 emissions from activity metrics | Yes |
+| `GET` | `/api/carbon/history` | Fetches historical emissions entries for authenticated user | Yes |
+| `DELETE`| `/api/carbon/history` | Clears historical activity entries | Yes |
+| `POST` | `/api/carbon/simulate` | Executes sensitivity analysis for scenario parameters | Yes |
 
-The user creates an account or logs in securely using JWT authentication.
+---
 
+## Code Quality & Engineering Standards
 
-### Step 2 — Enter Weekly Data
+This repository adheres to strict software engineering practices:
+- **No Hardcoded Credentials**: Secrets and configuration parameters are loaded via environment variables.
+- **Deterministic Calculation Integrity**: Financial and carbon accounting formulas are strictly isolated from non-deterministic logic.
+- **Performance Constraints**: UI transitions are restricted to GPU-accelerated properties (`transform`, `opacity`) under 250ms execution times.
 
-Users input their weekly lifestyle activities on the dashboard.
+---
 
-Example inputs include:
+## Authors & Contributors
 
-• Distance traveled by vehicle
-• Screen time
-• Internet usage
-• Water consumption habits
-• Air travel frequency
+- **Dhruv Gupta** — System Architecture, Backend API & Security
+- **Akshhaya Isa** — UI/UX Engineering & Frontend Visualizations
+- **Shubhangini Mehta** — Carbon Accounting & Analytical Research
 
+---
 
-### Step 3 — Emission Prediction
+## License
 
-The frontend sends data to the backend API, which forwards it to the ML model for prediction.
+This project is open-source software licensed under the [MIT License](LICENSE).
 
+---
 
-### Step 4 — Visualization
-
-The predicted carbon emissions are displayed on the dashboard using graphs.
-
-
-### Step 5 — Recommendations
-
-AI recommendations are generated to help users reduce their environmental impact.
-
-
-# Screenshots
-
-Example system outputs can be found in the **results/** folder.
-
-These include:
-
-• Homepage interface
-• Login page
-• Carbon dashboard
-• Graph visualization
-• Recommendation system
-
-
-# Future Improvements
-
-Potential upgrades for the system include:
-
-• Real-time carbon emission tracking
-• Mobile responsive interface improvements
-• Deployment on cloud infrastructure (AWS / GCP)
-• Integration with real environmental datasets
-• Advanced ML models for more accurate predictions
-• Gamification features to motivate sustainable behavior
-
-
-# Contributors
-
-**Dhruv Gupta**  
-Backend Development, Authentication System (JWT & bcrypt), MongoDB Database Integration, Dashboard Logic Implementation, Carbon Emission Graph Integration (Chart.js)
-
-**Akshhaya Isa**  
-Frontend Development, UI/UX Design, Dynamic Animations,  Dashboard Interface, Homepage Design
-
-**Shubhangini Mehta**  
-Machine Learning Model Development for Carbon Emission Prediction
-
-
-# License
-
-This project is developed for academic and educational purposes.
+<p align="center">
+  <i>Building verifiable technology for a sustainable future.</i>
+</p>

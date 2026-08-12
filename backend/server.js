@@ -1,29 +1,32 @@
-const authRoutes = require("./routes/auth");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
+const authRoutes = require("./routes/auth");
+const carbonRoutes = require("./routes/carbon");
+
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
-app.use("/api", authRoutes);
-
-const carbonRoutes = require("./routes/carbon");
+app.use("/api/auth", authRoutes);
 app.use("/api/carbon", carbonRoutes);
 
-app.use("/api", authRoutes)
-
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB Connected ✅"))
-.catch((err) => console.log("DB Error:", err));
-
-app.get("/", (req, res) => {
-    res.send("Server running successfully 🚀");
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.listen(5000, () => {
-    console.log("Server started on port 5000");
+mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/carbonly")
+    .then(() => {
+        console.log("Database connection established.");
+    })
+    .catch((err) => {
+        console.error("Database connection error:", err.message);
+    });
+
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
 });
