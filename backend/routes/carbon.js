@@ -12,6 +12,10 @@ const { generateCalculationLineage } = require("../services/provenanceEngine");
 const { processBatchIngestion } = require("../services/ingestionPipeline");
 const { runDataQualityAudit } = require("../services/dataQualityEngine");
 const { generateLineageDag } = require("../services/lineageDagService");
+const { selectOptimalModel } = require("../services/modelSelectionEngine");
+const { detectMultivariateAnomaly } = require("../services/multivariateAnomaly");
+const { runMonteCarloSimulation } = require("../services/uncertaintyQuantification");
+const { explainEcoScoreShap } = require("../services/shapExplainerService");
 const { generateExecutiveSummary, generateAnomalyDiagnosis, generateActionableRecommendations, answerCopilotQuestion } = require("../services/groqService");
 
 // In-Memory historical storage fallback
@@ -31,18 +35,20 @@ router.post("/calculate", async (req, res) => {
         // Execute deterministic carbon calculation engine
         const emissions = calculateCarbonFootprint(normalizedInput);
 
-        // Evaluate relative EcoScore benchmark
+        // Evaluate relative EcoScore benchmark & SHAP Feature Explainer
         const ecoScore = calculateEcoScore(emissions.totalKg);
+        const shapExplanation = explainEcoScoreShap(emissions);
 
         // Fetch historical user records for anomaly detection
         const userId = req.user ? req.user.id : "anonymous";
         const userHistory = inMemoryHistoryStore.get(userId) || [];
 
-        // Evaluate statistical Z-score anomaly outlier
+        // Evaluate statistical Z-score anomaly outlier & Multi-Variate Mahalanobis Distance
         const anomalyReport = detectAnomaly(emissions.totalKg, userHistory);
+        const multivariateAnomaly = detectMultivariateAnomaly(req.body, userHistory);
 
         // If anomaly triggered, isolate Shapley variance drivers & fetch Groq diagnosis
-        if (anomalyReport.isAnomaly) {
+        if (anomalyReport.isAnomaly || multivariateAnomaly.isMultivariateAnomaly) {
             const attribution = attributeAnomalySpike({ breakdown: emissions.breakdown }, userHistory);
             anomalyReport.attribution = attribution;
 
@@ -57,10 +63,13 @@ router.post("/calculate", async (req, res) => {
         // Generate 12-Month Holt-Winters Time-Series Forecast
         const forecast = forecastEmissions(userHistory, emissions.totalKg);
 
+        // Run 10,000-Iteration Monte Carlo Uncertainty Simulation
+        const monteCarlo = runMonteCarloSimulation(req.body, 10000);
+
         // Generate AI / Fallback Executive Brief & Actionable Recommendations
         const [executiveSummary, recommendations] = await Promise.all([
             generateExecutiveSummary(emissions, normalizedInput),
-            generateActionableRecommendations(emissions, anomalyReport)
+            generateActionableRecommendations(emissions)
         ]);
 
         // Generate Audit Lineage & Uncertainty Propagation Record
@@ -72,8 +81,11 @@ router.post("/calculate", async (req, res) => {
             scopes: emissions.scopes,
             breakdown: emissions.breakdown,
             ecoScore,
+            shapExplanation,
             anomalyReport,
+            multivariateAnomaly,
             forecast,
+            monteCarlo,
             executiveSummary,
             recommendations,
             canonicalRecord,
@@ -102,6 +114,60 @@ router.post("/calculate", async (req, res) => {
             status: "error",
             message: err.message || "Failed to process carbon calculation payload."
         });
+    }
+});
+
+/**
+ * POST /api/carbon/model-competition
+ * Cross-validates Holt-Winters, ARIMA(1,1,1), and Seasonal Naive models on holdout test data
+ */
+router.post("/model-competition", (req, res) => {
+    try {
+        const { series } = req.body;
+        const result = selectOptimalModel(series || []);
+        res.json({ status: "success", data: result });
+    } catch (err) {
+        res.status(400).json({ status: "error", message: err.message });
+    }
+});
+
+/**
+ * POST /api/carbon/multivariate-anomaly
+ * Multi-Variate Mahalanobis Distance correlation anomaly detection
+ */
+router.post("/multivariate-anomaly", (req, res) => {
+    try {
+        const result = detectMultivariateAnomaly(req.body, []);
+        res.json({ status: "success", data: result });
+    } catch (err) {
+        res.status(400).json({ status: "error", message: err.message });
+    }
+});
+
+/**
+ * POST /api/carbon/monte-carlo-uncertainty
+ * 10,000-Iteration Monte Carlo Uncertainty Propagation Simulator
+ */
+router.post("/monte-carlo-uncertainty", (req, res) => {
+    try {
+        const { iterations } = req.body;
+        const result = runMonteCarloSimulation(req.body, iterations || 10000);
+        res.json({ status: "success", data: result });
+    } catch (err) {
+        res.status(400).json({ status: "error", message: err.message });
+    }
+});
+
+/**
+ * POST /api/carbon/shap-explanation
+ * SHAP (SHapley Additive exPlanations) Global Feature Importance Explainer
+ */
+router.post("/shap-explanation", (req, res) => {
+    try {
+        const result = explainEcoScoreShap(req.body);
+        res.json({ status: "success", data: result });
+    } catch (err) {
+        res.status(400).json({ status: "error", message: err.message });
     }
 });
 
