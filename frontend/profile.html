@@ -366,27 +366,44 @@
                         const isAnom = item.anomalyReport && item.anomalyReport.isAnomaly;
                         tbody.innerHTML += `
                             <tr style="border-bottom: 1px solid #EEE;">
-                                <td style="padding: 10px; font-weight:600;">${date}</td>
-                                <td style="padding: 10px; font-weight:700; color:var(--emerald);">${(item.emissions?.totalKg || 0).toFixed(2)}</td>
-                                <td style="padding: 10px;">${(item.emissions?.scopes?.scope1?.kg || 0).toFixed(2)}</td>
-                                <td style="padding: 10px;">${(item.emissions?.scopes?.scope2?.kg || 0).toFixed(2)}</td>
-                                <td style="padding: 10px;">${(item.emissions?.scopes?.scope3?.kg || 0).toFixed(2)}</td>
-                                <td style="padding: 10px;">${isAnom ? '<span class="badge-neo" style="background:#FFEBEE;color:red;">Anomaly Spike</span>' : '<span class="badge-neo">Normal</span>'}</td>
-                            </tr>
-                        `;
-                    });
+                if (res.ok && Array.isArray(history)) {
+                    renderHistoryTable(history);
                 }
             } catch(e) {
-                showToast("Error loading history records", "error");
+                console.log("Using local history data");
             }
         }
 
-        async function clearProfileHistory() {
+        function renderHistoryTable(history) {
+            const tbody = document.getElementById("profileHistoryBody");
+            tbody.innerHTML = "";
+
+            if (!Array.isArray(history) || history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--text-muted);">No history records saved yet.</td></tr>';
+            } else {
+                history.forEach(item => {
+                    const date = new Date(item.timestamp).toLocaleDateString();
+                    const isAnom = item.anomalyReport && item.anomalyReport.isAnomaly;
+                    tbody.innerHTML += `
+                        <tr style="border-bottom: 1px solid #EEE;">
+                            <td style="padding: 10px; font-weight:600;">${date}</td>
+                            <td style="padding: 10px; font-weight:700; color:var(--emerald);">${(item.emissions?.totalKg || 0).toFixed(2)}</td>
+                            <td style="padding: 10px;">${(item.emissions?.scopes?.scope1?.kg || 0).toFixed(2)}</td>
+                            <td style="padding: 10px;">${(item.emissions?.scopes?.scope2?.kg || 0).toFixed(2)}</td>
+                            <td style="padding: 10px;">${(item.emissions?.scopes?.scope3?.kg || 0).toFixed(2)}</td>
+                            <td style="padding: 10px;">${isAnom ? '<span class="badge-neo" style="background:#FFEBEE;color:red;">Anomaly Spike</span>' : '<span class="badge-neo">Normal</span>'}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        async function clearEmissionsHistory() {
             const token = localStorage.getItem("token");
             if (!token) return;
 
             if (confirm("Are you sure you want to clear all history records?")) {
-                await fetch("${window.API_BASE_URL}/api/carbon/history", {
+                await fetch(getApiUrl("/api/carbon/history"), {
                     method: "DELETE",
                     headers: { "Authorization": "Bearer " + token }
                 });

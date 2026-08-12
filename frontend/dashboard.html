@@ -455,7 +455,7 @@
                 showToast("Please log in to export formal ESG report", "error");
                 return;
             }
-            window.open("${window.API_BASE_URL}/api/carbon/export-report", "_blank");
+            window.open(getApiUrl("/api/carbon/export-report"), "_blank");
         }
 
         window.addEventListener("DOMContentLoaded", () => {
@@ -754,7 +754,7 @@
 
             try {
                 const token = getToken();
-                const res = await fetch("${window.API_BASE_URL}/api/carbon/ai-copilot", {
+                const res = await fetch(getApiUrl("/api/carbon/ai-copilot"), {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

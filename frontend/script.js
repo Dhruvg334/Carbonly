@@ -7,6 +7,14 @@ window.API_BASE_URL = (window.location.hostname === "localhost" || window.locati
     ? "http://localhost:5000"
     : "https://carbonly-qpet.onrender.com";
 
+window.getApiUrl = function(path) {
+    const baseUrl = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+        ? "http://localhost:5000"
+        : "https://carbonly-qpet.onrender.com";
+    const cleanPath = path.startsWith("/") ? path : "/" + path;
+    return baseUrl + cleanPath;
+};
+
 function syncNavbarAuth() {
     const token = localStorage.getItem("token");
     const authContainers = document.querySelectorAll(".nav-links");

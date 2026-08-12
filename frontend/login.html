@@ -165,7 +165,7 @@
 
             if (currentAuthMode === "signup") {
                 try {
-                    const res = await fetch("${window.API_BASE_URL}/api/auth/register", {
+                    const res = await fetch(getApiUrl("/api/auth/register"), {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ username, email, password })
@@ -182,7 +182,7 @@
                 }
             } else {
                 try {
-                    const res = await fetch("${window.API_BASE_URL}/api/auth/login", {
+                    const res = await fetch(getApiUrl("/api/auth/login"), {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ username, password })
