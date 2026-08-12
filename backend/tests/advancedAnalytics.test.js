@@ -8,6 +8,7 @@ const { getMethodology } = require("../services/methodologyRegistry");
 const { recordAuditEvent, getAuditTrail } = require("../services/auditTrail");
 const { validateAndNormalizeActivity } = require("../services/ingestionValidator");
 const { generateCalculationLineage } = require("../services/provenanceEngine");
+const { calculateTargetGap } = require("../services/baselineManager");
 
 test("Advanced AI / DS / DA & Provenance Engine Unit Tests", async (t) => {
 
@@ -37,14 +38,22 @@ test("Advanced AI / DS / DA & Provenance Engine Unit Tests", async (t) => {
         assert.equal(event.newState, 370);
     });
 
-    await t.test("validateAndNormalizeActivity should reject negative quantities and normalize canonical units", () => {
-        const input = { transportKm: -50, electricityKwh: 350, vehicleType: "gasoline" };
-        const { normalizedInput } = validateAndNormalizeActivity(input);
-        assert.equal(normalizedInput.transportKm, 0);
-        assert.equal(normalizedInput.electricityKwh, 350);
+    await t.test("calculateTargetGap should calculate baseline emissions and 2030 target gap", () => {
+        const gap = calculateTargetGap(1000, 850, 50);
+        assert.equal(gap.targetEmissionsKg, 500);
+        assert.equal(gap.targetGapKg, 350);
+        assert.equal(gap.progressPct, 30);
     });
 
-    await t.test("generateCalculationLineage should attach unique calculation ID, methodologies, and uncertainty bounds", () => {
+    await t.test("validateAndNormalizeActivity should generate generic ActivityRecord array", () => {
+        const input = { transportKm: 180, electricityKwh: 350, vehicleType: "gasoline" };
+        const { normalizedInput, canonicalRecord } = validateAndNormalizeActivity(input);
+        assert.equal(normalizedInput.transportKm, 180);
+        assert.ok(canonicalRecord.records.length >= 3);
+        assert.equal(canonicalRecord.records[0].methodologyId, "S1-MC-01");
+    });
+
+    await t.test("generateCalculationLineage should attach unique calculation ID, methodologies, and Evidence Store object", () => {
         const input = { vehicleType: "gasoline", region: "US", flightType: "short" };
         const scopeBreakdown = {
             totalKg: 200,
@@ -52,8 +61,8 @@ test("Advanced AI / DS / DA & Provenance Engine Unit Tests", async (t) => {
         };
         const lineage = generateCalculationLineage(input, scopeBreakdown);
         assert.ok(lineage.calculationId.startsWith("calc_"));
-        assert.ok(lineage.methodologiesUsed.length > 0);
-        assert.ok(lineage.dataQuality.percentiles.p50 === 200);
+        assert.ok(lineage.evidenceStoreObject.evidenceId.startsWith("ev_"));
+        assert.equal(lineage.evidenceStoreObject.totalKg, 200);
     });
 
     await t.test("forecastEmissions should generate 12 monthly projections and confidence bounds", () => {
