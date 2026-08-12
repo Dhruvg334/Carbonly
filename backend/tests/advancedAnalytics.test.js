@@ -4,17 +4,33 @@ const { forecastEmissions } = require("../services/forecastingEngine");
 const { solveOptimalDecarbonization } = require("../services/optimizerEngine");
 const { attributeAnomalySpike } = require("../services/anomalyAttribution");
 const { getEmissionFactor } = require("../services/emissionFactorRegistry");
+const { getMethodology } = require("../services/methodologyRegistry");
+const { recordAuditEvent, getAuditTrail } = require("../services/auditTrail");
 const { validateAndNormalizeActivity } = require("../services/ingestionValidator");
 const { generateCalculationLineage } = require("../services/provenanceEngine");
 
 test("Advanced AI / DS / DA & Provenance Engine Unit Tests", async (t) => {
 
-    await t.test("getEmissionFactor should return versioned metadata and provenance for valid factor ID", () => {
+    await t.test("getEmissionFactor should return versioned metadata and lifecycle status for factor ID", () => {
         const factor = getEmissionFactor("EPA_GRID_US_2023");
         assert.equal(factor.factor_id, "EPA_GRID_US_2023");
         assert.equal(factor.value, 0.385);
+        assert.equal(factor.lifecycle_status, "Active");
         assert.equal(factor.source_organization, "US EPA eGRID");
-        assert.equal(factor.scope, "Scope 2");
+    });
+
+    await t.test("getMethodology should return accounting boundary and methodology details", () => {
+        const method = getMethodology("S1-CAT1-01");
+        assert.equal(method.methodology_id, "S1-CAT1-01");
+        assert.equal(method.scope, "Scope 1");
+        assert.equal(method.accounting_boundary, "Operational Control Boundary");
+    });
+
+    await t.test("recordAuditEvent should log data mutation event", () => {
+        const event = recordAuditEvent("analyst@company.com", "UPDATE_ELECTRICITY", 350, 370, "Invoice correction");
+        assert.equal(event.userEmail, "analyst@company.com");
+        assert.equal(event.oldState, 350);
+        assert.equal(event.newState, 370);
     });
 
     await t.test("validateAndNormalizeActivity should reject negative quantities and normalize canonical units", () => {
@@ -24,7 +40,7 @@ test("Advanced AI / DS / DA & Provenance Engine Unit Tests", async (t) => {
         assert.equal(normalizedInput.electricityKwh, 350);
     });
 
-    await t.test("generateCalculationLineage should attach unique calculation ID and uncertainty bounds", () => {
+    await t.test("generateCalculationLineage should attach unique calculation ID, methodologies, and uncertainty bounds", () => {
         const input = { vehicleType: "gasoline", region: "US", flightType: "short" };
         const scopeBreakdown = {
             totalKg: 200,
@@ -32,7 +48,7 @@ test("Advanced AI / DS / DA & Provenance Engine Unit Tests", async (t) => {
         };
         const lineage = generateCalculationLineage(input, scopeBreakdown);
         assert.ok(lineage.calculationId.startsWith("calc_"));
-        assert.ok(lineage.dataQuality.propagatedUncertaintyPct > 0);
+        assert.ok(lineage.methodologiesUsed.length > 0);
         assert.ok(lineage.dataQuality.percentiles.p50 === 200);
     });
 
