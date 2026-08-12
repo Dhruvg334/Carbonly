@@ -16,16 +16,25 @@ app.use("/api/auth", authRoutes);
 app.use("/api/carbon", carbonRoutes);
 
 app.get("/health", (req, res) => {
-    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+    res.status(200).json({
+        status: "ok",
+        databaseConnected: mongoose.connection && mongoose.connection.readyState === 1,
+        timestamp: new Date().toISOString()
+    });
 });
 
-mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/carbonly")
-    .then(() => {
-        console.log("Database connection established.");
-    })
-    .catch((err) => {
-        console.error("Database connection error:", err.message);
-    });
+// Attempt MongoDB Connection if MONGO_URI is provided
+if (process.env.MONGO_URI) {
+    mongoose.connect(process.env.MONGO_URI)
+        .then(() => {
+            console.log("MongoDB Database connection established.");
+        })
+        .catch((err) => {
+            console.warn("MongoDB connection warning (falling back to in-memory store):", err.message);
+        });
+} else {
+    console.log("No MONGO_URI provided. Operating with in-memory zero-config store fallback.");
+}
 
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
