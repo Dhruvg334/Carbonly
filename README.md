@@ -10,77 +10,50 @@
 
 ---
 
-## 1. Executive Summary & Product Architecture
+## 1. Executive Summary & Core Architectural Philosophy
 
-Carbonly is an auditable enterprise carbon intelligence platform: it converts corporate activity data into traceable GHG inventories, quantifies measurement uncertainty, detects operational consumption anomalies, forecasts emissions, optimizes decarbonization investments, and uses **evidence-grounded AI** to explain what happened and what the organization should do next.
+Carbonly is an auditable enterprise carbon intelligence platform designed to convert corporate activity data into traceable GHG inventories, quantify measurement uncertainty, detect operational consumption anomalies, forecast emissions, optimize decarbonization investments, and provide evidence-grounded AI decision support.
 
-### Key Architectural Principle: Decoupling Math from Probabilistic LLMs
-In enterprise carbon accounting, numbers must be 100% reproducible and verifiable for regulatory filings and audit assurance. Allowing an AI language model to compute arithmetic values introduces risks of model hallucination. Carbonly solves this by executing all calculations via a **100% deterministic mathematical engine**, using the Groq `llama-3.3-70b-versatile` LLM exclusively as a reasoning agent over verified evidence proofs.
+### Architectural Boundary: Decoupling Arithmetic from Probabilistic LLMs
+In corporate ESG auditing, carbon footprint calculations must strictly adhere to verified emission conversion constants established by government environmental protection agencies (UK DEFRA, US EPA). Allowing an AI language model to directly compute arithmetic values introduces risks of model hallucination and regulatory audit failure. 
 
-```text
-                     ┌──────────────────────┐
-                     │ Enterprise Data      │
-                     │ ERP / CSV / APIs / IoT│
-                     └──────────┬───────────┘
-                                ↓
-                     ┌──────────────────────┐
-                     │ Ingestion Layer      │
-                     │ Validation            │
-                     │ Deduplication         │
-                     │ Unit Normalization    │
-                     └──────────┬───────────┘
-                                ↓
-                     ┌──────────────────────┐
-                     │ Canonical Activity DB│
-                     │ (ActivityRecord)     │
-                     └──────────┬───────────┘
-                                ↓
-              ┌─────────────────┴─────────────────┐
-              ↓                                   ↓
-   ┌──────────────────────┐            ┌──────────────────────┐
-   │ Emission Factor      │            │ Methodology Registry │
-   │ Registry (EFR)       │            │ GHG boundaries       │
-   │ Versions / Sources    │            │ Calculation methods  │
-   └──────────┬───────────┘            └──────────┬───────────┘
-              └─────────────────┬─────────────────┘
-                                ↓
-                     ┌──────────────────────┐
-                     │ Deterministic        │
-                     │ Carbon Engine        │
-                     └──────────┬───────────┘
-                                ↓
-                     ┌──────────────────────┐
-                     │ Evidence / Provenance│
-                     │ Layer                │
-                     │ (calculation_id)     │
-                     └──────────┬───────────┘
-                                ↓
-              ┌─────────────────┼─────────────────┐
-              ↓                 ↓                 ↓
-         Anomaly            Forecast          Optimizer
-         Detection          Engine            Engine
-              └─────────────────┼─────────────────┘
-                                ↓
-                     ┌──────────────────────┐
-                     │ AI Reasoning Layer   │
-                     │ Grounded in evidence │
-                     └──────────┬───────────┘
-                                ↓
-                 ┌──────────────┼──────────────┐
-                 ↓              ↓              ↓
-             Dashboard       Reports       AI Assistant
+Carbonly solves this by executing all calculations via a **100% deterministic mathematical engine**, using the Groq `llama-3.3-70b-versatile` LLM exclusively as a reasoning agent over verified evidence proofs.
+
+```mermaid
+graph TD
+    A[Enterprise Activity Data] -->|ERP / CSV / Utility APIs| B[Ingestion & Normalization Layer]
+    B -->|Schema Validation & Guardrails| C[(Canonical Activity DB: ActivityRecord)]
+    C --> D[Factor Resolver & Registry Gateway]
+    E[Emission Factor Registry - EFR] -->|Versioned Factor Metadata| D
+    F[Methodology Registry] -->|GHG Boundary Specifications| D
+    D --> G[Deterministic Carbon Calculation Engine]
+    G --> H[Provenance & Lineage Engine]
+    H -->|Unique calculation_id & Uncertainty| I[Evidence Store]
+    
+    I --> J[Holt-Winters Forecasting Engine]
+    I --> K[Constrained Linear Solver]
+    I --> L[Z-Score Anomaly Detector]
+    
+    J --> M[Evidence-Grounded AI Reasoning Proxy - Groq LLM]
+    K --> M
+    L --> M
+    I --> M
+    
+    M --> N[Analytics Dashboard]
+    M --> O[Audit-Ready GHG Inventory Reports]
+    M --> P[AI Strategy Copilot]
 ```
 
 ---
 
-## 2. Technical & Engineering Specifications
+## 2. Technical Specifications & Accounting Methodology
 
 ### A. GHG Protocol Category Mapping (Scope 1, 2, & Progressive Scope 3)
 Carbonly explicitly maps operational activity streams into formal GHG Protocol categories:
 
 - **Scope 1: Direct Fleet Transport & Fuel Combustion**
   - *Category 1: Mobile Combustion*: Direct fuel combustion from owned or leased fleet vehicles.
-- **Scope 2: Purchased Electricity (Dual Location-Based & Market-Based)**
+- **Scope 2: Purchased Electricity (Dual Location-Based & Market-Based Methods)**
   - *Location-Based Method*: Evaluates grid draw against regional average emission factors ($I_{\text{grid}}$).
   - *Market-Based Method*: Adjusts footprint for contractual instruments (Renewable PPAs, RECs, Guarantees of Origin).
 - **Progressive Scope 3 Value-Chain Accounting**
@@ -90,13 +63,24 @@ Carbonly explicitly maps operational activity streams into formal GHG Protocol c
 
 ---
 
-### B. Emission Factor Registry (EFR) & Versioning
+### B. Emission Factor Registry (EFR) & Governance Lifecycle
 Every conversion factor is managed via an immutable **Emission Factor Registry** (`backend/services/emissionFactorRegistry.js`), preventing silent recalculation of historical reports when factors update.
 
-#### Sample EFR Factor Record Schema:
+```mermaid
+stateDiagram-v2
+    [*] --> Draft : Factor Proposed
+    Draft --> Reviewed : Internal QA & Source Verification
+    Reviewed --> Approved : Enterprise Compliance Sign-off
+    Approved --> Active : Deployed to Registry Gateway
+    Active --> Deprecated : Superceded by New Annual Revision
+    Deprecated --> [*]
+```
+
+#### EFR Factor Entry JSON Schema:
 ```json
 {
   "factor_id": "EPA_GRID_US_2023",
+  "lifecycle_status": "Active",
   "value": 0.385,
   "unit": "kgCO2e/kWh",
   "geography": "US",
@@ -115,31 +99,53 @@ Every conversion factor is managed via an immutable **Emission Factor Registry**
 
 ---
 
-### C. Calculation Lineage & Provenance Engine
+### C. Methodology Registry & Operational Control Boundaries
+Carbonly defines explicit methodology entries (`backend/services/methodologyRegistry.js`) mapping accounting boundaries and calculation formulas:
+
+| Methodology ID | Name | Scope & GHG Category | Boundary Specification |
+|---|---|---|---|
+| `S1-CAT1-01` | Direct Fleet Mobile Combustion | Scope 1 (Category 1) | Operational Control Fleet Distance |
+| `S2-LOC-01` | Location-Based Electricity Grid Draw | Scope 2 (Purchased Electricity) | Physical Meter Subgrid Average |
+| `S2-MKT-01` | Market-Based Contractual Instrument | Scope 2 (Purchased Electricity) | PPA / REC Guarantee Claim |
+| `S3-CAT6-01` | Business Aviation Travel | Scope 3 (Category 6) | Airline Passenger-km x 1.9x RF |
+| `S3-CAT4-01` | Operational Water Supply | Scope 3 (Category 4/5) | Municipal Treatment Inflow Volume |
+| `S3-CAT3-01` | Digital Infrastructure Activity | Scope 3 (Category 3) | Cloud GB Transfer & Display Runtime |
+
+---
+
+### D. Calculation Lineage, Provenance & Audit Trail
 For every calculated number, Carbonly generates an immutable audit lineage record with a unique `calculation_id`:
 
-```text
-Final Emission (205.80 kg CO2e)
-      ↓
-Calculation ID (calc_83a91f)
-      ↓
-Canonical Activity Record (350 kWh, 180 km, 1 flight)
-      ↓
-Unit Normalization Layer (Wh → kWh, miles → km)
-      ↓
-Emission Factor Registry (EPA_GRID_US_2023, DEFRA_TRANSPORT_GASOLINE_2024)
-      ↓
-Factor Version (v1.0, 2024 Revision)
-      ↓
-Source Document (US EPA eGRID 2023, UK DEFRA 2024)
+```mermaid
+graph LR
+    A[Final Emission Result] --> B[Calculation ID: calc_83a91f]
+    B --> C[Canonical ActivityRecord]
+    C --> D[Unit Normalization Layer]
+    D --> E[Emission Factor Registry]
+    E --> F[Factor Version: v1.0]
+    F --> G[Source Doc: US EPA eGRID 2023]
+```
+
+#### Audit Trail Data Mutation Schema (`auditTrail.js`):
+```json
+{
+  "eventId": "audit_89f1a2",
+  "userEmail": "analyst@company.com",
+  "action": "UPDATE_ELECTRICITY_CONSUMPTION",
+  "oldState": 350,
+  "newState": 370,
+  "reason": "Corrected utility invoice billing discrepancy",
+  "timestamp": "2026-08-13T02:45:00.000Z",
+  "affectedCalcId": "calc_83a91f"
+}
 ```
 
 ---
 
-### D. Uncertainty Propagation & Data Quality Confidence Score
+### E. Uncertainty Propagation & Data Quality Confidence Score
 
-#### 1. Uncertainty Propagation Equations
-Activity measurements contain inherent statistical measurement error. Carbonly propagates analytical uncertainty using a weighted variance sum:
+#### 1. Analytical Uncertainty Propagation Equation
+Activity measurements contain statistical measurement error. Carbonly propagates analytical uncertainty using a weighted variance sum:
 
 $$m = \text{Total} \times \sqrt{\sum \left( \frac{E_i}{\text{Total}} \times u_i \right)^2}$$
 
@@ -148,14 +154,17 @@ Where $u_i$ is the percentage uncertainty of vector $i$. Percentile bounds are c
 $$\text{P10} = \text{Total} - 1.28 \cdot m, \quad \text{P50} = \text{Total}, \quad \text{P90} = \text{Total} + 1.28 \cdot m$$
 
 #### 2. Data Quality Confidence Score (0 - 100%)
-Quantifies the trustworthiness of input activity streams based on data completeness, measurement precision, and factor specificity:
+Quantifies the trustworthiness of input activity streams based on source data quality ratings:
+- **Smart Meter / Utility Invoice**: High Confidence ($98\%$)
+- **Corporate Travel API**: Medium/High Confidence ($90\%$)
+- **Facility Water Meter**: Medium Confidence ($80\%$)
+- **Cloud Workload Estimate**: Low Confidence ($50\%$)
 
 $$\text{Confidence Score} = 100\% - \text{Penalty}_{\text{missing}} - \text{Penalty}_{\text{default\_factor}} - \text{Penalty}_{\text{estimation}}$$
 
 ---
 
-### E. Ingestion Validation & Canonical Activity Data Model
-
+### F. Data Ingestion Validation & Canonical Activity Data Model
 Raw incoming API and CSV payloads pass through `ingestionValidator.js` for schema validation, deduplication key checks, range check guardrails, and canonical unit conversion (e.g., miles $\rightarrow$ km, Wh $\rightarrow$ kWh).
 
 #### Canonical `ActivityRecord` JSON Schema:
@@ -177,7 +186,7 @@ Raw incoming API and CSV payloads pass through `ingestionValidator.js` for schem
 
 ---
 
-### F. Holt-Winters Forecasting & Empirical Backtesting Validation
+### G. Holt-Winters Forecasting & Empirical Backtesting Validation
 
 Future emissions are projected using additive Holt-Winters exponential smoothing:
 
@@ -190,14 +199,13 @@ $$\hat{y}_{t+h} = \ell_t + h \cdot b_t + s_{t+h-m}$$
 $$\text{CI}_{95\%} = \hat{y}_{t+h} \pm 1.96 \cdot \hat{\sigma}_e \sqrt{1 + \sum_{j=1}^{h-1} \psi_j^2}$$
 
 #### Empirical Model Accuracy Metrics:
-- **Mean Absolute Error (MAE)**: Evaluated across rolling backtest windows.
 - **Symmetric Mean Absolute Percentage Error (sMAPE)**: $3.12\%$.
 - **Mean Absolute Scaled Error (MASE)**: $0.42$ (outperforming Seasonal Naive baseline MASE $= 1.0$).
 - **Empirical Prediction Interval Coverage**: $94.2\%$ observed coverage on $95\%$ nominal bounds.
 
 ---
 
-### G. Corrected Constrained Decarbonization Linear Solver
+### H. Corrected Constrained Decarbonization Linear Solver
 
 The slider optimization engine formulates a linear program to **maximize carbon emissions avoided** subject to an annual target capital budget:
 
@@ -208,16 +216,16 @@ Where:
 - $v_i$ is the capital implementation cost ($\$$) of intervention $i$.
 - $B_{\text{annual}}$ is the user's annual decarbonization budget limit.
 
-#### Intervention Portfolio & ROI Explainability:
+#### Intervention Portfolio Economics:
 - **EV Fleet Transition**: Abatement Cost: $\$45 / tCO_2e$, Payback: $2.5 \text{ yrs}$.
 - **Solar PPA Subscription**: Abatement Cost: $\$28 / tCO_2e$, Payback: $1.8 \text{ yrs}$.
 - **Virtual Flight Consolidation**: Abatement Cost: $-\$120 / tCO_2e$ (Net cost savings), Payback: $0.1 \text{ yrs}$.
 
 ---
 
-### H. Evidence-Grounded AI Reasoning Layer
+### I. Evidence-Grounded AI Reasoning Layer
 
-The Groq LLM (`llama-3.3-70b-versatile`) acts purely as a reasoning interface. It queries an **Evidence Store** containing verified calculation proofs (`calc_83a91f`).
+The Groq LLM (`llama-3.3-70b-versatile`) acts purely as a reasoning interface over an **Evidence Store** containing verified calculation proofs (`calc_83a91f`).
 
 #### Sample Evidence Object Schema:
 ```json
@@ -241,15 +249,117 @@ To guarantee mathematical audit rigor, Carbonly’s deterministic calculation en
 
 | Validation Metric | Benchmark Value | Technical Description |
 |---|---|---|
-| **Reference Test Vectors** | 22 Automated Unit Tests | Verified against official DEFRA & EPA test cases |
-| **Passed Test Cases** | 22 / 22 (100% Pass Rate) | Native Node.js test runner execution |
+| **Reference Test Vectors** | 24 Automated Unit Tests | Verified against official DEFRA & EPA test cases |
+| **Passed Test Cases** | 24 / 24 (100% Pass Rate) | Native Node.js test runner execution |
 | **Max Absolute Error** | $0.0000 \text{ kg CO}_2e$ | Zero arithmetic deviation from reference standards |
 | **Mean Absolute Error (MAE)** | $0.0000 \text{ kg CO}_2e$ | Exact floating-point calculation match |
 | **Tolerance Boundary** | $\pm 10^{-6} \text{ kg CO}_2e$ | Strict numerical floating-point boundary |
 
 ---
 
-## 4. Local Setup & Testing
+## 4. Repository Structure & Module Boundaries
+
+```text
+Carbonly/
+├── backend/
+│   ├── routes/
+│   │   ├── auth.js            # User registration & JWT authentication
+│   │   └── carbon.js          # GHG calculation, forecast, simulation, & report endpoints
+│   ├── services/
+│   │   ├── carbonEngine.js    # Scope 1, 2, 3 GHG calculation engine
+│   │   ├── emissionFactorRegistry.js # EFR versioned factors & lifecycle governance
+│   │   ├── methodologyRegistry.js   # Formal GHG Protocol boundary specifications
+│   │   ├── provenanceEngine.js # Unique calculation_id lineage & uncertainty bounds
+│   │   ├── auditTrail.js      # User data mutation log store
+│   │   ├── ingestionValidator.js # Input guardrails, schema validation, & unit conversion
+│   │   ├── anomalyDetector.js # Z-score statistical outlier detector
+│   │   ├── anomalyAttribution.js # Shapley-style variance driver attribution
+│   │   ├── ecoScoreService.js # 0-1000 pts relative benchmark engine
+│   │   ├── forecastingEngine.js # Holt-Winters 12-month time-series forecaster
+│   │   ├── optimizerEngine.js # Operations research linear solver
+│   │   └── groqService.js     # Groq LLM API proxy with evidence store grounding
+│   ├── tests/
+│   │   ├── carbonEngine.test.js
+│   │   ├── anomalyDetector.test.js
+│   │   ├── ecoScoreService.test.js
+│   │   ├── groqService.test.js
+│   │   └── advancedAnalytics.test.js
+│   ├── models/                # User & CarbonRecord database models
+│   ├── server.js              # Express gateway entry point
+│   └── package.json
+├── frontend/
+│   ├── index.html             # Centered hero landing page & live report card
+│   ├── dashboard.html         # Subpaged ESG analytics dashboard hub
+│   ├── docs.html              # Subpaged technical documentation hub
+│   ├── profile.html           # Profile management, reset password, & activity log
+│   ├── why.html               # 6-card "Why Track Carbon?" value proposition page
+│   ├── login.html             # Unified switchable authentication portal
+│   ├── signup.html            # Redirect page to unified login portal
+│   ├── style.css              # Custom high-contrast design system
+│   ├── script.js             # Dynamic navbar authentication state sync
+│   ├── toast.js              # Toast notification system
+│   ├── sampleData.js          # Pre-loaded sandbox datasets & public dataset metrics
+│   └── assets/                # High-craft SVG vectors (logo.svg, hero-illustration.svg)
+├── docs/
+│   ├── ARCHITECTURE.md        # Technical design blueprint
+│   ├── USER_GUIDE.md          # Platform user guide & handbook
+│   ├── DATASETS_AND_MATH.md   # Dataset specifications & math formulas
+│   └── API_SPECIFICATION.md   # Complete REST API specifications
+└── README.md
+```
+
+---
+
+## 5. REST API Specifications
+
+### A. Calculation Endpoint
+- **URL**: `POST /api/carbon/calculate`
+- **Headers**: `Content-Type: application/json`, `Authorization: Bearer <token>`
+- **Request Payload**:
+```json
+{
+  "transportKm": 180,
+  "vehicleType": "gasoline",
+  "electricityKwh": 350,
+  "region": "US",
+  "flightsTaken": 1,
+  "flightType": "short",
+  "waterLiters": 1200,
+  "screenHours": 160,
+  "internetGb": 450
+}
+```
+- **Response Schema**:
+```json
+{
+  "status": "success",
+  "data": {
+    "totalKg": 205.8,
+    "totalTonnes": 0.2058,
+    "scopes": {
+      "scope1": { "kg": 34.56, "percentage": 16.8 },
+      "scope2": { "kg": 134.75, "percentage": 65.5 },
+      "scope3": { "kg": 36.49, "percentage": 17.7 }
+    },
+    "ecoScore": { "scorePoints": 920, "starRating": 5 },
+    "anomalyReport": { "isAnomaly": false, "zScore": "0.42" },
+    "auditLineage": {
+      "calculationId": "calc_83a91f",
+      "dataQuality": { "overallConfidenceScorePct": 95.0, "propagatedUncertaintyPct": 4.2 }
+    },
+    "executiveSummary": "Activity footprint totals 205.80 kg CO2e dominated by grid power draw."
+  }
+}
+```
+
+### B. ESG Report Exporter Endpoint
+- **URL**: `GET /api/carbon/export-report`
+- **Headers**: `Authorization: Bearer <token>`
+- **Response**: Triggers an automated download of an Audit-Ready GHG Inventory Report (`Carbonly_ESG_Audit_Report.md`).
+
+---
+
+## 6. Local Setup & Testing
 
 ### Prerequisites
 - Node.js (v18.0.0 or higher)
@@ -266,11 +376,11 @@ npm install
 # 3. Start Backend Gateway Server
 npm start
 
-# 4. Execute Automated Test Suite (22 Tests Across 5 Suites)
+# 4. Execute Automated Test Suite (24 Tests Across 5 Suites)
 npm test
 ```
 
 ---
 
-## 5. License
+## 7. License
 Distributed under the Open Source **MIT License**.
