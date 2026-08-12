@@ -307,6 +307,7 @@ Carbonly/
 │   ├── middleware/
 │   │   └── auth.js            # Multi-tenant JWT authorization boundary middleware
 │   ├── tests/                 # 40 native unit tests across 8 test suites
+│   ├── .env.example           # Gateway environment configuration template
 │   ├── server.js              # Express gateway entry point
 │   └── package.json
 ├── frontend/
@@ -323,7 +324,7 @@ Carbonly/
 └── README.md
 ```
 
-### Local Setup & Testing
+### Local Setup & Environment Configuration Steps
 ```bash
 # 1. Clone Repository
 git clone https://github.com/Dhruvg334/Carbonly.git
@@ -332,10 +333,13 @@ cd Carbonly/backend
 # 2. Install Dependencies
 npm install
 
-# 3. Start Gateway Server
+# 3. Create Environment Configuration File from Example
+cp .env.example .env
+
+# 4. Start Gateway Server
 npm start
 
-# 4. Run Automated Test Suite (40 Tests Across 8 Suites)
+# 5. Run Automated Test Suite (40 Tests Across 8 Suites)
 npm test
 ```
 
