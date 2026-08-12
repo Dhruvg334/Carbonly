@@ -455,7 +455,7 @@
                 showToast("Please log in to export formal ESG report", "error");
                 return;
             }
-            window.open("http://localhost:5000/api/carbon/export-report", "_blank");
+            window.open("${window.API_BASE_URL}/api/carbon/export-report", "_blank");
         }
 
         window.addEventListener("DOMContentLoaded", () => {
@@ -479,7 +479,7 @@
             };
 
             try {
-                const response = await fetch("http://localhost:5000/api/carbon/calculate", {
+                const response = await fetch("${window.API_BASE_URL}/api/carbon/calculate", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -664,7 +664,7 @@
         async function runOptimizationSolver() {
             const budget = Number(document.getElementById("optBudgetInput").value || 500);
             try {
-                const res = await fetch("http://localhost:5000/api/carbon/optimize", {
+                const res = await fetch("${window.API_BASE_URL}/api/carbon/optimize", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -703,7 +703,7 @@
             };
 
             try {
-                const response = await fetch("http://localhost:5000/api/carbon/simulate", {
+                const response = await fetch("${window.API_BASE_URL}/api/carbon/simulate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -754,7 +754,7 @@
 
             try {
                 const token = getToken();
-                const res = await fetch("http://localhost:5000/api/carbon/ai-copilot", {
+                const res = await fetch("${window.API_BASE_URL}/api/carbon/ai-copilot", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

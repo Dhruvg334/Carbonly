@@ -1,7 +1,11 @@
 /**
  * Centralized Client Script & Dynamic Navbar Auth State Controller
- * Enforces unified navbar states across all pages.
+ * Enforces dynamic API base URL and unified navbar states across all pages.
  */
+
+window.API_BASE_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000"
+    : "https://carbonly-qpet.onrender.com";
 
 function syncNavbarAuth() {
     const token = localStorage.getItem("token");
