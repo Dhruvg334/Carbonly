@@ -1,62 +1,122 @@
 /**
- * SHAP (SHapley Additive exPlanations) Global Feature Importance Explainer Service
- * Calculates exact SHAP feature contributions for relative EcoScore percentile ranking across operational vectors.
+ * Authentic KernelSHAP (SHapley Additive exPlanations) Explainer Service
+ * Formulates predictive surrogate model f(x), feature coalition subsets S ⊆ M, background distributions E[x],
+ * and exact Shapley marginal value contributions phi_i(f, x) satisfying the Efficiency Axiom: sum(phi_i) = f(x) - E[f(x)].
  */
 
-function explainEcoScoreShap(currentEmissions = {}) {
-    const breakdown = currentEmissions.breakdown || { transportKg: 34.56, electricityKg: 134.75, flightsKg: 36.49, waterKg: 0.85, digitalKg: 15.2 };
-    
-    // Population baseline expected values (E[f(x)])
-    const baselineMeans = {
-        transportKg: 40.0,
-        electricityKg: 110.0,
-        flightsKg: 50.0,
-        waterKg: 2.0,
-        digitalKg: 20.0
-    };
+const { calculateEmissions } = require("./carbonEngine");
+const { calculateEcoScore } = require("./ecoScoreService");
 
-    const expectedEcoScoreBase = 750; // Expected baseline population score
-
-    // Marginal EcoScore SHAP contribution per feature: phi_i = (E[X_i] - X_i) * sensitivity_i
-    const sensitivities = {
-        transportKg: -1.8,
-        electricityKg: -2.2,
-        flightsKg: -2.5,
-        waterKg: -5.0,
-        digitalKg: -3.0
-    };
-
-    const featureContributions = [];
-    let cumulativeShap = 0;
-
-    Object.keys(baselineMeans).forEach(feature => {
-        const actual = Number(breakdown[feature] || 0);
-        const expected = baselineMeans[feature];
-        const diff = actual - expected; // positive means higher emissions than average (negative score impact)
-        const shapValue = Number((diff * sensitivities[feature]).toFixed(2));
-        cumulativeShap += shapValue;
-
-        featureContributions.push({
-            feature,
-            actualValueKg: actual,
-            expectedValueKg: expected,
-            shapValue,
-            impact: shapValue >= 0 ? "POSITIVE_PERCENTILE_BOOST" : "NEGATIVE_PERCENTILE_PENALTY"
-        });
+/**
+ * Predictive Model f(x) mapping 5 operational features -> EcoScore rating (0 - 1000 pts)
+ */
+function predictEcoScore(xVector) {
+    const emissions = calculateEmissions({
+        transportKm: xVector[0],
+        vehicleType: "gasoline",
+        electricityKwh: xVector[1],
+        region: "US",
+        flightsTaken: xVector[2],
+        flightType: "short",
+        waterLiters: xVector[3],
+        screenHours: 160,
+        internetGb: xVector[4]
     });
+    const ecoScore = calculateEcoScore(emissions.totalKg);
+    return ecoScore.scorePoints;
+}
 
-    featureContributions.sort((a, b) => Math.abs(b.shapValue) - Math.abs(a.shapValue));
+/**
+ * Executes exact KernelSHAP feature attribution over non-linear model f(x)
+ */
+function explainEcoScoreShap(currentPayload = {}) {
+    const features = ["transportKm", "electricityKwh", "flightsTaken", "waterLiters", "internetGb"];
+    const M = features.length; // 5 features -> 2^5 = 32 coalitions
 
-    const finalExploredScore = Math.min(1000, Math.max(0, Math.round(expectedEcoScoreBase + cumulativeShap)));
+    // Actual observation vector x
+    const x = [
+        Number(currentPayload.transportKm || 180),
+        Number(currentPayload.electricityKwh || 350),
+        Number(currentPayload.flightsTaken || 1),
+        Number(currentPayload.waterLiters || 1200),
+        Number(currentPayload.internetGb || 450)
+    ];
+
+    // Background reference expected baseline E[x]
+    const E_x = [100, 200, 0, 500, 100];
+
+    // Model outputs: f(x) and E[f(x)]
+    const f_x = predictEcoScore(x);
+    const E_f_x = predictEcoScore(E_x);
+
+    // Value Function v(S) = f(x_S) where x_S[i] = x[i] if i in S else E_x[i]
+    function valueFunction(coalitionIndices) {
+        const x_S = E_x.slice();
+        coalitionIndices.forEach(idx => {
+            x_S[idx] = x[idx];
+        });
+        return predictEcoScore(x_S);
+    }
+
+    function factorial(n) {
+        return n <= 1 ? 1 : n * factorial(n - 1);
+    }
+
+    // Compute exact SHAP values phi_i for each feature i
+    const shapValues = [];
+
+    for (let i = 0; i < M; i++) {
+        const otherIndices = [];
+        for (let j = 0; j < M; j++) {
+            if (j !== i) otherIndices.push(j);
+        }
+
+        let phi_i = 0;
+        const numSubsets = 1 << otherIndices.length; // 2^4 = 16 subsets
+
+        for (let mask = 0; mask < numSubsets; mask++) {
+            const S = [];
+            for (let k = 0; k < otherIndices.length; k++) {
+                if (mask & (1 << k)) {
+                    S.push(otherIndices[k]);
+                }
+            }
+
+            const sSize = S.length;
+            const weight = (factorial(sSize) * factorial(M - sSize - 1)) / factorial(M);
+
+            const S_with_i = [...S, i];
+            const marginalContribution = valueFunction(S_with_i) - valueFunction(S);
+
+            phi_i += weight * marginalContribution;
+        }
+
+        shapValues.push({
+            feature: features[i],
+            actualValue: x[i],
+            backgroundExpectedValue: E_x[i],
+            shapValue: Number(phi_i.toFixed(2))
+        });
+    }
+
+    // Efficiency Axiom Verification: sum(phi_i) === f(x) - E[f(x)]
+    const totalShapSum = shapleySum = shapValues.reduce((sum, item) => sum + item.shapValue, 0);
+    const targetDelta = f_x - E_f_x;
+    const efficiencyResidual = Math.abs(targetDelta - totalShapSum);
+
+    shapValues.sort((a, b) => Math.abs(b.shapValue) - Math.abs(a.shapValue));
 
     return {
-        explainerType: "SHAP (SHapley Additive exPlanations) Global EcoScore Explainer",
-        baseExpectedEcoScore: expectedEcoScoreBase,
-        finalExplainedEcoScore: finalExploredScore,
-        globalFeatureImportance: featureContributions
+        explainerType: "KernelSHAP (SHapley Additive exPlanations) Predictive Surrogate Explainer",
+        predictiveModel: "f(x) = EcoScore(x)",
+        modelOutput_fx: f_x,
+        expectedBaseOutput_E_fx: E_f_x,
+        shapEfficiencyAxiomVerified: efficiencyResidual < 1.0,
+        shapValues
     };
 }
 
 module.exports = {
-    explainEcoScoreShap
+    explainEcoScoreShap,
+    predictEcoScore
 };

@@ -10,20 +10,20 @@
 </p>
 
 <p align="center">
-  An enterprise-grade ESG accounting platform providing deterministic GHG Protocol calculations across Scope 1, Scope 2, and Scope 3, versioned emission factor registries, calculation provenance lineage, uncertainty propagation, time-series model selection competition (Holt-Winters vs ARIMA(1,1,1) vs Seasonal Naive), multi-variate Mahalanobis distance anomaly detection, 10,000-iteration Monte Carlo uncertainty simulation, SHAP feature explainer, Primal Simplex linear programming optimization, Shapley value attribution, and evidence-grounded AI decision intelligence.
+  An enterprise-grade ESG accounting platform providing deterministic GHG Protocol calculations across Scope 1, Scope 2, and Scope 3, versioned emission factor registries, calculation provenance lineage, uncertainty propagation, time-series model selection competition (Holt-Winters vs ARIMA(1,1,1) with CSS MA(1) estimation vs Seasonal Naive), multi-variate Mahalanobis distance anomaly detection via 5x5 Gauss-Jordan matrix inversion, 10,000-iteration Monte Carlo uncertainty simulation with true Log-Normal sampling, KernelSHAP surrogate model feature explainer, Primal Simplex linear programming optimization, Shapley value attribution with facility load synergy scaling, and evidence-grounded AI decision intelligence.
 </p>
 
 ---
 
 ## 1. Executive Summary & Core Architectural Philosophy
 
-Carbonly is an auditable carbon data and decarbonization decision platform: it converts corporate activity data into traceable GHG inventories, quantifies data confidence and uncertainty, identifies operational emission drivers via Shapley value game theory, forecasts future trajectories via Holt-Winters exponential smoothing and ARIMA(1,1,1), detects multi-dimensional correlation anomalies via Mahalanobis distance, quantifies risk via 10,000-iteration Monte Carlo simulation, and optimizes decarbonization investments via Primal Simplex linear programming—with AI providing a grounded decision interface over verified evidence.
+Carbonly is an auditable carbon data and decarbonization decision platform: it converts corporate activity data into traceable GHG inventories, quantifies data confidence and uncertainty, identifies operational emission drivers via Shapley value game theory, forecasts future trajectories via Holt-Winters exponential smoothing and ARIMA(1,1,1), detects multi-dimensional correlation anomalies via Mahalanobis distance matrix inversion, quantifies risk via 10,000-iteration Monte Carlo simulation, and optimizes decarbonization investments via Primal Simplex linear programming—with AI providing a grounded decision interface over verified evidence.
 
 ### Enterprise Data Science, ML & Data Engineering Capabilities:
-- **Time-Series Model Competition Framework**: Cross-validates Holt-Winters, ARIMA(1,1,1), and Seasonal Naive models on held-out test data (`/api/carbon/model-competition`) to select the winning model with minimum out-of-sample sMAPE.
-- **Multi-Variate Mahalanobis Distance Anomaly Engine**: Detects joint correlation anomalies (`/api/carbon/multivariate-anomaly`) using $D_M = \sqrt{(x-\mu)^T \Sigma^{-1} (x-\mu)}$ across 5 operational dimensions.
-- **10,000-Iteration Monte Carlo Uncertainty Quantification**: Executes stochastic simulation (`/api/carbon/monte-carlo-uncertainty`) sampling Gaussian/Log-Normal input and factor uncertainties to derive $P_{10}$, $P_{50}$, and $P_{90}$ non-parametric quantiles.
-- **SHAP (SHapley Additive exPlanations) Global Feature Explainer**: Calculates exact SHAP feature contributions (`/api/carbon/shap-explanation`) for relative EcoScore percentile rankings.
+- **Time-Series Model Competition & CSS Parameter Estimation**: Cross-validates Holt-Winters, ARIMA(1,1,1) (with Conditional Sum of Squares $\theta_1$ parameter estimation), and Seasonal Naive models on held-out test data (`/api/carbon/model-competition`) to select the winning model with minimum out-of-sample sMAPE.
+- **Multi-Variate Mahalanobis Distance Matrix Inversion Engine**: Executes $5 \times 5$ Gauss-Jordan matrix inversion $\Sigma^{-1}$ (`/api/carbon/multivariate-anomaly`) to compute the full quadratic form $D_M = \sqrt{(x-\mu)^T \Sigma^{-1} (x-\mu)}$ capturing joint off-diagonal correlations.
+- **10,000-Iteration Monte Carlo Uncertainty Quantification**: Executes independent Box-Muller Gaussian and true Log-Normal stochastic draws $X = \exp(\mu_{\ln} + \sigma_{\ln} Z)$ (`/api/carbon/monte-carlo-uncertainty`) deriving non-parametric $80\%$ $[P_{10}, P_{90}]$ and $95\%$ $[P_{2.5}, P_{97.5}]$ Central Predictive Intervals.
+- **KernelSHAP Surrogate Model Explainer**: Formulates predictive surrogate model $f(x) = \text{EcoScore}(x)$, evaluates coalition subsets $S \subseteq M$ against background expectation $E[x]$, and computes exact Shapley marginal contributions (`/api/carbon/shap-explanation`) satisfying the Efficiency Axiom ($\sum \phi_i = f(x) - E[f(x)]$).
 - **High-Throughput Batch Ingestion & Idempotency Pipeline**: Bulk stream ingestion via NDJSON/CSV APIs (`/api/carbon/batch-ingest`) with strict idempotency key deduplication (`idempotencyKey`).
 - **Decoupled Arithmetic from Probabilistic LLMs**: All carbon arithmetic is executed by a 100% deterministic mathematical engine. The Groq LLM operates strictly as an evidence-grounded reasoning proxy over verified calculation proofs.
 
@@ -42,9 +42,9 @@ graph TD
     J --> K[Time-Series Model Competition: HW vs ARIMA vs Naive]
     J --> L[Primal Simplex Linear Solver]
     J --> M[Shapley Value Anomaly Attribution]
-    J --> R[Multi-Variate Mahalanobis Distance Anomaly Engine]
+    J --> R[Multi-Variate Mahalanobis Distance Matrix Inversion Engine]
     J --> S[10,000-Iteration Monte Carlo Simulator]
-    J --> T[SHAP Global Feature Explainer]
+    J --> T[KernelSHAP Surrogate Model Explainer]
     
     K --> N[Evidence-Grounded AI Reasoning Proxy - Groq LLM]
     L --> N
@@ -66,7 +66,7 @@ graph TD
 ### A. Time-Series Model Competition & Cross-Validation (`modelSelectionEngine.js`)
 Competes 3 distinct time-series candidate models across held-out test data:
 1. **Holt-Winters Additive Triple Exponential Smoothing** ($\alpha, \beta, \gamma$ grid-tuned).
-2. **ARIMA(1,1,1) Auto-Regressive Moving Average Model** ($y_t = c + \phi_1 y_{t-1} + \theta_1 e_{t-1} + e_t$).
+2. **ARIMA(1,1,1) Auto-Regressive Moving Average Model** ($y_t = c + \phi_1 y_{t-1} + \theta_1 e_{t-1} + e_t$) with Conditional Sum of Squares (CSS) $\theta_1$ parameter optimization.
 3. **Seasonal Naive Benchmark Model** ($y_{N+h} = y_{N+h-m}$).
 
 ```json
@@ -78,7 +78,7 @@ Competes 3 distinct time-series candidate models across held-out test data:
   "holdoutTestMonths": 8,
   "allCandidates": [
     { "modelName": "Holt-Winters Triple Exponential Smoothing", "outOfSampleSmapePct": 3.12 },
-    { "modelName": "ARIMA(1,1,1) Auto-Regressive Moving Average", "outOfSampleSmapePct": 4.85 },
+    { "modelName": "ARIMA(1,1,1) Auto-Regressive Moving Average", "outOfSampleSmapePct": 4.85, "estimatedParams": { "phi1": 0.35, "theta1": -0.22 } },
     { "modelName": "Seasonal Naive Benchmark", "outOfSampleSmapePct": 7.40 }
   ]
 }
@@ -86,27 +86,28 @@ Competes 3 distinct time-series candidate models across held-out test data:
 
 ---
 
-### B. Multi-Variate Mahalanobis Distance Anomaly Engine (`multivariateAnomaly.js`)
-Detects joint multi-dimensional correlation anomalies across 5 activity vectors:
+### B. Multi-Variate Mahalanobis Distance Matrix Inversion Engine (`multivariateAnomaly.js`)
+Inverts the sample covariance matrix $\Sigma^{-1}$ via $5 \times 5$ Gauss-Jordan matrix elimination to compute the full quadratic form capturing off-diagonal joint correlations:
 
 $$D_M(x) = \sqrt{(x - \mu)^T \Sigma^{-1} (x - \mu)}$$
 
-Flags anomalies exceeding the Chi-Square critical threshold ($\chi^2_{5, 0.95} = 11.07$).
+Flags joint anomalies exceeding the Chi-Square critical threshold ($\chi^2_{5, 0.95} = 11.07$).
 
 ---
 
 ### C. 10,000-Iteration Monte Carlo Uncertainty Quantification (`uncertaintyQuantification.js`)
-Executes $N=10,000$ stochastic Box-Muller Gaussian draws over input activity metrics and DEFRA/EPA factor uncertainties to generate non-parametric confidence quantiles:
-- **$P_{10}$ (Optimistic Low Bound)**
-- **$P_{50}$ (Median Expected)**
-- **$P_{90}$ (Conservative High Bound)**
+Executes $N=10,000$ independent Box-Muller Gaussian and true Log-Normal stochastic draws $X = \exp(\mu_{\ln} + \sigma_{\ln} Z)$ over input activity metrics and DEFRA/EPA factor uncertainties to generate non-parametric confidence intervals:
+- **80% Central Predictive Uncertainty Interval**: $[P_{10}, P_{90}]$
+- **95% Central Predictive Uncertainty Interval**: $[P_{2.5}, P_{97.5}]$
 
 ---
 
-### D. SHAP Global Feature Importance Explainer (`shapExplainerService.js`)
-Calculates exact SHAP marginal contributions relative to expected population baselines:
+### D. KernelSHAP Surrogate Model Explainer (`shapExplainerService.js`)
+Formulates predictive surrogate model $f(x) = \text{EcoScore}(x)$, evaluates coalition subsets $S \subseteq M$ against background expectation $E[x]$, and calculates exact Shapley marginal feature contributions:
 
-$$\phi_i = (E[X_i] - X_i) \cdot \text{sensitivity}_i$$
+$$\phi_i(f, x) = \sum_{S \subseteq M \setminus \{i\}} \frac{|S|!(|M|-|S|-1)!}{|M|!} \left[ f(x_{S \cup \{i\}}) - f(x_S) \right]$$
+
+Satisfies the **Efficiency Axiom** ($\sum \phi_i = f(x) - E[f(x)]$).
 
 ---
 
@@ -123,8 +124,8 @@ Constructs a standard 5-row Simplex Tableau matrix and executes Gauss-Jordan piv
 
 | Validation Metric | Benchmark Value | Technical Description |
 |---|---|---|
-| **Reference Test Vectors** | 39 Automated Unit & Benchmark Tests | Verified across 8 dedicated test suites |
-| **Passed Test Cases** | 39 / 39 (100% Pass Rate) | Native Node.js test runner execution |
+| **Reference Test Vectors** | 40 Automated Unit & Benchmark Tests | Verified across 8 dedicated test suites |
+| **Passed Test Cases** | 40 / 40 (100% Pass Rate) | Native Node.js test runner execution |
 | **Max Absolute Error** | $0.0000 \text{ kg CO}_2e$ | Zero arithmetic deviation from reference standards |
 | **Mean Absolute Error (MAE)** | $0.0000 \text{ kg CO}_2e$ | Exact floating-point calculation match |
 | **Tolerance Boundary** | $\pm 10^{-6} \text{ kg CO}_2e$ | Strict numerical floating-point boundary |
@@ -135,6 +136,9 @@ Constructs a standard 5-row Simplex Tableau matrix and executes Gauss-Jordan piv
 
 ```text
 Carbonly/
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # GitHub Actions CI matrix runner (Node 18, 20, 22, 24)
 ├── backend/
 │   ├── data/
 │   │   ├── defra_2024_factors.json  # Raw UK DEFRA 2024 conversion table reference
@@ -150,10 +154,10 @@ Carbonly/
 │   │   ├── ingestionPipeline.js # High-throughput batch ingestion & idempotency pipeline
 │   │   ├── dataQualityEngine.js # Data quality assertions & schema drift monitoring
 │   │   ├── lineageDagService.js # Data lineage Directed Acyclic Graph (DAG) generator
-│   │   ├── modelSelectionEngine.js # Time-series model competition (HW vs ARIMA vs Naive)
-│   │   ├── multivariateAnomaly.js # Mahalanobis distance multi-variate anomaly engine
-│   │   ├── uncertaintyQuantification.js # 10,000-iteration Monte Carlo simulator
-│   │   ├── shapExplainerService.js # SHAP global feature importance explainer
+│   │   ├── modelSelectionEngine.js # Time-series model competition with CSS ARIMA theta estimation
+│   │   ├── multivariateAnomaly.js # Mahalanobis distance 5x5 Gauss-Jordan matrix inversion
+│   │   ├── uncertaintyQuantification.js # 10,000-iteration Log-Normal Monte Carlo simulator
+│   │   ├── shapExplainerService.js # KernelSHAP surrogate model feature explainer
 │   │   ├── auditTrail.js      # User data mutation log store (userId, orgId, action)
 │   │   ├── baselineManager.js # 2030 Net-Zero target gap & trajectory manager
 │   │   ├── ingestionValidator.js # Input guardrails, schema validation, & unit conversion
@@ -165,7 +169,7 @@ Carbonly/
 │   │   └── groqService.js     # Groq LLM API proxy with evidence store grounding
 │   ├── middleware/
 │   │   └── auth.js            # Multi-tenant JWT authorization boundary middleware
-│   ├── tests/                 # 39 native unit tests across 8 test suites
+│   ├── tests/                 # 40 native unit tests across 8 test suites
 │   ├── server.js              # Express gateway entry point
 │   └── package.json
 ├── frontend/
@@ -197,7 +201,7 @@ npm install
 # 3. Start Gateway Server
 npm start
 
-# 4. Run Automated Test Suite (39 Tests Across 8 Suites)
+# 4. Run Automated Test Suite (40 Tests Across 8 Suites)
 npm test
 ```
 
